@@ -1,0 +1,4 @@
+numpy
+dashscope
+pyaudio
+pyaudiowpatch

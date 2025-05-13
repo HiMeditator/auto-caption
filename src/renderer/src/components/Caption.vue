@@ -9,7 +9,8 @@
       fontFamily: captionFontFamily
     }"
   >
-    {{ captionContent }}
+    <div>{{ captionContent }}</div>
+    <div>{{ translation }}</div>
   </div>
 </template>
 
@@ -18,6 +19,7 @@ import { ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useCaptionStore } from '../stores/caption'
 const captionContent = ref<String>("これは確か、ずっと前に人からもらって。")
+const translation = ref<string>('这是很久以前从别人那里得到的。')
 const {captionFontColor, captionFontFamily, captionFontSize} = storeToRefs(useCaptionStore())
 const captionTarget = ref()
 
