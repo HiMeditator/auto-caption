@@ -23,13 +23,15 @@
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.1",
     "@electron-toolkit/utils": "^4.0.0",
-    "pinia": "^3.0.2"
+    "pinia": "^3.0.2",
+    "ws": "^8.18.2"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config-prettier": "3.0.0",
     "@electron-toolkit/eslint-config-ts": "^3.0.0",
     "@electron-toolkit/tsconfig": "^1.0.1",
     "@types/node": "^22.14.1",
+    "@types/ws": "^8.18.1",
     "@vitejs/plugin-vue": "^5.2.3",
     "electron": "^35.1.5",
     "electron-builder": "^25.1.8",

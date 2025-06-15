@@ -3,6 +3,16 @@ import path from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 
+import { PythonConnector } from './pyComm';
+
+const pythonConnector = new PythonConnector();
+setTimeout(() => {
+  pythonConnector.send({
+    command: 'process_data',
+    payload: { some: 'data' }
+  });
+}, 2000);
+
 let mainWindow: BrowserWindow | undefined
 
 function createMainWindow(): void {
@@ -32,7 +42,7 @@ function createMainWindow(): void {
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
   } else {
-    mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'))
+    mainWindow.loadFile(path.join(__dirname, '../renderer/main/index.html'))
   }
 }
 

@@ -1,8 +1,9 @@
-from dashscope.audio.asr import \
-    TranslationRecognizerCallback, \
-    TranscriptionResult, \
-    TranslationResult, \
-    TranslationRecognizerRealtime
+from dashscope.audio.asr import (
+    TranslationRecognizerCallback,
+    TranscriptionResult,
+    TranslationResult,
+    TranslationRecognizerRealtime    
+)
 
 class Callback(TranslationRecognizerCallback):
     """
@@ -53,15 +54,15 @@ class Callback(TranslationRecognizerCallback):
         if usage: self.usage += usage['duration']
 
 
-def getGummpyTranslator(rate) -> TranslationRecognizerRealtime:
-    translator = TranslationRecognizerRealtime(
+class GummyTranslator:
+    def __init__(self, rate, source, target):
+        self.translator = TranslationRecognizerRealtime(
         model = "gummy-realtime-v1",
         format = "pcm",
         sample_rate = rate,
         transcription_enabled = True,
         translation_enabled = True,
-        source_language = "ja",
-        translation_target_languages = ["zh"],
+        source_language = source,
+        translation_target_languages = [target],
         callback = Callback()
     )
-    return translator
