@@ -2,7 +2,8 @@
   <div style="height: 20px;"></div>
   <a-card size="small" title="字幕控制">
     <template #extra>
-      <a @click="applyControl">应用</a>
+      <a @click="applyChange">更改设置</a> |
+      <a @click="cancelChange">取消更改</a>
     </template>
     <div class="control-item">
       <span class="control-label">源语言</span>
@@ -71,12 +72,20 @@ const langList = computed(() => {
   return []
 })
 
-function applyControl(){
+function applyChange(){
   captionControl.sourceLang = currentSourceLang.value
   captionControl.targetLang = currentTargetLang.value
   captionControl.engine = currentEngine.value
   captionControl.port = currentPort.value
   captionControl.translation = currentTranslation.value
+}
+
+function cancelChange(){
+  currentSourceLang.value = captionControl.sourceLang
+  currentTargetLang.value = captionControl.targetLang
+  currentEngine.value = captionControl.engine
+  currentPort.value = captionControl.port
+  currentTranslation.value = captionControl.translation
 }
 </script>
 

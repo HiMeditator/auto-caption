@@ -25,6 +25,7 @@
     "@electron-toolkit/utils": "^4.0.0",
     "ant-design-vue": "^4.2.6",
     "pinia": "^3.0.2",
+    "vue-router": "^4.5.1",
     "ws": "^8.18.2"
   },
   "devDependencies": {
