@@ -23,6 +23,7 @@
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.1",
     "@electron-toolkit/utils": "^4.0.0",
+    "ant-design-vue": "^4.2.6",
     "pinia": "^3.0.2",
     "ws": "^8.18.2"
   },
