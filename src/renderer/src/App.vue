@@ -3,9 +3,8 @@
   <a-row>
     <a-col :span="controlSpan">
       <div class="caption-control">
-        <a-card size="small" title="页面设置">
+        <a-card size="small" title="页面宽度">
         <div>
-          <span class="span-label">页面宽度</span>
           <a-input
             type="range" class="span-input"
             min="6" max="18"
@@ -18,7 +17,9 @@
       </div>
     </a-col>
     <a-col :span="24 - controlSpan">
-      <CaptionData />
+      <div class="caption-data">
+        <CaptionData />
+      </div>
     </a-col>
   </a-row>
 </div>
@@ -30,8 +31,7 @@ import CaptionStyle from './components/CaptionStyle.vue'
 import CaptionControl from './components/CaptionControl.vue';
 import CaptionData from './components/CaptionData.vue'
 import { ref } from 'vue'
-
-const controlSpan = ref(9)
+const controlSpan = ref(8)
 </script>
 
 <style scoped>
@@ -43,11 +43,11 @@ const controlSpan = ref(9)
   scrollbar-width: thin;
 }
 
-.span-label {
-  display: inline-block;
-  width: 80px;
-  text-align: right;
-  margin-right: 10px;
+.caption-data {
+  height: 100vh;
+  padding: 20px;
+  overflow-y: auto;
+  scrollbar-width: thin;
 }
 
 .span-input {

@@ -1,14 +1,16 @@
 <template>
   <div style="height: 20px;"></div>
   <a-card size="small" title="字幕控制">
-    <template #extra><a href="#">应用</a></template>
+    <template #extra>
+      <a @click="applyControl">应用</a>
+    </template>
     <div class="control-item">
       <span class="control-label">源语言</span>
       <a-select
         class="control-input"
         ref="select"
-        v-model:value="sourceLang"
-        :options="languages"
+        v-model:value="currentSourceLang"
+        :options="langList"
       ></a-select>
     </div>
     <div class="control-item">
@@ -16,8 +18,8 @@
       <a-select
         class="control-input"
         ref="select"
-        v-model:value="targetLang"
-        :options="languages"
+        v-model:value="currentTargetLang"
+        :options="langList.filter((item) => item.value !== 'auto')"
       ></a-select>
     </div>
     <div class="control-item">
@@ -25,35 +27,57 @@
       <a-select
         class="control-input"
         ref="select"
-        v-model:value="engine"
+        v-model:value="currentEngine"
         :options="captionEngine"
       ></a-select>
     </div>
     <div class="control-item">
+      <span class="control-label">端口号</span>
+      <a-input
+        class="control-input"
+        ref="select"
+        type="number"
+        v-model:value="currentPort"
+      ></a-input>
+    </div>
+    <div class="control-item">
       <span class="control-label">启用翻译</span>
-      <a-switch v-model:checked="translation" />
+      <a-switch v-model:checked="currentTranslation" />
     </div>
   </a-card>
   <div style="height: 20px;"></div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useCaptionControlStore } from '@renderer/stores/captionControl'
 
-const languages = ref([
-  { value: 'en', label: '英语' },
-  { value: 'zh', label: '简体中文' },
-  { value: 'ja', label: '日语' },
-])
-const captionEngine = ref([
-  {value: 'gummy', label: '云端-阿里云-Gummy'}
-])
+const captionControl = useCaptionControlStore()
+const { captionEngine } = storeToRefs(captionControl)
 
+const currentSourceLang = ref('auto')
+const currentTargetLang = ref('zh')
+const currentEngine = ref('gummy')
+const currentPort = ref(8765)
+const currentTranslation = ref<boolean>(false)
 
-const sourceLang = ref('en')
-const targetLang = ref('zh')
-const engine = ref('gummy')
-const translation = ref<boolean>(true)
+const langList = computed(() => {
+  for(let item of captionEngine.value){
+    if(item.value === currentEngine.value) {
+      return item.languages
+    }
+  }
+  return []
+})
+
+function applyControl(){
+  captionControl.sourceLang = currentSourceLang.value
+  captionControl.targetLang = currentTargetLang.value
+  captionControl.engine = currentEngine.value
+  captionControl.port = currentPort.value
+  captionControl.translation = currentTranslation.value
+}
 </script>
 
 <style scoped>
@@ -65,7 +89,6 @@ const translation = ref<boolean>(true)
   display: inline-block;
   width: 80px;
   text-align: right;
-
   margin-right: 10px;
 }
 
