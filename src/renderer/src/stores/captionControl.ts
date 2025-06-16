@@ -30,6 +30,7 @@ export const useCaptionControlStore = defineStore('captionControl', () => {
   const engine = ref<string>('gummy')
   const port = ref<number>(8765)
   const translation = ref<boolean>(false)
+
   return {
     captionEngine,  // 字幕引擎
     sourceLang,     // 源语言

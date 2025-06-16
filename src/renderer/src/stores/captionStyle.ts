@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 
 export const useCaptionStyleStore = defineStore('captionStyle', () => {
@@ -11,6 +11,48 @@ export const useCaptionStyleStore = defineStore('captionStyle', () => {
   const transFontFamily = ref<string>('sans-serif')
   const transFontSize = ref<number>(24)
   const transFontColor = ref<string>('#000000')
+  const changeSignal = ref<boolean>(false)
+
+  function addOpicityToColor(color: string, opicity: number) {
+    const opicityValue = Math.round(opicity * 255 / 100);
+    const opicityHex = opicityValue.toString(16).padStart(2, '0');
+    return `${color}${opicityHex}`;
+  }
+
+  const backgroundRGBA = computed(() => {
+    return addOpicityToColor(background.value, opacity.value)
+  })
+
+  function sendStyleChange() {
+    const styles = {
+      fontFamily: fontFamily.value,
+      fontSize: fontSize.value,
+      fontColor: fontColor.value,
+      background: background.value,
+      opacity: opacity.value,
+      transDisplay: transDisplay.value,
+      transFontFamily: transFontFamily.value,
+      transFontSize: transFontSize.value,
+      transFontColor: transFontColor.value
+    }
+    window.electron.ipcRenderer.send('control.style.change', styles)
+    console.log('SEND control.style.change', styles)
+  }
+
+  window.electron.ipcRenderer.on('caption.style.set', async (_, args) => {
+    fontFamily.value = args.fontFamily
+    fontSize.value = args.fontSize
+    fontColor.value = args.fontColor
+    background.value = args.background
+    opacity.value = args.opacity
+    transDisplay.value = args.transDisplay
+    transFontFamily.value = args.transFontFamily
+    transFontSize.value = args.transFontSize
+    transFontColor.value = args.transFontColor
+    changeSignal.value = true
+    console.log('GET caption.style.set', args)
+  })
+
   return {
     fontFamily,         // 字体族
     fontSize,           // 字体大小
@@ -20,6 +62,9 @@ export const useCaptionStyleStore = defineStore('captionStyle', () => {
     transDisplay,       // 是否显示翻译
     transFontFamily,    // 翻译字体族
     transFontSize,      // 翻译字体大小
-    transFontColor      // 翻译字体颜色
+    transFontColor,     // 翻译字体颜色
+    backgroundRGBA,     // 带透明度的背景颜色
+    sendStyleChange,    // 发送样式改变
+    changeSignal        // 样式改变信号
   }
 })

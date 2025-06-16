@@ -1,5 +1,5 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
-import HomePage from '../views/HomePage.vue'
+import ControlPage from '../views/ControlPage.vue'
 import CaptionPage from '@renderer/views/CaptionPage.vue'
 
 const router = createRouter({
@@ -8,7 +8,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: HomePage
+      component: ControlPage
     },
     {
       path: '/caption',

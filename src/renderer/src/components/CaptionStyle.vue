@@ -123,9 +123,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useCaptionStyleStore } from '@renderer/stores/captionStyle'
+import { storeToRefs } from 'pinia'
+
 const captionStyle = useCaptionStyleStore()
+const { changeSignal } = storeToRefs(captionStyle)
 
 const currentFontFamily = ref<string>('sans-serif')
 const currentFontSize = ref<number>(24)
@@ -161,6 +164,8 @@ function applyStyle(){
   captionStyle.transFontFamily = currentTransFontFamily.value;
   captionStyle.transFontSize = currentTransFontSize.value;
   captionStyle.transFontColor = currentTransFontColor.value;
+
+  captionStyle.sendStyleChange();
 }
 
 function resetStyle(){
@@ -175,6 +180,13 @@ function resetStyle(){
   currentTransFontSize.value = captionStyle.transFontSize;
   currentTransFontColor.value = captionStyle.transFontColor;
 }
+
+watch(changeSignal, (val) => {
+  if(val == true) {
+    resetStyle();
+    captionStyle.changeSignal = false;
+  }
+})
 </script>
 
 <style scoped>
