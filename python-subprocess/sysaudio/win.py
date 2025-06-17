@@ -70,7 +70,7 @@ class LoopbackStream:
         self.FORMAT = pyaudio.paInt16
         self.CHANNELS = self.loopback["maxInputChannels"]
         self.RATE = int(self.loopback["defaultSampleRate"])
-        self.CHUNK = self.RATE // 10
+        self.CHUNK = self.RATE // 20
         self.INDEX = self.loopback["index"]
 
     def printInfo(self):
