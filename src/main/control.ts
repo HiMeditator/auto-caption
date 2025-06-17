@@ -2,7 +2,7 @@ import { shell, BrowserWindow, ipcMain } from 'electron'
 import path from 'path'
 import { is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import { setStyles, sendStyles } from './data'
+import { setStyles, sendStyles, sendCaptionLog } from './data'
 import { captionWindow } from './caption'
 
 class ControlWindow {
@@ -11,8 +11,10 @@ class ControlWindow {
   public createWindow(): void {
     this.window = new BrowserWindow({
       icon: icon,
-      width: 900,
-      height: 670,
+      width: 1200,
+      height: 800,
+      minWidth: 900,
+      minHeight: 600,
       show: false,
       center: true,
       autoHideMenuBar: true,
@@ -26,6 +28,7 @@ class ControlWindow {
     setTimeout(() => {
       if (this.window) {
         sendStyles(this.window);
+        sendCaptionLog(this.window);
       }
     }, 1000);
     
@@ -61,10 +64,13 @@ class ControlWindow {
       }
     })
     // 控制窗口请求创建字幕窗口
-    ipcMain.on('control.captionWindow.create', () => {
+    ipcMain.on('control.captionWindow.activate', () => {
       if(!captionWindow.window){
         captionWindow.createWindow()
-        console.log('GET control.captionWindow.create')
+        console.log('GET control.captionWindow.activate')
+      }
+      else {
+        captionWindow.window.show()
       }
     })
   }

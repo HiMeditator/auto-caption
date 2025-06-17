@@ -6,7 +6,7 @@ export const useCaptionStyleStore = defineStore('captionStyle', () => {
   const fontSize = ref<number>(24)
   const fontColor = ref<string>('#000000')
   const background = ref<string>('#dbe2ef')
-  const opacity = ref<number>(50)
+  const opacity = ref<number>(80)
   const transDisplay = ref<boolean>(true)
   const transFontFamily = ref<string>('sans-serif')
   const transFontSize = ref<number>(24)
@@ -39,7 +39,7 @@ export const useCaptionStyleStore = defineStore('captionStyle', () => {
     console.log('SEND control.style.change', styles)
   }
 
-  window.electron.ipcRenderer.on('caption.style.set', async (_, args) => {
+  window.electron.ipcRenderer.on('caption.style.set', (_, args) => {
     fontFamily.value = args.fontFamily
     fontSize.value = args.fontSize
     fontColor.value = args.fontColor

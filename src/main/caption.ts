@@ -3,7 +3,8 @@ import path from 'path'
 import { is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { controlWindow } from './control'
-import { sendStyles } from './data'
+import { sendStyles, sendCaptionLog } from './data'
+import { send } from 'vite'
 
 class CaptionWindow { 
   window: BrowserWindow | undefined;
@@ -30,6 +31,7 @@ class CaptionWindow {
     setTimeout(() => {
       if (this.window) {
         sendStyles(this.window);
+        sendCaptionLog(this.window);
       }
     }, 1000);
 
@@ -58,10 +60,13 @@ class CaptionWindow {
 
   public handleMessage() {
     // 字幕窗口请求创建控制窗口
-    ipcMain.on('caption.controlWindow.create', () => {
+    ipcMain.on('caption.controlWindow.activate', () => {
       if(!controlWindow.window){
         controlWindow.createWindow()
-        console.log('GET caption.controlWindow.create')
+        console.log('GET caption.controlWindow.activate')
+      }
+      else {
+        controlWindow.window.show()
       }
     })
     // 字幕窗口高度发生变化
@@ -69,6 +74,20 @@ class CaptionWindow {
       console.log('GET caption.window.height.change', height)
       if(this.window){
         this.window.setSize(this.window.getSize()[0], height) 
+      }
+    })
+    // 关闭字幕窗口
+    ipcMain.on('caption.window.close', () => {
+      console.log('GET caption.window.close')
+      if(this.window){
+        this.window.close()
+      }
+    })
+    // 是否固定在最前面
+    ipcMain.on('caption.pin.set', (_, pinned) => {
+      console.log('GET caption.pin.set', pinned)
+      if(this.window){
+        this.window.setAlwaysOnTop(pinned)
       }
     })
   }

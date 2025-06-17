@@ -91,7 +91,7 @@ const columns = [
 ]
 
 function openCaptionWindow() {
-  window.electron.ipcRenderer.send('control.captionWindow.create')
+  window.electron.ipcRenderer.send('control.captionWindow.activate')
 }
 
 </script>
