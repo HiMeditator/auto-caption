@@ -2,9 +2,9 @@ import { app, BrowserWindow } from 'electron'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import { controlWindow } from './control'
 import { captionWindow } from './caption'
-import { WebSocketConnector } from './wsConnector'
 
-const wsConnector = new WebSocketConnector()
+import { PythonProcess } from './pythonProcess'
+const pySubProcess = new PythonProcess()
 
 app.whenReady().then(() => {
   electronApp.setAppUserModelId('com.himeditator.autocaption')
@@ -18,7 +18,7 @@ app.whenReady().then(() => {
 
   controlWindow.createWindow()
 
-  wsConnector.connect()
+  pySubProcess.start()
 
   app.on('activate', function () {
     if (BrowserWindow.getAllWindows().length === 0){

@@ -5,6 +5,8 @@ from dashscope.audio.asr import (
     TranslationRecognizerRealtime    
 )
 from datetime import datetime
+import json
+import sys
 
 class Callback(TranslationRecognizerCallback):
     """
@@ -17,11 +19,10 @@ class Callback(TranslationRecognizerCallback):
         self.time_str = ''
     
     def on_open(self) -> None:
-        print("INFO gummy translation start...")
+        pass
 
     def on_close(self) -> None:
-        print(f"INFO tokens useage: {self.usage}")
-        print(f"INFO translation end...")
+        pass
 
     def on_event(
         self,
@@ -32,10 +33,10 @@ class Callback(TranslationRecognizerCallback):
     ) -> None:
         caption = {}
         if transcription_result is not None:
-            caption['id'] = transcription_result.sentence_id
+            caption['index'] = transcription_result.sentence_id
             caption['text'] = transcription_result.text
-            if caption['id'] != self.cur_id:
-                self.cur_id = caption['id']
+            if caption['index'] != self.cur_id:
+                self.cur_id = caption['index']
                 cur_time = datetime.now().strftime('%H:%M:%S')
                 caption['time_s'] = cur_time
                 self.time_str = cur_time
@@ -50,7 +51,20 @@ class Callback(TranslationRecognizerCallback):
         
         if usage:
             self.usage += usage['duration']
-        print(caption)
+
+        # print(caption)
+        self.send_to_node(caption)
+
+    def send_to_node(self, data):
+        """
+        将数据发送到 Node.js 进程
+        """
+        try:
+            json_data = json.dumps(data) + '\n'
+            sys.stdout.write(json_data)
+            sys.stdout.flush()
+        except Exception as e:
+            print(f"Error sending data to Node.js: {e}", file=sys.stderr)
 
 class GummyTranslator:
     def __init__(self, rate, source, target):
