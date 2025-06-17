@@ -12,9 +12,13 @@ class CaptionWindow {
     this.window = new BrowserWindow({
       icon: icon,
       width: 900,
-      height: 320,
+      height: 100,
+      minWidth: 480,
       show: false,
-      // center: true,
+      frame: false,
+      transparent: true,
+      alwaysOnTop: true,
+      center: true,
       autoHideMenuBar: true,
       ...(process.platform === 'linux' ? { icon } : {}),
       webPreferences: {
@@ -57,7 +61,14 @@ class CaptionWindow {
     ipcMain.on('caption.controlWindow.create', () => {
       if(!controlWindow.window){
         controlWindow.createWindow()
-        console.log('caption.controlWindow.create')
+        console.log('GET caption.controlWindow.create')
+      }
+    })
+    // 字幕窗口高度发生变化
+    ipcMain.on('caption.windowHeight.change', (_, height) => {
+      console.log('GET caption.window.height.change', height)
+      if(this.window){
+        this.window.setSize(this.window.getSize()[0], height) 
       }
     })
   }
