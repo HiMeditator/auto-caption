@@ -14,7 +14,6 @@ export const useCaptionLogStore = defineStore('captionLog', () => {
 
   window.electron.ipcRenderer.on('both.log.set', (_, logs) => {
     captionData.value = logs
-    console.log('GET both.log.set', logs)
   })
 
   return {

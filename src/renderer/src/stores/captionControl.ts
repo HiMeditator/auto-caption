@@ -26,17 +26,36 @@ export const useCaptionControlStore = defineStore('captionControl', () => {
   ])
 
   const sourceLang = ref<string>('auto')
-  const targetLang = ref<string>('')
+  const targetLang = ref<string>('zh')
   const engine = ref<string>('gummy')
-  const port = ref<number>(8765)
   const translation = ref<boolean>(false)
+  const customized = ref<boolean>(false)
+  const customizedApp = ref<string>('')
+  const customizedCommand = ref<string>('')
+
+
+  function sendControlChange() {
+    const controls = {
+      sourceLang: sourceLang.value,
+      targetLang: targetLang.value,
+      engine: engine.value,
+      translation: translation.value,
+      customized: customized.value,
+      customizedApp: customizedApp.value,
+      customizedCommand: customizedCommand.value
+    }
+    window.electron.ipcRenderer.send('control.control.change', controls)
+  }
 
   return {
-    captionEngine,  // 字幕引擎
-    sourceLang,     // 源语言
-    targetLang,     // 目标语言
-    engine,         // 字幕引擎
-    port,           // 端口
-    translation     // 是否启用翻译
+    captionEngine,      // 字幕引擎
+    sourceLang,         // 源语言
+    targetLang,         // 目标语言
+    engine,             // 字幕引擎
+    translation,        // 是否启用翻译
+    customized,         // 是否使用自定义字幕引擎
+    customizedApp,      // 自定义字幕引擎的应用程序
+    customizedCommand,  // 自定义字幕引擎的命令
+    sendControlChange   // 发送最新控制消息到后端
   }
 })

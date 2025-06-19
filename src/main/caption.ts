@@ -3,8 +3,7 @@ import path from 'path'
 import { is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { controlWindow } from './control'
-import { sendStyles, sendCaptionLog } from './data'
-import { send } from 'vite'
+import { sendStyles, sendCaptionLog } from './utils/config'
 
 class CaptionWindow { 
   window: BrowserWindow | undefined;
@@ -40,7 +39,6 @@ class CaptionWindow {
     })
 
     this.window.on('closed', () => {
-      console.log('INFO caption window closed')
       this.window = undefined
     })
 
@@ -63,7 +61,6 @@ class CaptionWindow {
     ipcMain.on('caption.controlWindow.activate', () => {
       if(!controlWindow.window){
         controlWindow.createWindow()
-        console.log('GET caption.controlWindow.activate')
       }
       else {
         controlWindow.window.show()
@@ -71,21 +68,18 @@ class CaptionWindow {
     })
     // 字幕窗口高度发生变化
     ipcMain.on('caption.windowHeight.change', (_, height) => {
-      console.log('GET caption.window.height.change', height)
       if(this.window){
         this.window.setSize(this.window.getSize()[0], height) 
       }
     })
     // 关闭字幕窗口
     ipcMain.on('caption.window.close', () => {
-      console.log('GET caption.window.close')
       if(this.window){
         this.window.close()
       }
     })
     // 是否固定在最前面
     ipcMain.on('caption.pin.set', (_, pinned) => {
-      console.log('GET caption.pin.set', pinned)
       if(this.window){
         this.window.setAlwaysOnTop(pinned)
       }

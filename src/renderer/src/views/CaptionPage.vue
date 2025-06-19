@@ -58,7 +58,6 @@ onMounted(() => {
     for (const entry of entries) {
       if(windowHeight.value !== Math.floor(entry.contentRect.height) + 2) {
         windowHeight.value = Math.floor(entry.contentRect.height) + 2;
-        console.log('INFO window height change', windowHeight.value);
         window.electron.ipcRenderer.send('caption.windowHeight.change', windowHeight.value)
       }
     }

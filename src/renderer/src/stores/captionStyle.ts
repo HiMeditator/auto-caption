@@ -36,7 +36,6 @@ export const useCaptionStyleStore = defineStore('captionStyle', () => {
       transFontColor: transFontColor.value
     }
     window.electron.ipcRenderer.send('control.style.change', styles)
-    console.log('SEND control.style.change', styles)
   }
 
   window.electron.ipcRenderer.on('caption.style.set', (_, args) => {
@@ -50,7 +49,6 @@ export const useCaptionStyleStore = defineStore('captionStyle', () => {
     transFontSize.value = args.transFontSize
     transFontColor.value = args.transFontColor
     changeSignal.value = true
-    console.log('GET caption.style.set', args)
   })
 
   return {

@@ -2,8 +2,13 @@ import { shell, BrowserWindow, ipcMain } from 'electron'
 import path from 'path'
 import { is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import { setStyles, sendStyles, sendCaptionLog } from './data'
 import { captionWindow } from './caption'
+import {
+  setStyles,
+  sendStyles,
+  sendCaptionLog,
+  setControls
+} from './utils/config'
 
 class ControlWindow {
   window: BrowserWindow | undefined;
@@ -38,7 +43,6 @@ class ControlWindow {
     })
   
     this.window.on('closed', () => {
-      console.log('INFO control window closed')
       this.window = undefined
     })
   
@@ -57,7 +61,6 @@ class ControlWindow {
   public handleMessage() {
     // 控制窗口样式更新
     ipcMain.on('control.style.change', (_, args) => {
-      console.log('GET control.style.change', args)
       setStyles(args)
       if(captionWindow.window){
         sendStyles(captionWindow.window)
@@ -67,11 +70,14 @@ class ControlWindow {
     ipcMain.on('control.captionWindow.activate', () => {
       if(!captionWindow.window){
         captionWindow.createWindow()
-        console.log('GET control.captionWindow.activate')
       }
       else {
         captionWindow.window.show()
       }
+    })
+    // 字幕引擎控制配置更新
+    ipcMain.on('control.control.change', (_, args) => {
+      setControls(args)
     })
   }
 }
