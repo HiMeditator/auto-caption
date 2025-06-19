@@ -4,15 +4,18 @@ import { is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { captionWindow } from './caption'
 import {
+  captionEngine,
+  controls,
   setStyles,
   sendStyles,
   sendCaptionLog,
-  setControls
+  setControls,
+  sendControls
 } from './utils/config'
 
 class ControlWindow {
   window: BrowserWindow | undefined;
-  
+
   public createWindow(): void {
     this.window = new BrowserWindow({
       icon: icon,
@@ -32,8 +35,9 @@ class ControlWindow {
 
     setTimeout(() => {
       if (this.window) {
-        sendStyles(this.window);
-        sendCaptionLog(this.window);
+        sendStyles(this.window) // 配置初始样式
+        sendCaptionLog(this.window, 'set') // 配置当前字幕记录
+        sendControls(this.window) // 配置字幕引擎配置
       }
     }, 1000);
     
@@ -75,9 +79,24 @@ class ControlWindow {
         captionWindow.window.show()
       }
     })
-    // 字幕引擎控制配置更新
+    // 字幕引擎控制配置更新并启动引擎
     ipcMain.on('control.control.change', (_, args) => {
       setControls(args)
+    })
+    // 启动字幕引擎
+    ipcMain.on('control.engine.start', () => {
+      if(controls.engineEnabled){
+        this.window?.webContents.send('control.engine.already')
+      }
+      else {
+        captionEngine.start()
+        this.window?.webContents.send('control.engine.started')
+      }
+    })
+    // 停止字幕引擎
+    ipcMain.on('control.engine.stop', () => {
+      captionEngine.stop()
+      this.window?.webContents.send('control.engine.stopped')
     })
   }
 }

@@ -3,9 +3,6 @@ import { electronApp, optimizer } from '@electron-toolkit/utils'
 import { controlWindow } from './control'
 import { captionWindow } from './caption'
 
-import { PythonProcess } from './utils/pythonProcess'
-const pySubProcess = new PythonProcess()
-
 app.whenReady().then(() => {
   electronApp.setAppUserModelId('com.himeditator.autocaption')
 
@@ -17,8 +14,6 @@ app.whenReady().then(() => {
   captionWindow.handleMessage()
 
   controlWindow.createWindow()
-
-  // pySubProcess.start()
 
   app.on('activate', function () {
     if (BrowserWindow.getAllWindows().length === 0){

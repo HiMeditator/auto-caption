@@ -1,5 +1,8 @@
 import { Styles, CaptionItem, Controls } from '../types'
 import { BrowserWindow } from 'electron'
+import { CaptionEngine } from './engine'
+
+export const captionEngine = new CaptionEngine()
 
 export const styles: Styles = {
   fontFamily: 'sans-serif',
@@ -19,11 +22,14 @@ export const controls: Controls = {
   sourceLang: 'en',
   targetLang: 'zh',
   engine: 'gummy',
+  engineEnabled: false,
   translation: true,
   customized: false,
   customizedApp: '',
   customizedCommand: ''
 }
+
+export let engineRunning: boolean = false
 
 export function setStyles(args: any) {
   styles.fontFamily = args.fontFamily
@@ -40,23 +46,27 @@ export function setStyles(args: any) {
 
 export function sendStyles(window: BrowserWindow) {
   window.webContents.send('caption.style.set', styles)
-  console.log('[INFO] Send Styles:', styles)
+  console.log(`[INFO] Send Styles to #${window.id}:`, styles)
 }
 
-export function sendCaptionLog(window: BrowserWindow) {
-  window.webContents.send('both.log.set', captionLog)
+export function sendCaptionLog(window: BrowserWindow, command: string) {
+  if(command === 'add'){
+    window.webContents.send(`both.log.add`, captionLog[captionLog.length - 1])
+  }
+  else if(command === 'set'){
+    window.webContents.send(`both.log.${command}`, captionLog)
+  }
 }
 
 export function addCaptionLog(log: CaptionItem) {
   if(captionLog.length && captionLog[captionLog.length - 1].index === log.index) {
-    captionLog.splice(captionLog.length - 1, 1)
-    captionLog.push(log)
+    captionLog.splice(captionLog.length - 1, 1, log)
   }
   else {
     captionLog.push(log)
   }
   for(const window of BrowserWindow.getAllWindows()){
-    sendCaptionLog(window)
+    sendCaptionLog(window, 'add')
   }
 }
 
@@ -69,4 +79,9 @@ export function setControls(args: any) {
   controls.customizedApp = args.customizedApp
   controls.customizedCommand = args.customizedCommand
   console.log('[INFO] Set Controls:', controls)
+}
+
+export function sendControls(window: BrowserWindow) {
+  window.webContents.send('control.control.set', controls)
+  console.log(`[INFO] Send Controls to #${window.id}:`, controls)
 }

@@ -19,6 +19,7 @@ export interface CaptionItem {
 }
 
 export interface Controls {
+  engineEnabled: boolean,
   sourceLang: string,
   targetLang: string,
   engine: string,

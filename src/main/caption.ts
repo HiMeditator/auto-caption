@@ -30,7 +30,7 @@ class CaptionWindow {
     setTimeout(() => {
       if (this.window) {
         sendStyles(this.window);
-        sendCaptionLog(this.window);
+        sendCaptionLog(this.window, 'set');
       }
     }, 1000);
 

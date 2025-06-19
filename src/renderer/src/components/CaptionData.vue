@@ -2,10 +2,10 @@
   <div class="caption-stat">
     <a-row>
       <a-col :span="6">
-        <a-statistic title="字幕引擎" :value="'gummy'" />
+        <a-statistic title="字幕引擎" :value="engine" />
       </a-col>
       <a-col :span="6">
-        <a-statistic title="字幕引擎状态" :value="'未连接'" />
+        <a-statistic title="字幕引擎状态" :value="engineEnabled?'已启动':'未启动'" />
       </a-col>
       <a-col :span="6">
         <a-statistic title="已记录字幕" :value="captionData.length" />
@@ -14,9 +14,19 @@
   </div>
 
   <div class="caption-control">
-    <a-button type="primary" class="control-button" @click="openCaptionWindow">打开字幕窗口</a-button>
-    <a-button class="control-button">启动字幕引擎</a-button>
-    <a-button danger class="control-button">关闭字幕引擎</a-button>
+    <a-button
+      type="primary"
+      class="control-button"
+      @click="openCaptionWindow"
+    >打开字幕窗口</a-button>
+    <a-button
+      class="control-button"
+      @click="captionControl.startEngine"
+    >启动字幕引擎</a-button>
+    <a-button 
+     danger class="control-button"
+     @click="captionControl.stopEngine"
+    >关闭字幕引擎</a-button>
   </div>
 
   <div class="caption-list">
@@ -51,9 +61,11 @@
 import { ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useCaptionLogStore } from '@renderer/stores/captionLog'
+import { useCaptionControlStore } from '@renderer/stores/captionControl'
 const captionLog = useCaptionLogStore()
 const { captionData } = storeToRefs(captionLog)
-
+const captionControl = useCaptionControlStore()
+const { engineEnabled, engine } = storeToRefs(captionControl)
 const pagination = ref({
   current: 1,
   pageSize: 10,
@@ -93,7 +105,6 @@ const columns = [
 function openCaptionWindow() {
   window.electron.ipcRenderer.send('control.captionWindow.activate')
 }
-
 </script>
 
 <style scoped>

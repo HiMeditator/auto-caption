@@ -7,10 +7,12 @@ export const useCaptionStyleStore = defineStore('captionStyle', () => {
   const fontColor = ref<string>('#000000')
   const background = ref<string>('#dbe2ef')
   const opacity = ref<number>(80)
+  
   const transDisplay = ref<boolean>(true)
   const transFontFamily = ref<string>('sans-serif')
   const transFontSize = ref<number>(24)
   const transFontColor = ref<string>('#000000')
+
   const changeSignal = ref<boolean>(false)
 
   function addOpicityToColor(color: string, opicity: number) {

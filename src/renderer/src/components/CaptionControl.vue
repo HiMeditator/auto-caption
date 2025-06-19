@@ -59,12 +59,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useCaptionControlStore } from '@renderer/stores/captionControl'
 
 const captionControl = useCaptionControlStore()
-const { captionEngine } = storeToRefs(captionControl)
+const { captionEngine, changeSignal } = storeToRefs(captionControl)
 
 const currentSourceLang = ref('auto')
 const currentTargetLang = ref('zh')
@@ -107,6 +107,13 @@ function cancelChange(){
   currentCustomizedApp.value = captionControl.customizedApp
   currentCustomizedCommand.value = captionControl.customizedCommand
 }
+
+watch(changeSignal, (val) => {
+  if(val == true) {
+    cancelChange();
+    captionControl.changeSignal = false;
+  }
+})
 </script>
 
 <style scoped>
