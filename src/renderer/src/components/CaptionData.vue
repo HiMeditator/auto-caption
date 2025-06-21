@@ -30,7 +30,16 @@
   </div>
 
   <div class="caption-list">
-    <div class="caption-title">字幕记录</div>
+    <div class="caption-title">
+      <span style="margin-right: 30px;">字幕记录</span>
+      <a-button
+        type="primary"
+        @click="exportCaptions"
+        :disabled="captionData.length === 0"
+      >
+        导出字幕记录
+      </a-button>
+    </div>
     <a-table
       :columns="columns"
       :data-source="captionData"
@@ -104,6 +113,20 @@ const columns = [
 
 function openCaptionWindow() {
   window.electron.ipcRenderer.send('control.captionWindow.activate')
+}
+
+function exportCaptions() {
+  const jsonData = JSON.stringify(captionData.value, null, 2)
+  const blob = new Blob([jsonData], { type: 'application/json' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
+  a.download = `captions-${timestamp}.json`
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+  URL.revokeObjectURL(url)
 }
 </script>
 

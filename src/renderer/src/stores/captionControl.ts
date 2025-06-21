@@ -15,15 +15,6 @@ export const useCaptionControlStore = defineStore('captionControl', () => {
         { value: 'ko', label: '韩语' }
       ]
     },
-    {
-      value: 'whisper',
-      label: '本地-OpenAI-Whisper',
-      languages: [
-        { value: 'auto', label: '自动检测' },
-        { value: 'en', label: '英语' },
-        { value: 'zh', label: '简体中文' }
-      ]
-    },
   ])
   const engineEnabled = ref(false)
 
@@ -82,7 +73,8 @@ export const useCaptionControlStore = defineStore('captionControl', () => {
     engineEnabled.value = true
     notification.open({
       message: '字幕引擎启动',
-      description: `原语言：${sourceLang.value}，是否翻译：${translation.value?'是':'否'}，翻译语言：${targetLang.value}`
+      description: `原语言：${sourceLang.value}，是否翻译：${translation.value?'是':'否'}` + 
+        (translation.value ? `，翻译语言：${targetLang.value}` : '')
     });
   })
 

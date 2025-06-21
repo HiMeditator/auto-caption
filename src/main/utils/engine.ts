@@ -24,7 +24,7 @@ export class CaptionEngine {
                 'python-subprocess', 'main.py'
             ))
             this.command.push('-s', controls.sourceLang)
-            this.command.push('-t', controls.targetLang)
+            this.command.push('-t',  controls.translation ? controls.targetLang : 'none')
 
             console.log(this.appPath)
             console.log(this.command)
