@@ -10,9 +10,14 @@ export const useCaptionControlStore = defineStore('captionControl', () => {
       languages: [
         { value: 'auto', label: '自动检测' },
         { value: 'en', label: '英语' },
-        { value: 'zh', label: '简体中文' },
+        { value: 'zh', label: '中文' },
         { value: 'ja', label: '日语' },
-        { value: 'ko', label: '韩语' }
+        { value: 'ko', label: '韩语' },
+        { value: 'de', label: '德语' },
+        { value: 'fr', label: '法语' },
+        { value: 'ru', label: '俄语' },
+        { value: 'es', label: '西班牙语' },
+        { value: 'it', label: '意大利语' },
       ]
     },
   ])

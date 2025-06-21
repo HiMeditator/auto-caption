@@ -10,7 +10,7 @@ export class CaptionEngine {
     process: any | undefined
 
     private getApp() {
-        if(controls.customized && controls.customizedCommand && controls.customizedApp){
+        if(controls.customized && controls.customizedApp){
             this.appPath = controls.customizedApp
             this.command = [ controls.customizedCommand ]
         }

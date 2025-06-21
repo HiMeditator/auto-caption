@@ -17,7 +17,7 @@
 
 ### 基本使用
 
-目前仅提供 Windows 平台的可安装版本。如果使用默认的 Gummy 字幕引擎，需要获取阿里云百炼平台的 API KEY 并配置到环境变量中才能正常使用该模型相关教程：[获取API KEY](https://help.aliyun.com/zh/model-studio/get-api-key)、[将API Key配置到环境变量](https://help.aliyun.com/zh/model-studio/configure-api-key-through-environment-variables)。
+目前仅提供 Windows 平台的可安装版本。如果使用默认的 Gummy 字幕引擎，需要获取阿里云百炼平台的 API KEY 并配置到环境变量中才能正常使用该模型。相关教程：[获取API KEY](https://help.aliyun.com/zh/model-studio/get-api-key)、[将API Key配置到环境变量](https://help.aliyun.com/zh/model-studio/configure-api-key-through-environment-variables)。
 
 对于开发者，可以自己创建新的字幕引擎。具体通信规范请参考源代码。
 ## ✨ 特性
