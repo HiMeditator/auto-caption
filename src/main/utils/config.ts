@@ -22,6 +22,7 @@ export const controls: Controls = {
   sourceLang: 'en',
   targetLang: 'zh',
   engine: 'gummy',
+  audio: 0,
   engineEnabled: false,
   translation: true,
   customized: false,
@@ -74,6 +75,7 @@ export function setControls(args: any) {
   controls.sourceLang = args.sourceLang
   controls.targetLang = args.targetLang
   controls.engine = args.engine
+  controls.audio = args.audio
   controls.translation = args.translation
   controls.customized = args.customized
   controls.customizedApp = args.customizedApp

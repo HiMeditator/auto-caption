@@ -6,4 +6,4 @@ out
 *.log*
 __pycache__
 subenv
-build
+python-subprocess/build

@@ -1,5 +1,6 @@
-import { spawn } from 'child_process'
+import { spawn, exec } from 'child_process'
 import { app } from 'electron'
+import { is } from '@electron-toolkit/utils'
 import path from 'path'
 import { addCaptionLog, controls } from './config'
 
@@ -14,24 +15,29 @@ export class CaptionEngine {
             this.command = [ controls.customizedCommand ]
         }
         else if(controls.engine === 'gummy'){
-            this.appPath = path.join(
-                app.getAppPath(),
-                'python-subprocess', 'subenv', 'Scripts', 'python.exe'
-            )
+            if(is.dev){
+                this.appPath = path.join(
+                    app.getAppPath(),
+                    'python-subprocess', 'dist', 'main-gummy.exe'
+                )
+            }
+            else{
+                this.appPath = path.join(
+                    process.resourcesPath,
+                    'python-subprocess', 'dist', 'main-gummy.exe'
+                )
+            }
             this.command = []
-            this.command.push(path.join(
-                app.getAppPath(),
-                'python-subprocess', 'main.py'
-            ))
             this.command.push('-s', controls.sourceLang)
             this.command.push('-t',  controls.translation ? controls.targetLang : 'none')
+            this.command.push('-a', controls.audio ? '1' : '0')
 
-            console.log(this.appPath)
-            console.log(this.command)
+            console.log('[INFO] engine', this.appPath)
+            console.log('[INFO] engine command',this.command)
         }
     }
 
-    public start() { 
+    public start() {
         if (this.process) {
             this.stop();
         }
@@ -70,7 +76,15 @@ export class CaptionEngine {
 
     public stop() {
         if (this.process) {
-            this.process.kill();
+            if (process.platform === "win32" && this.process.pid) {
+                exec(`taskkill /pid ${this.process.pid} /t /f`, (error) => {
+                    if (error) {
+                        console.error(`Failed to kill process: ${error}`);
+                    }
+                });
+            } else {
+                this.process.kill('SIGKILL');
+            }
             this.process = undefined;
             controls.engineEnabled = false;
             console.log('[INFO] Caption engine process stopped');

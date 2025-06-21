@@ -23,6 +23,7 @@ export interface Controls {
   sourceLang: string,
   targetLang: string,
   engine: string,
+  audio: 0 | 1,
   translation: boolean,
   customized: boolean,
   customizedApp: string,

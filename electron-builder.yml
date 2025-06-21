@@ -1,4 +1,4 @@
-appId: com.electron.app
+appId: com.himeditator.autocaption
 productName: auto-caption
 directories:
   buildResources: build
@@ -9,10 +9,14 @@ files:
   - '!{.eslintcache,eslint.config.mjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
   - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
+extraResources:
+  from: ./python-subprocess/dist/main-gummy.exe
+  to: ./python-subprocess/dist/main-gummy.exe
 asarUnpack:
   - resources/**
 win:
   executableName: auto-caption
+  icon: resources/icon.png
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}

@@ -16,11 +16,23 @@ export const useCaptionControlStore = defineStore('captionControl', () => {
       ]
     },
   ])
+  const audioType = ref([
+    {
+      value: 0,
+      label: '系统音频输出（扬声器）'
+    },
+    {
+      value: 1,
+      label: '系统音频输入（麦克风）'
+    }
+  ])
+
   const engineEnabled = ref(false)
 
   const sourceLang = ref<string>('en')
   const targetLang = ref<string>('zh')
   const engine = ref<string>('gummy')
+  const audio = ref<0 | 1>(0)
   const translation = ref<boolean>(true)
   const customized = ref<boolean>(false)
   const customizedApp = ref<string>('')
@@ -34,6 +46,7 @@ export const useCaptionControlStore = defineStore('captionControl', () => {
       sourceLang: sourceLang.value,
       targetLang: targetLang.value,
       engine: engine.value,
+      audio: audio.value,
       translation: translation.value,
       customized: customized.value,
       customizedApp: customizedApp.value,
@@ -54,6 +67,7 @@ export const useCaptionControlStore = defineStore('captionControl', () => {
     sourceLang.value = controls.sourceLang
     targetLang.value = controls.targetLang
     engine.value = controls.engine
+    audio.value = controls.audio
     translation.value = controls.translation
     customized.value = controls.customized
     customizedApp.value = controls.customizedApp
@@ -73,7 +87,8 @@ export const useCaptionControlStore = defineStore('captionControl', () => {
     engineEnabled.value = true
     notification.open({
       message: '字幕引擎启动',
-      description: `原语言：${sourceLang.value}，是否翻译：${translation.value?'是':'否'}` + 
+      description: `原语言：${sourceLang.value}，是否翻译：${translation.value?'是':'否'}，` + 
+        `字幕引擎：${engine.value}，音频类型：${audio.value ? '输入音频' : '输出音频'}` +
         (translation.value ? `，翻译语言：${targetLang.value}` : '')
     });
   })
@@ -88,10 +103,12 @@ export const useCaptionControlStore = defineStore('captionControl', () => {
 
   return {
     captionEngine,      // 字幕引擎
+    audioType,          // 音频类型
     engineEnabled,      // 字幕引擎是否启用
     sourceLang,         // 源语言
     targetLang,         // 目标语言
     engine,             // 字幕引擎
+    audio,              // 选择音频
     translation,        // 是否启用翻译
     customized,         // 是否使用自定义字幕引擎
     customizedApp,      // 自定义字幕引擎的应用程序

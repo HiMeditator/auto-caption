@@ -30,6 +30,14 @@
       ></a-select>
     </div>
     <div class="control-item">
+      <span class="control-label">音频选择</span>
+      <a-select
+        class="control-input"
+        v-model:value="currentAudio"
+        :options="audioType"
+      ></a-select>
+    </div>
+    <div class="control-item">
       <span class="control-label">启用翻译</span>
       <a-switch v-model:checked="currentTranslation" />
       <span class="control-label">自定义引擎</span>
@@ -62,13 +70,15 @@
 import { ref, computed, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useCaptionControlStore } from '@renderer/stores/captionControl'
+import { notification } from 'ant-design-vue'
 
 const captionControl = useCaptionControlStore()
-const { captionEngine, changeSignal } = storeToRefs(captionControl)
+const { captionEngine, audioType, changeSignal } = storeToRefs(captionControl)
 
 const currentSourceLang = ref('auto')
 const currentTargetLang = ref('zh')
 const currentEngine = ref('gummy')
+const currentAudio = ref<0 | 1>(0)
 const currentTranslation = ref<boolean>(false)
 
 const currentCustomized = ref<boolean>(false)
@@ -88,6 +98,7 @@ function applyChange(){
   captionControl.sourceLang = currentSourceLang.value
   captionControl.targetLang = currentTargetLang.value
   captionControl.engine = currentEngine.value
+  captionControl.audio = currentAudio.value
   captionControl.translation = currentTranslation.value
 
   captionControl.customized = currentCustomized.value
@@ -95,12 +106,18 @@ function applyChange(){
   captionControl.customizedCommand = currentCustomizedCommand.value
 
   captionControl.sendControlChange()
+
+  notification.open({
+      message: '字幕控制已更改',
+      description: '如果字幕引擎已经启动，需要关闭后重启才会生效'
+  });
 }
 
 function cancelChange(){
   currentSourceLang.value = captionControl.sourceLang
   currentTargetLang.value = captionControl.targetLang
   currentEngine.value = captionControl.engine
+  currentAudio.value = captionControl.audio
   currentTranslation.value = captionControl.translation
 
   currentCustomized.value = captionControl.customized
