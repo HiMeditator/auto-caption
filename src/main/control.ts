@@ -5,6 +5,7 @@ import icon from '../../resources/icon.png?asset'
 import { captionWindow } from './caption'
 import {
   captionEngine,
+  captionLog,
   controls,
   setStyles,
   sendStyles,
@@ -97,6 +98,10 @@ class ControlWindow {
     ipcMain.on('control.engine.stop', () => {
       captionEngine.stop()
       this.window?.webContents.send('control.engine.stopped')
+    })
+    // 清空字幕记录
+    ipcMain.on('control.caption.clear', () => {
+      captionLog.splice(0)
     })
   }
 }

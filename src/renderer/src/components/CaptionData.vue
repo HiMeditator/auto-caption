@@ -34,10 +34,17 @@
       <span style="margin-right: 30px;">字幕记录</span>
       <a-button
         type="primary"
+        style="margin-right: 20px;"
         @click="exportCaptions"
         :disabled="captionData.length === 0"
       >
         导出字幕记录
+      </a-button>
+      <a-button
+        danger
+        @click="clearCaptions"
+      >
+        清空字幕记录
       </a-button>
     </div>
     <a-table
@@ -127,6 +134,10 @@ function exportCaptions() {
   a.click()
   document.body.removeChild(a)
   URL.revokeObjectURL(url)
+}
+
+function clearCaptions() {
+  captionLog.clear()
 }
 </script>
 

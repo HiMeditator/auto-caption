@@ -21,11 +21,17 @@ export const useCaptionLogStore = defineStore('captionLog', () => {
     }
   })
 
+  function clear() {
+    captionData.value = []
+    window.electron.ipcRenderer.send('control.caption.clear')
+  }
+
   window.electron.ipcRenderer.on('both.log.set', (_, logs) => {
     captionData.value = logs
   })
 
   return {
-    captionData
+    captionData,
+    clear
   }
 })

@@ -15,16 +15,26 @@ export class CaptionEngine {
             this.command = [ controls.customizedCommand ]
         }
         else if(controls.engine === 'gummy'){
+            let gummyName = ''
+            if(process.platform === 'win32'){
+                gummyName = 'main-gummy.exe'
+            }
+            else if(process.platform === 'linux'){
+                gummyName = 'main-gummy'
+            }
+            else{
+                throw new Error('Unsupported platform')
+            }
             if(is.dev){
                 this.appPath = path.join(
                     app.getAppPath(),
-                    'python-subprocess', 'dist', 'main-gummy.exe'
+                    'python-subprocess', 'dist', gummyName
                 )
             }
             else{
                 this.appPath = path.join(
                     process.resourcesPath,
-                    'python-subprocess', 'dist', 'main-gummy.exe'
+                    'python-subprocess', 'dist', gummyName
                 )
             }
             this.command = []
