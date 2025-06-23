@@ -2,7 +2,7 @@
   <div class="caption-stat">
     <a-row>
       <a-col :span="6">
-        <a-statistic title="字幕引擎" :value="engine" />
+        <a-statistic title="字幕引擎" :value="(customized && customizedApp)?'自定义':engine" />
       </a-col>
       <a-col :span="6">
         <a-statistic title="字幕引擎状态" :value="engineEnabled?'已启动':'未启动'" />
@@ -81,7 +81,7 @@ import { useCaptionControlStore } from '@renderer/stores/captionControl'
 const captionLog = useCaptionLogStore()
 const { captionData } = storeToRefs(captionLog)
 const captionControl = useCaptionControlStore()
-const { engineEnabled, engine } = storeToRefs(captionControl)
+const { engineEnabled, engine, customized, customizedApp } = storeToRefs(captionControl)
 const pagination = ref({
   current: 1,
   pageSize: 10,

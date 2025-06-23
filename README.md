@@ -2,7 +2,10 @@
     <img src="./resources/icon.png" width="100px" height="100px"/>
     <h1 align="center">auto-caption</h1>
     <p>Auto Caption 是一个跨平台的字幕显示软件。</p>
-    <b>项目初版已经开发完毕。</b>
+    <p>
+        | <b>简体中文</b>
+        | <a href="https://github.com/HiMeditator/auto-caption/blob/main/README_en.md">English</a> |
+    </p>
 </div>
 
 ![](./assets/01.png)

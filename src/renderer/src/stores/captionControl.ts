@@ -90,11 +90,14 @@ export const useCaptionControlStore = defineStore('captionControl', () => {
   
   window.electron.ipcRenderer.on('control.engine.started', () => { 
     engineEnabled.value = true
+    const str0 = 
+      `原语言：${sourceLang.value}，是否翻译：${translation.value?'是':'否'}，` + 
+      `字幕引擎：${engine.value}，音频类型：${audio.value ? '输入音频' : '输出音频'}` +
+      (translation.value ? `，翻译语言：${targetLang.value}` : '');
+    const str1 = `类型：自定义引擎，引擎路径：${customizedApp.value}，命令参数：${customizedCommand.value}`;
     notification.open({
       message: '字幕引擎启动',
-      description: `原语言：${sourceLang.value}，是否翻译：${translation.value?'是':'否'}，` + 
-        `字幕引擎：${engine.value}，音频类型：${audio.value ? '输入音频' : '输出音频'}` +
-        (translation.value ? `，翻译语言：${targetLang.value}` : '')
+      description: (customized.value && customizedApp.value) ? str1 : str0
     });
   })
 
