@@ -2,7 +2,7 @@ import { app, BrowserWindow } from 'electron'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import { controlWindow } from './control'
 import { captionWindow } from './caption'
-import { captionEngine } from './utils/config'
+import { captionEngine, writeConfig } from './utils/config'
 
 app.whenReady().then(() => {
   electronApp.setAppUserModelId('com.himeditator.autocaption')
@@ -25,6 +25,7 @@ app.whenReady().then(() => {
 
 app.on('will-quit', async () => { 
   captionEngine.stop()
+  writeConfig()
 });
 
 app.on('window-all-closed', () => {

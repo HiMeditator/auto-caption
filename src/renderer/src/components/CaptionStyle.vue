@@ -2,7 +2,8 @@
   <a-card size="small" title="字幕样式设置">
     <template #extra>
       <a @click="applyStyle">应用样式</a> |
-      <a @click="resetStyle">取消更改</a>
+      <a @click="backStyle">取消更改</a> |
+      <a @click="resetStyle">恢复默认</a>
     </template>
     <div class="style-item">
       <span class="style-label">字体族</span>
@@ -168,7 +169,7 @@ function applyStyle(){
   captionStyle.sendStyleChange();
 }
 
-function resetStyle(){
+function backStyle(){
   currentFontFamily.value = captionStyle.fontFamily;
   currentFontSize.value = captionStyle.fontSize;
   currentFontColor.value = captionStyle.fontColor;
@@ -181,9 +182,13 @@ function resetStyle(){
   currentTransFontColor.value = captionStyle.transFontColor;
 }
 
+function resetStyle() { 
+  captionStyle.sendStyleReset();
+}
+
 watch(changeSignal, (val) => {
   if(val == true) {
-    resetStyle();
+    backStyle();
     captionStyle.changeSignal = false;
   }
 })

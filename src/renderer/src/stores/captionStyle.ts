@@ -40,6 +40,10 @@ export const useCaptionStyleStore = defineStore('captionStyle', () => {
     window.electron.ipcRenderer.send('control.style.change', styles)
   }
 
+  function sendStyleReset() {
+    window.electron.ipcRenderer.send('control.style.reset')
+  }
+
   window.electron.ipcRenderer.on('caption.style.set', (_, args) => {
     fontFamily.value = args.fontFamily
     fontSize.value = args.fontSize
@@ -65,6 +69,7 @@ export const useCaptionStyleStore = defineStore('captionStyle', () => {
     transFontColor,     // 翻译字体颜色
     backgroundRGBA,     // 带透明度的背景颜色
     sendStyleChange,    // 发送样式改变
+    sendStyleReset,   // 恢复默认样式
     changeSignal        // 样式改变信号
   }
 })

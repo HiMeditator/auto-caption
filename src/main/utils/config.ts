@@ -1,6 +1,8 @@
 import { Styles, CaptionItem, Controls } from '../types'
-import { BrowserWindow } from 'electron'
+import { app, BrowserWindow } from 'electron'
 import { CaptionEngine } from './engine'
+import * as path from 'path'
+import * as fs from 'fs'
 
 export const captionEngine = new CaptionEngine()
 
@@ -30,8 +32,6 @@ export const controls: Controls = {
   customizedCommand: ''
 }
 
-export let engineRunning: boolean = false
-
 export function setStyles(args: any) {
   styles.fontFamily = args.fontFamily
   styles.fontSize = args.fontSize
@@ -43,6 +43,20 @@ export function setStyles(args: any) {
   styles.transFontSize = args.transFontSize
   styles.transFontColor = args.transFontColor
   console.log('[INFO] Set Styles:', styles)
+}
+
+export function resetStyles() {
+  setStyles({
+    fontFamily: 'sans-serif',
+    fontSize: 24,
+    fontColor: '#000000',
+    background: '#dbe2ef',
+    opacity: 80,
+    transDisplay: true,
+    transFontFamily: 'sans-serif',
+    transFontSize: 24,
+    transFontColor: '#000000'
+  })
 }
 
 export function sendStyles(window: BrowserWindow) {
@@ -86,4 +100,24 @@ export function setControls(args: any) {
 export function sendControls(window: BrowserWindow) {
   window.webContents.send('control.control.set', controls)
   console.log(`[INFO] Send Controls to #${window.id}:`, controls)
+}
+
+export function readConfig() { 
+  const configPath = path.join(app.getPath('userData'), 'config.json')
+  if(fs.existsSync(configPath)){
+    const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'))
+    setStyles(config.styles)
+    setControls(config.controls)
+    console.log('[INFO] Read Config from:', configPath)
+  }
+}
+
+export function writeConfig() {
+  const config = {
+    controls: controls,
+    styles: styles
+  }
+  const configPath = path.join(app.getPath('userData'), 'config.json')
+  fs.writeFileSync(configPath, JSON.stringify(config, null, 2))
+  console.log('[INFO] Write Config to:', configPath)
 }

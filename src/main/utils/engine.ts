@@ -96,6 +96,8 @@ export class CaptionEngine {
     this.process.on('close', (code: any) => {
       console.log(`[INFO] Subprocess exited with code ${code}`);
       this.process = undefined;
+      controls.engineEnabled = false
+      sendControls(window)
     });
   }
 
@@ -111,9 +113,10 @@ export class CaptionEngine {
       } else {
         this.process.kill('SIGKILL');
       }
-      this.process = undefined;
-      controls.engineEnabled = false;
-      console.log('[INFO] Caption engine process stopped');
     }
+    this.process = undefined;
+    controls.engineEnabled = false;
+    console.log('[INFO] Caption engine process stopped');
+    if(controlWindow.window) sendControls(controlWindow.window);
   }
 }

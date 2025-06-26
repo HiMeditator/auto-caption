@@ -76,6 +76,7 @@ export const useCaptionControlStore = defineStore('captionControl', () => {
     targetLang.value = controls.targetLang
     engine.value = controls.engine
     audio.value = controls.audio
+    engineEnabled.value = controls.engineEnabled
     translation.value = controls.translation
     customized.value = controls.customized
     customizedApp.value = controls.customizedApp
@@ -84,7 +85,6 @@ export const useCaptionControlStore = defineStore('captionControl', () => {
   })
 
   window.electron.ipcRenderer.on('control.engine.already', () => { 
-    engineEnabled.value = true
     notification.open({
       message: '字幕引擎已经启动',
       description: '字幕引擎已经启动，请勿重复启动'
@@ -92,7 +92,6 @@ export const useCaptionControlStore = defineStore('captionControl', () => {
   })
   
   window.electron.ipcRenderer.on('control.engine.started', () => { 
-    engineEnabled.value = true
     const str0 = 
       `原语言：${sourceLang.value}，是否翻译：${translation.value?'是':'否'}，` + 
       `字幕引擎：${engine.value}，音频类型：${audio.value ? '输入音频' : '输出音频'}` +
@@ -105,7 +104,6 @@ export const useCaptionControlStore = defineStore('captionControl', () => {
   })
 
   window.electron.ipcRenderer.on('control.engine.stopped', () => { 
-    engineEnabled.value = false
     notification.open({
       message: '字幕引擎停止',
       description: '可点击“启动字幕引擎”按钮重新启动'

@@ -8,7 +8,11 @@
     </p>
 </div>
 
-![](./assets/01.png)
+![](./assets/media/main.png)
+
+## ⚠️ Attention
+
+**The current software interface language is Chinese. English adaptation has not been done yet.**
 
 ## 📥 Download
 
@@ -36,6 +40,8 @@ Note: The Windows platform supports generating subtitles for both audio output a
 
 ## 🚀 Project Execution
 
+![](./assets/media/structure.png)
+
 ### Install Dependencies
 
 ```bash
@@ -45,6 +51,8 @@ npm install
 ### Build Subtitle Engine
 
 > #### Background
+>
+> If you are a developer and want to develop a custom subtitle engine, please refer to the [Subtitle Engine Documentation (Chinese)](./assets/engine-manual_zh.md).
 >
 > The so-called subtitle engine is actually a subprocess that will real-time acquire streaming data from system audio input (recording) or output (playing sound) and call an audio-to-text model to generate corresponding subtitles for the audio. The generated subtitles are output as JSON data converted to strings via IPC and returned to the main program. The main program reads the subtitle data, processes it, and displays it on the window.
 >

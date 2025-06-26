@@ -8,10 +8,12 @@ import {
   captionLog,
   controls,
   setStyles,
+  resetStyles,
   sendStyles,
   sendCaptionLog,
   setControls,
-  sendControls
+  sendControls,
+  readConfig
 } from './utils/config'
 
 class ControlWindow {
@@ -36,6 +38,7 @@ class ControlWindow {
 
     setTimeout(() => {
       if (this.window) {
+        readConfig()
         sendStyles(this.window) // 配置初始样式
         sendCaptionLog(this.window, 'set') // 配置当前字幕记录
         sendControls(this.window) // 配置字幕引擎配置
@@ -69,6 +72,15 @@ class ControlWindow {
       setStyles(args)
       if(captionWindow.window){
         sendStyles(captionWindow.window)
+      }
+    })
+    ipcMain.on('control.style.reset', () => {
+      resetStyles()
+      if(captionWindow.window){
+        sendStyles(captionWindow.window)
+      }
+      if(this.window){
+        sendStyles(this.window)
       }
     })
     // 控制窗口请求创建字幕窗口
