@@ -16,7 +16,9 @@
 
 ## 📚 用户手册
 
-暂无
+[Auto Caption 用户手册](./assets/user-manual_zh.md)
+
+[字幕引擎说明文档](./assets/engine-manual_zh.md)
 
 ### 基本使用
 

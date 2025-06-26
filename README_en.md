@@ -20,7 +20,9 @@
 
 ## 📚 User Manual
 
-Not available yet.
+[Auto Caption User Manual (Chinese)](./assets/user-manual_en.md)
+
+[Caption Engine Documentation (Chinese)](./assets/engine-manual_en.md)
 
 ### Basic Usage
 
@@ -52,7 +54,7 @@ npm install
 
 > #### Background
 >
-> If you are a developer and want to develop a custom subtitle engine, please refer to the [Subtitle Engine Documentation (Chinese)](./assets/engine-manual_zh.md).
+> If you are a developer and want to develop a custom subtitle engine, please refer to the [Caption Engine Documentation (Chinese)](./assets/engine-manual_zh.md).
 >
 > The so-called subtitle engine is actually a subprocess that will real-time acquire streaming data from system audio input (recording) or output (playing sound) and call an audio-to-text model to generate corresponding subtitles for the audio. The generated subtitles are output as JSON data converted to strings via IPC and returned to the main program. The main program reads the subtitle data, processes it, and displays it on the window.
 >
