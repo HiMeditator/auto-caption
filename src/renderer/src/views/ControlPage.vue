@@ -24,15 +24,24 @@
     <a-modal v-model:open="showAbout" title="关于本项目" :footer="null">
       <div class="about-modal-content">
         <h2 class="about-title">Auto Caption 项目</h2>
-        <p class="about-desc">一个跨平台的字幕显示软件。</p>
+        <p class="about-desc">一个跨平台的实时字幕显示软件。</p>
         <a-divider />
         <div class="about-info">
           <p><b>作者：</b>HiMeditator</p>
           <p><b>版本：</b>v0.1.0</p>
           <p>
             <b>项目地址：</b>
-            <a href="https://github.com/HiMeditator/auto-caption" target="_blank" style="display:inline-flex;align-items:center;">
+            <a href="https://github.com/HiMeditator/auto-caption" target="_blank">
               GitHub | auto-caption
+            </a>
+          </p>
+          <p>
+            <b>用户手册：</b>
+            <a
+              href="https://github.com/HiMeditator/auto-caption/blob/main/assets/user-manual_zh.md"
+              target="_blank"
+            >
+              GitHub | user-manual_zh.md
             </a>
           </p>
         </div>

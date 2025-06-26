@@ -1,7 +1,7 @@
 <div align="center" >
     <img src="./resources/icon.png" width="100px" height="100px"/>
     <h1 align="center">auto-caption</h1>
-    <p>Auto Caption 是一个跨平台的字幕显示软件。</p>
+    <p>Auto Caption 是一个跨平台的实时字幕显示软件。</p>
     <p>
         | <b>简体中文</b>
         | <a href="https://github.com/HiMeditator/auto-caption/blob/main/README_en.md">English</a> |
@@ -22,9 +22,9 @@
 
 ### 基本使用
 
-目前仅提供 Windows 平台的可安装版本。如果使用默认的 Gummy 字幕引擎，需要获取阿里云百炼平台的 API KEY 并配置到环境变量中才能正常使用该模型。相关教程：[获取API KEY](https://help.aliyun.com/zh/model-studio/get-api-key)、[将API Key配置到环境变量](https://help.aliyun.com/zh/model-studio/configure-api-key-through-environment-variables)。
+目前仅提供了 Windows 平台的可安装版本。如果使用默认的 Gummy 字幕引擎，需要获取阿里云百炼平台的 API KEY 并配置到环境变量中才能正常使用该模型。相关教程：[获取 API KEY](https://help.aliyun.com/zh/model-studio/get-api-key)、[将 API Key 配置到环境变量](https://help.aliyun.com/zh/model-studio/configure-api-key-through-environment-variables)。
 
-对于开发者，可以自己创建新的字幕引擎。具体通信规范请参考源代码。
+对于开发者，可以自己开发新的字幕引擎，自定义字幕引擎的开发请参考[字幕引擎说明文档](./assets/engine-manual_zh.md)。
 ## ✨ 特性
 
 - 丰富的字幕样式设置
@@ -53,7 +53,7 @@ npm install
 > 
 > 所谓的字幕引擎实际上是一个子程序，它会实时获取系统音频输入（录音）或输出（播放声音）的流式数据，并调用音频转文字的模型生成对应音频的字幕。生成的字幕通过 IPC 输出为转换为字符串的 JSON 数据，并返回给主程序。主程序读取字幕数据，处理后显示在窗口上。
 >
->目前项目默认使用[阿里云 Gummy 模型](https://help.aliyun.com/zh/model-studio/gummy-speech-recognition-translation/)，需要获取阿里云百炼平台的 API KEY 并配置到环境变量中才能正常使用该模型，相关教程：[获取API KEY](https://help.aliyun.com/zh/model-studio/get-api-key)、[将API Key配置到环境变量](https://help.aliyun.com/zh/model-studio/configure-api-key-through-environment-variables)。
+>目前项目默认使用[阿里云 Gummy 模型](https://help.aliyun.com/zh/model-studio/gummy-speech-recognition-translation/)，需要获取阿里云百炼平台的 API KEY 并配置到环境变量中才能正常使用该模型。
 >
 > 本项目的 gummy 字幕引擎是一个 python 子程序，通过 pyinstaller 打包为可执行文件。 运行字幕引擎子程序的代码在 `src\main\utils\engine.ts` 文件中。
 
@@ -93,7 +93,7 @@ npm run dev
 ```
 ### 构建项目
 
-注意目前软件没有适配 macOS 平台，请使用 Windows 或 Linux 系统进行构建。
+注意目前软件没有适配 macOS 平台，请使用 Windows 或 Linux 系统进行构建，更建议使用实现了完整功能的 Windows 平台。
 
 ```bash
 # For windows

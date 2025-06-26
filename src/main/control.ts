@@ -13,7 +13,8 @@ import {
   sendCaptionLog,
   setControls,
   sendControls,
-  readConfig
+  readConfig,
+  writeConfig
 } from './utils/config'
 
 class ControlWindow {
@@ -52,6 +53,7 @@ class ControlWindow {
   
     this.window.on('closed', () => {
       this.window = undefined
+      writeConfig()
     })
   
     this.window.webContents.setWindowOpenHandler((details) => {

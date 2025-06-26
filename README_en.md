@@ -1,7 +1,7 @@
 <div align="center" >
     <img src="./resources/icon.png" width="100px" height="100px"/>
     <h1 align="center">auto-caption</h1>
-    <p>Auto Caption is a cross-platform subtitle display software.</p>
+    <p>Auto Caption is a cross-platform real-time subtitle display software.</p>
     <p>
         | <a href="https://github.com/HiMeditator/auto-caption/blob/main/README.md">简体中文</a>
         | <b>English</b> |
@@ -28,7 +28,8 @@
 
 Currently, only an installable version for the Windows platform is provided. If using the default Gummy subtitle engine, you need to obtain an API KEY from Alibaba Cloud's Bailian platform and configure it in the environment variables to use the model properly. Related tutorials: [Get API KEY](https://help.aliyun.com/zh/model-studio/get-api-key), [Configure API Key through Environment Variables](https://help.aliyun.com/zh/model-studio/configure-api-key-through-environment-variables).
 
-For developers, you can create new subtitle engines. Please refer to the source code for specific communication specifications.
+For developers, you can create a new subtitle engine. For instructions on customizing the subtitle engine, please refer to the [Caption Engine Documentation (Chinese)](./assets/engine-manual_zh.md).
+
 
 ## ✨ Features
 
@@ -99,7 +100,8 @@ npm run dev
 
 ### Build the Project
 
-Please note that the software is not currently adapted for macOS. Use Windows or Linux systems for building.
+Please note that the software is currently not compatible with the macOS platform. Use Windows or Linux systems for building, with Windows being more recommended as it implements the full set of features.
+
 
 ```bash
 # For Windows
