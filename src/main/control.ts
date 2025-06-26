@@ -90,8 +90,17 @@ class ControlWindow {
         this.window?.webContents.send('control.engine.already')
       }
       else {
-        captionEngine.start()
-        this.window?.webContents.send('control.engine.started')
+        if(
+          process.env.DASHSCOPE_API_KEY ||
+          (controls.customized && controls.customizedApp)
+        ) {
+          if(this.window){
+            captionEngine.start(this.window)
+          }
+        }
+        else {
+          this.sendErrorMessage('没有检测到 DASHSCOPE_API_KEY 环境变量，如果要使用 gummy 引擎，需要在阿里云百炼平台获取 API Key 并添加到本机环境变量')
+        }
       }
     })
     // 停止字幕引擎
@@ -103,6 +112,10 @@ class ControlWindow {
     ipcMain.on('control.caption.clear', () => {
       captionLog.splice(0)
     })
+  }
+
+  public sendErrorMessage(message: string) {
+    this.window?.webContents.send('control.error.send', message)
   }
 }
 

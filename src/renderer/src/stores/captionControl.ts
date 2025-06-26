@@ -1,6 +1,9 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
+
 import { notification } from 'ant-design-vue'
+import { ExclamationCircleOutlined } from '@ant-design/icons-vue'
+import { h } from 'vue'
 
 export const useCaptionControlStore = defineStore('captionControl', () => {
   const captionEngine = ref([
@@ -106,6 +109,16 @@ export const useCaptionControlStore = defineStore('captionControl', () => {
     notification.open({
       message: '字幕引擎停止',
       description: '可点击“启动字幕引擎”按钮重新启动'
+    });
+  })
+
+  window.electron.ipcRenderer.on('control.error.send', (_, message) => { 
+    notification.open({
+      message: '发生错误',
+      description: message,
+      duration: null,
+      placement: 'topLeft',
+      icon: () => h(ExclamationCircleOutlined, { style: 'color: #ff4d4f' })
     });
   })
 
