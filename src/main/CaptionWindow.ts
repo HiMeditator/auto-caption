@@ -2,13 +2,13 @@ import { shell, BrowserWindow, ipcMain } from 'electron'
 import path from 'path'
 import { is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import { controlWindow } from './control'
-import { sendStyles, sendCaptionLog } from './utils/config'
+import { controlWindow } from './ControlWindow'
+import { allConfig } from './utils/AllConfig'
 
-class CaptionWindow { 
+class CaptionWindow {
   window: BrowserWindow | undefined;
-  
-  public createWindow(): void { 
+
+  public createWindow(): void {
     this.window = new BrowserWindow({
       icon: icon,
       width: 900,
@@ -26,11 +26,11 @@ class CaptionWindow {
         sandbox: false
       }
     })
-  
+
     setTimeout(() => {
       if (this.window) {
-        sendStyles(this.window);
-        sendCaptionLog(this.window, 'set');
+        allConfig.sendStyles(this.window);
+        allConfig.sendCaptionLog(this.window, 'set');
       }
     }, 1000);
 
@@ -46,7 +46,7 @@ class CaptionWindow {
       shell.openExternal(details.url)
       return { action: 'deny' }
     })
-  
+
     if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
       this.window.loadURL(`${process.env['ELECTRON_RENDERER_URL']}/#/caption`)
     } else {
@@ -57,7 +57,7 @@ class CaptionWindow {
   }
 
   public handleMessage() {
-    // 字幕窗口请求创建控制窗口
+    // 激活控制窗口
     ipcMain.on('caption.controlWindow.activate', () => {
       if(!controlWindow.window){
         controlWindow.createWindow()
@@ -66,18 +66,21 @@ class CaptionWindow {
         controlWindow.window.show()
       }
     })
+
     // 字幕窗口高度发生变化
     ipcMain.on('caption.windowHeight.change', (_, height) => {
       if(this.window){
-        this.window.setSize(this.window.getSize()[0], height) 
+        this.window.setSize(this.window.getSize()[0], height)
       }
     })
+
     // 关闭字幕窗口
     ipcMain.on('caption.window.close', () => {
       if(this.window){
         this.window.close()
       }
     })
+
     // 是否固定在最前面
     ipcMain.on('caption.pin.set', (_, pinned) => {
       if(this.window){

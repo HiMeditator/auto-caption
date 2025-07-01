@@ -25,15 +25,13 @@
     "@electron-toolkit/utils": "^4.0.0",
     "ant-design-vue": "^4.2.6",
     "pinia": "^3.0.2",
-    "vue-router": "^4.5.1",
-    "ws": "^8.18.2"
+    "vue-router": "^4.5.1"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config-prettier": "3.0.0",
     "@electron-toolkit/eslint-config-ts": "^3.0.0",
     "@electron-toolkit/tsconfig": "^1.0.1",
     "@types/node": "^22.14.1",
-    "@types/ws": "^8.18.1",
     "@vitejs/plugin-vue": "^5.2.3",
     "electron": "^35.1.5",
     "electron-builder": "^25.1.8",

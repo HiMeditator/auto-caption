@@ -1,3 +1,5 @@
+export type UILanguage =  "zh" | "en" | "ja"
+
 export interface Styles {
   fontFamily: string,
   fontSize: number,
@@ -22,7 +24,7 @@ export interface Controls {
   engineEnabled: boolean,
   sourceLang: string,
   targetLang: string,
-  engine: string,
+  engine: 'gummy',
   audio: 0 | 1,
   translation: boolean,
   customized: boolean,

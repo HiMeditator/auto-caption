@@ -2,20 +2,9 @@ import { shell, BrowserWindow, ipcMain } from 'electron'
 import path from 'path'
 import { is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import { captionWindow } from './caption'
-import {
-  captionEngine,
-  captionLog,
-  controls,
-  setStyles,
-  resetStyles,
-  sendStyles,
-  sendCaptionLog,
-  setControls,
-  sendControls,
-  readConfig,
-  writeConfig
-} from './utils/config'
+import { captionWindow } from './CaptionWindow'
+import { allConfig } from './utils/AllConfig'
+import { captionEngine } from './utils/CaptionEngine'
 
 class ControlWindow {
   window: BrowserWindow | undefined;
@@ -25,8 +14,8 @@ class ControlWindow {
       icon: icon,
       width: 1200,
       height: 800,
-      minWidth: 900,
-      minHeight: 600,
+      minWidth: 600,
+      minHeight: 400,
       show: false,
       center: true,
       autoHideMenuBar: true,
@@ -37,30 +26,30 @@ class ControlWindow {
       }
     })
 
+    allConfig.readConfig()
+
     setTimeout(() => {
       if (this.window) {
-        readConfig()
-        sendStyles(this.window) // 配置初始样式
-        sendCaptionLog(this.window, 'set') // 配置当前字幕记录
-        sendControls(this.window) // 配置字幕引擎配置
+        allConfig.sendStyles(this.window)
+        allConfig.sendControls(this.window)
+        allConfig.sendCaptionLog(this.window, 'set')
       }
     }, 1000);
-    
 
     this.window.on('ready-to-show', () => {
       this.window?.show()
     })
-  
+
     this.window.on('closed', () => {
       this.window = undefined
-      writeConfig()
+      allConfig.writeConfig()
     })
-  
+
     this.window.webContents.setWindowOpenHandler((details) => {
       shell.openExternal(details.url)
       return { action: 'deny' }
     })
-  
+
     if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
       this.window.loadURL(process.env['ELECTRON_RENDERER_URL'])
     } else {
@@ -69,23 +58,26 @@ class ControlWindow {
   }
 
   public handleMessage() {
-    // 控制窗口样式更新
+    // 样式变更
     ipcMain.on('control.style.change', (_, args) => {
-      setStyles(args)
+      allConfig.setStyles(args)
       if(captionWindow.window){
-        sendStyles(captionWindow.window)
+        allConfig.sendStyles(captionWindow.window)
       }
     })
+
+    // 样式重置
     ipcMain.on('control.style.reset', () => {
-      resetStyles()
-      if(captionWindow.window){
-        sendStyles(captionWindow.window)
-      }
+      allConfig.resetStyles()
       if(this.window){
-        sendStyles(this.window)
+        allConfig.sendStyles(this.window)
+      }
+      if(captionWindow.window){
+        allConfig.sendStyles(captionWindow.window)
       }
     })
-    // 控制窗口请求创建字幕窗口
+
+    // 激活字幕窗口
     ipcMain.on('control.captionWindow.activate', () => {
       if(!captionWindow.window){
         captionWindow.createWindow()
@@ -94,37 +86,31 @@ class ControlWindow {
         captionWindow.window.show()
       }
     })
-    // 字幕引擎控制配置更新并启动引擎
+
+    // 字幕引擎配置更新
     ipcMain.on('control.control.change', (_, args) => {
-      setControls(args)
+      allConfig.setControls(args)
     })
+
     // 启动字幕引擎
     ipcMain.on('control.engine.start', () => {
-      if(controls.engineEnabled){
+      if(allConfig.controls.engineEnabled){
         this.window?.webContents.send('control.engine.already')
       }
       else {
-        if(
-          process.env.DASHSCOPE_API_KEY ||
-          (controls.customized && controls.customizedApp)
-        ) {
-          if(this.window){
-            captionEngine.start(this.window)
-          }
-        }
-        else {
-          this.sendErrorMessage('没有检测到 DASHSCOPE_API_KEY 环境变量，如果要使用 gummy 引擎，需要在阿里云百炼平台获取 API Key 并添加到本机环境变量')
-        }
+        captionEngine.start()
       }
     })
+
     // 停止字幕引擎
     ipcMain.on('control.engine.stop', () => {
       captionEngine.stop()
       this.window?.webContents.send('control.engine.stopped')
     })
+
     // 清空字幕记录
     ipcMain.on('control.caption.clear', () => {
-      captionLog.splice(0)
+      allConfig.captionLog.splice(0)
     })
   }
 
