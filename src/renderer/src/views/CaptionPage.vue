@@ -111,7 +111,7 @@ function closeCaptionWindow() {
   background-color: #2221;
 }
 
-.caption-container { 
+.caption-container {
   -webkit-app-region: drag;
 }
 

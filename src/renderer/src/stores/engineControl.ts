@@ -5,7 +5,9 @@ import { notification } from 'ant-design-vue'
 import { ExclamationCircleOutlined } from '@ant-design/icons-vue'
 import { h } from 'vue'
 
-export const useCaptionControlStore = defineStore('captionControl', () => {
+import { Controls } from '@renderer/types'
+
+export const useEngineControlStore = defineStore('engineControl', () => {
   const captionEngine = ref([
     {
       value: 'gummy',
@@ -39,7 +41,7 @@ export const useCaptionControlStore = defineStore('captionControl', () => {
 
   const sourceLang = ref<string>('en')
   const targetLang = ref<string>('zh')
-  const engine = ref<string>('gummy')
+  const engine = ref<'gummy'>('gummy')
   const audio = ref<0 | 1>(0)
   const translation = ref<boolean>(true)
   const customized = ref<boolean>(false)
@@ -49,7 +51,7 @@ export const useCaptionControlStore = defineStore('captionControl', () => {
   const changeSignal = ref<boolean>(false)
 
   function sendControlChange() {
-    const controls = {
+    const controls: Controls = {
       engineEnabled: engineEnabled.value,
       sourceLang: sourceLang.value,
       targetLang: targetLang.value,
@@ -61,14 +63,6 @@ export const useCaptionControlStore = defineStore('captionControl', () => {
       customizedCommand: customizedCommand.value
     }
     window.electron.ipcRenderer.send('control.control.change', controls)
-  }
-
-  function startEngine() {
-    window.electron.ipcRenderer.send('control.engine.start')
-  }
-
-  function stopEngine() {
-    window.electron.ipcRenderer.send('control.engine.stop')
   }
 
   window.electron.ipcRenderer.on('control.control.set', (_, controls) => {
@@ -84,16 +78,16 @@ export const useCaptionControlStore = defineStore('captionControl', () => {
     changeSignal.value = true
   })
 
-  window.electron.ipcRenderer.on('control.engine.already', () => { 
+  window.electron.ipcRenderer.on('control.engine.already', () => {
     notification.open({
       message: '字幕引擎已经启动',
       description: '字幕引擎已经启动，请勿重复启动'
     });
   })
-  
-  window.electron.ipcRenderer.on('control.engine.started', () => { 
-    const str0 = 
-      `原语言：${sourceLang.value}，是否翻译：${translation.value?'是':'否'}，` + 
+
+  window.electron.ipcRenderer.on('control.engine.started', () => {
+    const str0 =
+      `原语言：${sourceLang.value}，是否翻译：${translation.value?'是':'否'}，` +
       `字幕引擎：${engine.value}，音频类型：${audio.value ? '输入音频' : '输出音频'}` +
       (translation.value ? `，翻译语言：${targetLang.value}` : '');
     const str1 = `类型：自定义引擎，引擎路径：${customizedApp.value}，命令参数：${customizedCommand.value}`;
@@ -103,14 +97,14 @@ export const useCaptionControlStore = defineStore('captionControl', () => {
     });
   })
 
-  window.electron.ipcRenderer.on('control.engine.stopped', () => { 
+  window.electron.ipcRenderer.on('control.engine.stopped', () => {
     notification.open({
       message: '字幕引擎停止',
       description: '可点击“启动字幕引擎”按钮重新启动'
     });
   })
 
-  window.electron.ipcRenderer.on('control.error.send', (_, message) => { 
+  window.electron.ipcRenderer.on('control.error.send', (_, message) => {
     notification.open({
       message: '发生错误',
       description: message,
@@ -133,8 +127,6 @@ export const useCaptionControlStore = defineStore('captionControl', () => {
     customizedApp,      // 自定义字幕引擎的应用程序
     customizedCommand,  // 自定义字幕引擎的命令
     sendControlChange,  // 发送最新控制消息到后端
-    startEngine,        // 启动字幕引擎
-    stopEngine,         // 停止字幕引擎
     changeSignal,       // 配置改变信号
   }
 })

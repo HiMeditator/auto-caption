@@ -1,13 +1,6 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
-
-interface CaptionItem {
-  index: number,
-  time_s: string,
-  time_t: string,
-  text: string,
-  translation: string
-}
+import { CaptionItem } from '../types'
 
 export const useCaptionLogStore = defineStore('captionLog', () => {
   const captionData = ref<CaptionItem[]>([])

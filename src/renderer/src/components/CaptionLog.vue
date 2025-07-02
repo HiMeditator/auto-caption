@@ -1,34 +1,4 @@
 <template>
-  <div class="caption-stat">
-    <a-row>
-      <a-col :span="6">
-        <a-statistic title="字幕引擎" :value="(customized && customizedApp)?'自定义':engine" />
-      </a-col>
-      <a-col :span="6">
-        <a-statistic title="字幕引擎状态" :value="engineEnabled?'已启动':'未启动'" />
-      </a-col>
-      <a-col :span="6">
-        <a-statistic title="已记录字幕" :value="captionData.length" />
-      </a-col>
-    </a-row>    
-  </div>
-
-  <div class="caption-control">
-    <a-button
-      type="primary"
-      class="control-button"
-      @click="openCaptionWindow"
-    >打开字幕窗口</a-button>
-    <a-button
-      class="control-button"
-      @click="captionControl.startEngine"
-    >启动字幕引擎</a-button>
-    <a-button 
-     danger class="control-button"
-     @click="captionControl.stopEngine"
-    >关闭字幕引擎</a-button>
-  </div>
-
   <div class="caption-list">
     <div class="caption-title">
       <span style="margin-right: 30px;">字幕记录</span>
@@ -77,11 +47,8 @@
 import { ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useCaptionLogStore } from '@renderer/stores/captionLog'
-import { useCaptionControlStore } from '@renderer/stores/captionControl'
 const captionLog = useCaptionLogStore()
 const { captionData } = storeToRefs(captionLog)
-const captionControl = useCaptionControlStore()
-const { engineEnabled, engine, customized, customizedApp } = storeToRefs(captionControl)
 const pagination = ref({
   current: 1,
   pageSize: 10,
@@ -118,10 +85,6 @@ const columns = [
   },
 ]
 
-function openCaptionWindow() {
-  window.electron.ipcRenderer.send('control.captionWindow.activate')
-}
-
 function exportCaptions() {
   const jsonData = JSON.stringify(captionData.value, null, 2)
   const blob = new Blob([jsonData], { type: 'application/json' })
@@ -142,19 +105,6 @@ function clearCaptions() {
 </script>
 
 <style scoped>
-.caption-control {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin: 30px;
-}
-
-.control-button {
-  height: 40px;
-  margin: 20px;
-  font-size: 16px;
-}
-
 .caption-list {
   background: #fff;
   padding: 20px;

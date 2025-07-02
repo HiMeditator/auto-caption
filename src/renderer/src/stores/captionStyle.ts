@@ -1,5 +1,6 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
+import { Styles } from '@renderer/types'
 
 export const useCaptionStyleStore = defineStore('captionStyle', () => {
   const fontFamily = ref<string>('sans-serif')
@@ -7,7 +8,7 @@ export const useCaptionStyleStore = defineStore('captionStyle', () => {
   const fontColor = ref<string>('#000000')
   const background = ref<string>('#dbe2ef')
   const opacity = ref<number>(80)
-  
+
   const transDisplay = ref<boolean>(true)
   const transFontFamily = ref<string>('sans-serif')
   const transFontSize = ref<number>(24)
@@ -26,7 +27,7 @@ export const useCaptionStyleStore = defineStore('captionStyle', () => {
   })
 
   function sendStyleChange() {
-    const styles = {
+    const styles: Styles = {
       fontFamily: fontFamily.value,
       fontSize: fontSize.value,
       fontColor: fontColor.value,
@@ -69,7 +70,7 @@ export const useCaptionStyleStore = defineStore('captionStyle', () => {
     transFontColor,     // 翻译字体颜色
     backgroundRGBA,     // 带透明度的背景颜色
     sendStyleChange,    // 发送样式改变
-    sendStyleReset,   // 恢复默认样式
+    sendStyleReset,     // 恢复默认样式
     changeSignal        // 样式改变信号
   }
 })

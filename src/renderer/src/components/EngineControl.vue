@@ -69,15 +69,15 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useCaptionControlStore } from '@renderer/stores/captionControl'
+import { useEngineControlStore } from '@renderer/stores/engineControl'
 import { notification } from 'ant-design-vue'
 
-const captionControl = useCaptionControlStore()
-const { captionEngine, audioType, changeSignal } = storeToRefs(captionControl)
+const engineControl = useEngineControlStore()
+const { captionEngine, audioType, changeSignal } = storeToRefs(engineControl)
 
 const currentSourceLang = ref('auto')
 const currentTargetLang = ref('zh')
-const currentEngine = ref('gummy')
+const currentEngine = ref<'gummy'>('gummy')
 const currentAudio = ref<0 | 1>(0)
 const currentTranslation = ref<boolean>(false)
 
@@ -95,17 +95,17 @@ const langList = computed(() => {
 })
 
 function applyChange(){
-  captionControl.sourceLang = currentSourceLang.value
-  captionControl.targetLang = currentTargetLang.value
-  captionControl.engine = currentEngine.value
-  captionControl.audio = currentAudio.value
-  captionControl.translation = currentTranslation.value
+  engineControl.sourceLang = currentSourceLang.value
+  engineControl.targetLang = currentTargetLang.value
+  engineControl.engine = currentEngine.value
+  engineControl.audio = currentAudio.value
+  engineControl.translation = currentTranslation.value
 
-  captionControl.customized = currentCustomized.value
-  captionControl.customizedApp = currentCustomizedApp.value
-  captionControl.customizedCommand = currentCustomizedCommand.value
+  engineControl.customized = currentCustomized.value
+  engineControl.customizedApp = currentCustomizedApp.value
+  engineControl.customizedCommand = currentCustomizedCommand.value
 
-  captionControl.sendControlChange()
+  engineControl.sendControlChange()
 
   notification.open({
       message: '字幕控制已更改',
@@ -114,21 +114,21 @@ function applyChange(){
 }
 
 function cancelChange(){
-  currentSourceLang.value = captionControl.sourceLang
-  currentTargetLang.value = captionControl.targetLang
-  currentEngine.value = captionControl.engine
-  currentAudio.value = captionControl.audio
-  currentTranslation.value = captionControl.translation
+  currentSourceLang.value = engineControl.sourceLang
+  currentTargetLang.value = engineControl.targetLang
+  currentEngine.value = engineControl.engine
+  currentAudio.value = engineControl.audio
+  currentTranslation.value = engineControl.translation
 
-  currentCustomized.value = captionControl.customized
-  currentCustomizedApp.value = captionControl.customizedApp
-  currentCustomizedCommand.value = captionControl.customizedCommand
+  currentCustomized.value = engineControl.customized
+  currentCustomizedApp.value = engineControl.customizedApp
+  currentCustomizedCommand.value = engineControl.customizedCommand
 }
 
 watch(changeSignal, (val) => {
   if(val == true) {
     cancelChange();
-    captionControl.changeSignal = false;
+    engineControl.changeSignal = false;
   }
 })
 </script>
