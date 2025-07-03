@@ -26,7 +26,7 @@
         color: captionStyle.fontColor
       }">
         <span v-if="captionData.length">{{ captionData[captionData.length-1].text }}</span>
-        <span v-else>{{ "This is a preview of subtitle styles." }}</span>
+        <span v-else>{{ $t('example.original') }}</span>
       </p>
       <p class="preview-translation" v-if="captionStyle.transDisplay" :style="{
         fontFamily: captionStyle.transFontFamily,
@@ -34,7 +34,7 @@
         color: captionStyle.transFontColor
       }">
         <span v-if="captionData.length">{{ captionData[captionData.length-1].translation }}</span>
-        <span v-else>{{ "这是字幕样式预览(翻译)" }}</span>
+        <span v-else>{{ $t('example.translation') }}</span>
       </p>
     </div>
   </div>

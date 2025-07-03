@@ -8,6 +8,8 @@
     </p>
 </div>
 
+<p style="color:red;text-align:center;">The development of the new version is underway, featuring a local subtitle engine, English/Japanese internationalization, and a dark theme. It will also include fixes for known bugs and improvements to the user experience. It is expected to be released within this month.</p>
+
 ![](./assets/media/main.png)
 
 ## ⚠️ Attention

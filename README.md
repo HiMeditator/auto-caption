@@ -8,6 +8,8 @@
     </p>
 </div>
 
+<p style="color:red;text-align:center;">新版本的开发正在进行中，新特性包括本地字幕引擎、英日语国际化以及暗色主题，还将修复已知bug和提示使用体验，预计将于本月之内发布。</p>
+
 ![](./assets/media/main.png)
 
 ## 📥 下载
@@ -50,7 +52,7 @@ npm install
 > #### 背景介绍
 >
 > 如果你是开发者，想开发自定义字幕引擎，请查看[字幕引擎说明文档](./assets/engine-manual_zh.md)。
-> 
+>
 > 所谓的字幕引擎实际上是一个子程序，它会实时获取系统音频输入（录音）或输出（播放声音）的流式数据，并调用音频转文字的模型生成对应音频的字幕。生成的字幕通过 IPC 输出为转换为字符串的 JSON 数据，并返回给主程序。主程序读取字幕数据，处理后显示在窗口上。
 >
 >目前项目默认使用[阿里云 Gummy 模型](https://help.aliyun.com/zh/model-studio/gummy-speech-recognition-translation/)，需要获取阿里云百炼平台的 API KEY 并配置到环境变量中才能正常使用该模型。

@@ -44,34 +44,4 @@ const { leftBarWidth } = storeToRefs(generalSettingStore)
   overflow-y: auto;
   scrollbar-width: thin;
 }
-
-.about-modal-content {
-  text-align: center;
-  padding: 8px 0 0 0;
-}
-
-.about-title {
-  font-size: 1.5em;
-  font-weight: bold;
-  margin-bottom: 0.2em;
-}
-
-.about-desc {
-  color: #666;
-  margin-bottom: 0.5em;
-}
-
-.about-info {
-  text-align: left;
-  display: inline-block;
-  margin: 0 auto;
-  font-size: 1em;
-}
-
-.about-date {
-  margin-top: 1.5em;
-  color: #aaa;
-  font-size: 0.95em;
-  text-align: right;
-}
 </style>

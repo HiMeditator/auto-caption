@@ -5,57 +5,57 @@
       <a @click="backStyle">取消更改</a> |
       <a @click="resetStyle">恢复默认</a>
     </template>
-    <div class="style-item">
-      <span class="style-label">字体族</span>
+    <div class="input-item">
+      <span class="input-label">字体族</span>
       <a-input
-        class="style-input"
+        class="input-area"
         v-model:value="currentFontFamily"
-      />   
+      />
     </div>
-    <div class="style-item">
-      <span class="style-label">字体颜色</span>
+    <div class="input-item">
+      <span class="input-label">字体颜色</span>
       <a-input
-        class="style-input"
+        class="input-area"
         type="color"
         v-model:value="currentFontColor"
       />
-      <div class="style-item-value">{{ currentFontColor }}</div>
+      <div class="input-item-value">{{ currentFontColor }}</div>
     </div>
-    <div class="style-item">
-      <span class="style-label">字体大小</span>
+    <div class="input-item">
+      <span class="input-label">字体大小</span>
       <a-input
-        class="style-input"
+        class="input-area"
         type="range"
         min="0" max="64"
         v-model:value="currentFontSize"
-      />  
-      <div class="style-item-value">{{ currentFontSize }}px</div> 
+      />
+      <div class="input-item-value">{{ currentFontSize }}px</div>
     </div>
-    <div class="style-item">
-      <span class="style-label">背景颜色</span>
+    <div class="input-item">
+      <span class="input-label">背景颜色</span>
       <a-input
-        class="style-input"
+        class="input-area"
         type="color"
         v-model:value="currentBackground"
       />
-      <div class="style-item-value">{{ currentBackground }}</div>
+      <div class="input-item-value">{{ currentBackground }}</div>
     </div>
-    <div class="style-item">
-      <span class="style-label">背景透明度</span>
+    <div class="input-item">
+      <span class="input-label">背景透明度</span>
       <a-input
-        class="style-input"
+        class="input-area"
         type="range"
         min="0"
         max="100"
         v-model:value="currentOpacity"
       />
-      <div class="style-item-value">{{ currentOpacity }}</div>
+      <div class="input-item-value">{{ currentOpacity }}</div>
     </div>
-    
-    <div class="style-item">
-      <span class="style-label">显示预览</span>
+
+    <div class="input-item">
+      <span class="input-label">显示预览</span>
       <a-switch v-model:checked="displayPreview" />
-      <span class="style-label">显示翻译</span>
+      <span class="input-label">显示翻译</span>
       <a-switch v-model:checked="currentTransDisplay" />
     </div>
 
@@ -64,31 +64,31 @@
         <template #extra>
           <a @click="useSameStyle">使用相同样式</a>
         </template>
-        <div class="style-item">
-          <span class="style-label">翻译字体</span>
+        <div class="input-item">
+          <span class="input-label">翻译字体</span>
           <a-input
-            class="style-input"
+            class="input-area"
             v-model:value="currentTransFontFamily"
-          />   
+          />
         </div>
-        <div class="style-item">
-          <span class="style-label">翻译颜色</span>
+        <div class="input-item">
+          <span class="input-label">翻译颜色</span>
           <a-input
-            class="style-input"
+            class="input-area"
             type="color"
             v-model:value="currentTransFontColor"
           />
-          <div class="style-item-value">{{ currentTransFontColor }}</div>
+          <div class="input-item-value">{{ currentTransFontColor }}</div>
         </div>
-        <div class="style-item">
-          <span class="style-label">翻译大小</span>
+        <div class="input-item">
+          <span class="input-label">翻译大小</span>
           <a-input
-            class="style-input"
+            class="input-area"
             type="range"
             min="0" max="64"
             v-model:value="currentTransFontSize"
-          />   
-          <div class="style-item-value">{{ currentTransFontSize }}px</div>
+          />
+          <div class="input-item-value">{{ currentTransFontSize }}px</div>
         </div>
       </a-card>
     </div>
@@ -115,10 +115,10 @@
         :style="{
           fontFamily: currentTransFontFamily,
           fontSize: currentTransFontSize + 'px',
-          color: currentTransFontColor  
+          color: currentTransFontColor
         }"
       >这是字幕样式预览(翻译)</p>
-    </div>    
+    </div>
   </Teleport>
 
 </template>
@@ -154,7 +154,7 @@ function useSameStyle(){
   currentTransFontColor.value = currentFontColor.value;
 }
 
-function applyStyle(){ 
+function applyStyle(){
   captionStyle.fontFamily = currentFontFamily.value;
   captionStyle.fontSize = currentFontSize.value;
   captionStyle.fontColor = currentFontColor.value;
@@ -182,7 +182,7 @@ function backStyle(){
   currentTransFontColor.value = captionStyle.transFontColor;
 }
 
-function resetStyle() { 
+function resetStyle() {
   captionStyle.sendStyleReset();
 }
 
@@ -195,33 +195,7 @@ watch(changeSignal, (val) => {
 </script>
 
 <style scoped>
-.caption-button {
-  display: flex;
-  justify-content: center;
-}
-
-.style-item {
-  margin: 10px 0;
-}
-
-.style-label {
-  display: inline-block;
-  width: 80px;
-  text-align: right;
-  margin-right: 10px;
-}
-
-.style-input {
-  width: calc(100% - 100px);
-  min-width: 100px;
-}
-
-.style-item-value {
-  width: 80px;
-  text-align: right;
-  font-size: 12px;
-  color: #666
-}
+@import url(../assets/input.css);
 
 .preview-container {
   line-height: 2em;

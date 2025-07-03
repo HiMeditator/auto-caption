@@ -1,4 +1,4 @@
-import { Styles, CaptionItem, Controls } from '../types'
+import { UILanguage, Styles, CaptionItem, Controls } from '../types'
 import { app, BrowserWindow } from 'electron'
 import * as path from 'path'
 import * as fs from 'fs'
@@ -29,6 +29,7 @@ const defaultControls: Controls = {
 
 
 class AllConfig {
+  uiLanguage: UILanguage = 'ja'
   styles: Styles = {...defaultStyles};
   controls: Controls = {...defaultControls};
   captionLog: CaptionItem[] = [];
@@ -39,14 +40,16 @@ class AllConfig {
     const configPath = path.join(app.getPath('userData'), 'config.json')
     if(fs.existsSync(configPath)){
       const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'))
-      this.setStyles(config.styles)
-      this.setControls(config.controls)
+      if(config.uiLanguage) this.uiLanguage = config.uiLanguage
+      if(config.styles) this.setStyles(config.styles)
+      if(config.controls) this.setControls(config.controls)
       console.log('[INFO] Read Config from:', configPath)
     }
   }
 
   public writeConfig() {
     const config = {
+      uiLanguage: this.uiLanguage,
       controls: this.controls,
       styles: this.styles
     }

@@ -4,6 +4,7 @@ import { is } from '@electron-toolkit/utils'
 import path from 'path'
 import { controlWindow } from '../ControlWindow'
 import { allConfig } from './AllConfig'
+import { i18n } from '../i18n'
 
 export class CaptionEngine {
   appPath: string = ''
@@ -18,7 +19,7 @@ export class CaptionEngine {
     else if (allConfig.controls.engine === 'gummy') {
       allConfig.controls.customized = false
       if(!process.env.DASHSCOPE_API_KEY) {
-        controlWindow.sendErrorMessage('没有检测到 DASHSCOPE_API_KEY 环境变量，如果要使用 gummy 引擎，需要在阿里云百炼平台获取 API Key 并添加到本机环境变量')
+        controlWindow.sendErrorMessage(i18n('gummy.env.missing'))
         return false
       }
       let gummyName = ''
@@ -29,8 +30,8 @@ export class CaptionEngine {
         gummyName = 'main-gummy'
       }
       else {
-        controlWindow.sendErrorMessage('Unsupported platform: ' + process.platform)
-        throw new Error('Unsupported platform')
+        controlWindow.sendErrorMessage(i18n('platform.unsupported') + process.platform)
+        throw new Error(i18n('platform.unsupported'))
       }
       if (is.dev) {
         this.appPath = path.join(
@@ -66,7 +67,7 @@ export class CaptionEngine {
       this.process = spawn(this.appPath, this.command)
     }
     catch (e) {
-      controlWindow.sendErrorMessage('字幕引擎启动失败：' + e)
+      controlWindow.sendErrorMessage(i18n('engine.start.error') + e)
       console.error('[ERROR] Error starting subprocess:', e)
       return
     }
@@ -80,7 +81,7 @@ export class CaptionEngine {
       controlWindow.window.webContents.send('control.engine.started')
     }
 
-    this.process.stdout.on('data', (data) => {
+    this.process.stdout.on('data', (data: any) => {
       const lines = data.toString().split('\n');
       lines.forEach((line: string) => {
         if (line.trim()) {
@@ -88,7 +89,7 @@ export class CaptionEngine {
             const caption = JSON.parse(line);
             allConfig.updateCaptionLog(caption);
           } catch (e) {
-            controlWindow.sendErrorMessage('字幕引擎输出内容无法解析为 JSON 对象：' + e)
+            controlWindow.sendErrorMessage(i18n('engine.output.parse.error') + e)
             console.error('[ERROR] Error parsing JSON:', e);
           }
         }
@@ -96,7 +97,7 @@ export class CaptionEngine {
     });
 
     this.process.stderr.on('data', (data) => {
-      controlWindow.sendErrorMessage('字幕引擎错误：' + data)
+      controlWindow.sendErrorMessage(i18n('engine.error') + data)
       console.error(`[ERROR] Subprocess Error: ${data}`);
     });
 
@@ -115,7 +116,7 @@ export class CaptionEngine {
       if (process.platform === "win32" && this.process.pid) {
         exec(`taskkill /pid ${this.process.pid} /t /f`, (error) => {
           if (error) {
-            controlWindow.sendErrorMessage('字幕引擎进程关闭失败：' + error)
+            controlWindow.sendErrorMessage(i18n('engine.shutdown.error') + error)
             console.error(`[ERROR] Failed to kill process: ${error}`)
           }
         });
