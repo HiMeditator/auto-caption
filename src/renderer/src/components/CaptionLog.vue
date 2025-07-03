@@ -1,20 +1,20 @@
 <template>
   <div class="caption-list">
     <div class="caption-title">
-      <span style="margin-right: 30px;">字幕记录</span>
+      <span style="margin-right: 30px;">{{ $t('log.title') }}</span>
       <a-button
         type="primary"
         style="margin-right: 20px;"
         @click="exportCaptions"
         :disabled="captionData.length === 0"
       >
-        导出字幕记录
+        {{ $t('log.export') }}
       </a-button>
       <a-button
         danger
         @click="clearCaptions"
       >
-        清空字幕记录
+        {{ $t('log.clear') }}
       </a-button>
     </div>
     <a-table
@@ -54,7 +54,7 @@ const pagination = ref({
   pageSize: 10,
   showSizeChanger: true,
   pageSizeOptions: ['10', '20', '50'],
-  showTotal: (total: number) => `共 ${total} 条记录`,
+  showTotal: (total: number) => `Total: ${total}`,
   onChange: (page: number, pageSize: number) => {
     pagination.value.current = page
     pagination.value.pageSize = pageSize
@@ -67,19 +67,19 @@ const pagination = ref({
 
 const columns = [
   {
-    title: '序号',
+    title: 'index',
     dataIndex: 'index',
     key: 'index',
     width: 80,
   },
   {
-    title: '时间',
+    title: 'time',
     dataIndex: 'time',
     key: 'time',
     width: 160,
   },
   {
-    title: '字幕内容',
+    title: 'content',
     dataIndex: 'content',
     key: 'content',
   },

@@ -2,16 +2,22 @@
   <div class="caption-stat">
     <a-row>
       <a-col :span="6">
-        <a-statistic title="字幕引擎" :value="(customized && customizedApp)?'自定义':engine" />
+        <a-statistic
+          :title="$t('status.engine')"
+          :value="(customized && customizedApp)?$t('status.customized'):engine"
+        />
       </a-col>
       <a-col :span="6">
-        <a-statistic title="字幕引擎状态" :value="engineEnabled?'已启动':'未启动'" />
+        <a-statistic
+          :title="$t('status.status')"
+          :value="engineEnabled?$t('status.started'):$t('status.stopped')"
+        />
       </a-col>
       <a-col :span="6">
-        <a-statistic title="已记录字幕" :value="captionData.length" />
+        <a-statistic :title="$t('status.logNumber')" :value="captionData.length" />
       </a-col>
       <a-col :span="6">
-        <div class="about-tag">关于本项目</div>
+        <div class="about-tag">{{ $t('status.aboutProj') }}</div>
           <GithubOutlined class="proj-info" @click="showAbout = true"/>
       </a-col>
     </a-row>
@@ -22,42 +28,51 @@
       type="primary"
       class="control-button"
       @click="openCaptionWindow"
-    >打开字幕窗口</a-button>
+    >{{ $t('status.openCaption') }}</a-button>
     <a-button
       class="control-button"
       @click="startEngine"
-    >启动字幕引擎</a-button>
+    >{{  engineEnabled ? $t('status.restartEngine') : $t('status.startEngine') }}</a-button>
+    <!-- TODO 添加重启字幕引擎功能 -->
     <a-button
      danger class="control-button"
      @click="stopEngine"
-    >关闭字幕引擎</a-button>
+    >{{ $t('status.stopEngine') }}</a-button>
   </div>
 
-  <a-modal v-model:open="showAbout" title="关于本项目" :footer="null">
+  <a-modal v-model:open="showAbout" :title="$t('status.about.title')" :footer="null">
     <div class="about-modal-content">
-      <h2 class="about-title">Auto Caption 项目</h2>
-      <p class="about-desc">一个跨平台的实时字幕显示软件。</p>
+      <h2 class="about-title">{{ $t('status.about.proj') }}</h2>
+      <p class="about-desc">{{ $t('status.about.desc') }}</p>
       <a-divider />
       <div class="about-info">
-        <p><b>作者：</b>HiMeditator</p>
-        <p><b>版本：</b>v0.1.0</p>
+        <p><b>{{ $t('status.about.version') }}</b><a-tag color="green">v0.1.0</a-tag></p>
         <p>
-          <b>项目地址：</b>
-          <a href="https://github.com/HiMeditator/auto-caption" target="_blank">
-            GitHub | auto-caption
+          <b>{{ $t('status.about.author') }}</b>
+          <a
+            href="https://github.com/HiMeditator"
+            target="_blank"
+          >
+            <a-tag color="blue">HiMeditator</a-tag>
           </a>
         </p>
         <p>
-          <b>用户手册：</b>
+          <b>{{ $t('status.about.projLink') }}</b>
+          <a href="https://github.com/HiMeditator/auto-caption" target="_blank">
+            <a-tag color="blue">GitHub | auto-caption</a-tag>
+          </a>
+        </p>
+        <p>
+          <b>{{ $t('status.about.manual') }}</b>
           <a
             href="https://github.com/HiMeditator/auto-caption/blob/main/assets/user-manual_zh.md"
             target="_blank"
           >
-            GitHub | user-manual_zh.md
+            <a-tag color="blue">GitHub | user-manual_zh.md</a-tag>
           </a>
         </p>
       </div>
-      <div class="about-date">2026 年 6 月 26 日</div>
+      <div class="about-date">{{ $t('status.about.date') }}</div>
     </div>
   </a-modal>
 </template>
@@ -123,6 +138,10 @@ function stopEngine() {
   display: inline-block;
   margin: 0 auto;
   font-size: 1em;
+}
+
+.about-info b {
+  margin-right: 1em;
 }
 
 .about-date {

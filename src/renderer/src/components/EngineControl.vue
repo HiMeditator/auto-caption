@@ -1,12 +1,12 @@
 <template>
   <div style="height: 20px;"></div>
-  <a-card size="small" title="字幕控制">
+  <a-card size="small" :title="$t('engine.title')">
     <template #extra>
-      <a @click="applyChange">更改设置</a> |
-      <a @click="cancelChange">取消更改</a>
+      <a @click="applyChange">{{ $t('engine.applyChange') }}</a> |
+      <a @click="cancelChange">{{ $t('engine.cancelChange') }}</a>
     </template>
     <div class="input-item">
-      <span class="input-label">源语言</span>
+      <span class="input-label">{{ $t('engine.sourceLang') }}</span>
       <a-select
         class="input-area"
         v-model:value="currentSourceLang"
@@ -14,7 +14,7 @@
       ></a-select>
     </div>
     <div class="input-item">
-      <span class="input-label">翻译语言</span>
+      <span class="input-label">{{ $t('engine.transLang') }}</span>
       <a-select
         class="input-area"
         v-model:value="currentTargetLang"
@@ -22,7 +22,7 @@
       ></a-select>
     </div>
     <div class="input-item">
-      <span class="input-label">字幕引擎</span>
+      <span class="input-label">{{ $t('engine.captionEngine') }}</span>
       <a-select
         class="input-area"
         v-model:value="currentEngine"
@@ -30,7 +30,7 @@
       ></a-select>
     </div>
     <div class="input-item">
-      <span class="input-label">音频选择</span>
+      <span class="input-label">{{ $t('engine.audioType') }}</span>
       <a-select
         class="input-area"
         v-model:value="currentAudio"
@@ -38,23 +38,33 @@
       ></a-select>
     </div>
     <div class="input-item">
-      <span class="input-label">启用翻译</span>
+      <span class="input-label">{{ $t('engine.enableTranslation') }}</span>
       <a-switch v-model:checked="currentTranslation" />
-      <span class="input-label">自定义引擎</span>
-      <a-switch v-model:checked="currentCustomized" />
+      <sapn style="display:inline-block;width:20px;"></sapn>
+      <div style="display: inline-block;">
+        <span class="switch-label">{{ $t('engine.customEngine') }}</span>
+        <a-switch v-model:checked="currentCustomized" />
+      </div>
     </div>
     <div v-show="currentCustomized">
-      <a-card size="small" title="自定义字幕引擎">
-        <p class="customize-note">说明：允许用户使用自定义字幕引擎提供字幕。提供的引擎要能通过 <code>child_process.spawn()</code> 进行启动，且需要通过 IPC 与项目 node.js 后端进行通信。具体通信接口见后端实现。</p>
+      <a-card size="small" :title="$t('engine.custom.title')">
+        <template #extra>
+          <a-popover>
+            <template #content>
+              <p class="customize-note">{{ $t('engine.custom.note') }}</p>
+            </template>
+            <a><InfoCircleOutlined />{{ $t('engine.custom.attention') }}</a>
+          </a-popover>
+        </template>
         <div class="input-item">
-          <span class="input-label">引擎路径</span>
+          <span class="input-label">{{ $t('engine.custom.app') }}</span>
           <a-input
             class="input-area"
             v-model:value="currentCustomizedApp"
           ></a-input>
         </div>
         <div class="input-item">
-          <span class="input-label">引擎指令</span>
+          <span class="input-label">{{ $t('engine.custom.command') }}</span>
           <a-input
             class="input-area"
             v-model:value="currentCustomizedCommand"
@@ -71,7 +81,7 @@ import { ref, computed, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useEngineControlStore } from '@renderer/stores/engineControl'
 import { notification } from 'ant-design-vue'
-
+import { InfoCircleOutlined } from '@ant-design/icons-vue';
 const engineControl = useEngineControlStore()
 const { captionEngine, audioType, changeSignal } = storeToRefs(engineControl)
 
@@ -108,8 +118,8 @@ function applyChange(){
   engineControl.sendControlChange()
 
   notification.open({
-      message: '字幕控制已更改',
-      description: '如果字幕引擎已经启动，需要关闭后重启才会生效'
+    message: '字幕控制已更改',
+    description: '如果字幕引擎已经启动，需要关闭后重启才会生效'
   });
 }
 
@@ -137,8 +147,8 @@ watch(changeSignal, (val) => {
 @import url(../assets/input.css);
 
 .customize-note {
-  padding: 0 20px;
+  padding: 10px 10px 0;
   color: red;
-  font-size: 12px;
+  max-width: min(40vw, 480px);
 }
 </style>

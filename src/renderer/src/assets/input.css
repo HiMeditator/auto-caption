@@ -9,6 +9,11 @@
   margin-right: 10px;
 }
 
+.switch-label {
+  display: inline-block;
+  margin-right: 10px;
+}
+
 .input-area {
   width: calc(100% - 100px);
   min-width: 100px;

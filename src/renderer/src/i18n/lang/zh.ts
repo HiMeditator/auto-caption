@@ -1,8 +1,76 @@
 export default {
   example: {
     "original": "This is a preview of subtitle styles.",
-    "translation": "这是字幕样式预览（翻译）"
+    "translation": "（翻译）这是字幕样式预览。"
   },
   general: {
+    "title": "通用设置",
+    "uiLanguage": "界面语言",
+    "barWidth": "左侧宽度"
+  },
+  engine: {
+    "title": "字幕引擎设置",
+    "applyChange": "应用更改",
+    "cancelChange": "取消更改",
+    "sourceLang": "源语言",
+    "transLang": "翻译语言",
+    "captionEngine": "字幕引擎",
+    "audioType": "音频类型",
+    "systemOutput": "系统音频输出（扬声器）",
+    "systemInput": "系统音频输入（麦克风）",
+    "enableTranslation": "启用翻译",
+    "customEngine": "自定义引擎",
+    custom: {
+      "title": "自定义字幕引擎",
+      "attention": "注意事项",
+      "note": "说明：允许用户使用自定义引擎提供字幕。提供的引擎要能通过命令行启动，且可以提供命令行指令来指定参数。引擎需要使用标准输出与软件 node.js 后端进行通信。详细信息参考项目文档。",
+      "app": "引擎路径",
+      "command": "引擎指令"
+    }
+  },
+  style: {
+    "title": "字幕样式设置",
+    "applyStyle": "应用样式",
+    "cancelChange": "取消更改",
+    "resetStyle": "恢复默认",
+    "fontFamily": "字体族",
+    "fontColor": "字体颜色",
+    "fontSize": "字体大小",
+    "background": "背景颜色",
+    "opacity": "不透明度",
+    "preview": "显示预览",
+    "translation": "显示翻译",
+    trans: {
+      "title": "翻译样式设置",
+      "useSame": "使用原文样式"
+    }
+  },
+  status: {
+    "engine": "字幕引擎",
+    "customized": "自定义",
+    "status": "引擎状态",
+    "started": "已启动",
+    "stopped": "未启动",
+    "logNumber": "字幕数量",
+    "aboutProj": "项目关于",
+    "openCaption": "打开字幕窗口",
+    "startEngine": "启动字幕引擎",
+    "restartEngine": "重启字幕引擎",
+    "stopEngine": "关闭字幕引擎",
+    about: {
+      "title": "关于本项目",
+      "proj": "Auto Caption 项目",
+      "desc": "一个跨平台的支持多种语言的实时字幕显示软件。",
+      "version": "软件版本",
+      "author": "项目作者",
+      "projLink": "项目链接",
+      "manual": "用户手册",
+      "date": "2026 年 6 月 26 日"
+    }
+  },
+  log: {
+    "title": "字幕记录",
+    "export": "导出字幕记录",
+    "clear": "清空字幕记录"
   }
 }

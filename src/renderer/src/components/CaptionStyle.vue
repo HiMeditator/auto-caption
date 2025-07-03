@@ -1,19 +1,19 @@
 <template>
-  <a-card size="small" title="字幕样式设置">
+  <a-card size="small" :title="$t('style.title')">
     <template #extra>
-      <a @click="applyStyle">应用样式</a> |
-      <a @click="backStyle">取消更改</a> |
-      <a @click="resetStyle">恢复默认</a>
+      <a @click="applyStyle">{{ $t('style.applyStyle') }}</a> |
+      <a @click="backStyle">{{ $t('style.cancelChange') }}</a> |
+      <a @click="resetStyle">{{ $t('style.resetStyle') }}</a>
     </template>
     <div class="input-item">
-      <span class="input-label">字体族</span>
+      <span class="input-label">{{ $t('style.fontFamily') }}</span>
       <a-input
         class="input-area"
         v-model:value="currentFontFamily"
       />
     </div>
     <div class="input-item">
-      <span class="input-label">字体颜色</span>
+      <span class="input-label">{{ $t('style.fontColor') }}</span>
       <a-input
         class="input-area"
         type="color"
@@ -22,7 +22,7 @@
       <div class="input-item-value">{{ currentFontColor }}</div>
     </div>
     <div class="input-item">
-      <span class="input-label">字体大小</span>
+      <span class="input-label">{{ $t('style.fontSize') }}</span>
       <a-input
         class="input-area"
         type="range"
@@ -32,7 +32,7 @@
       <div class="input-item-value">{{ currentFontSize }}px</div>
     </div>
     <div class="input-item">
-      <span class="input-label">背景颜色</span>
+      <span class="input-label">{{ $t('style.background') }}</span>
       <a-input
         class="input-area"
         type="color"
@@ -41,7 +41,7 @@
       <div class="input-item-value">{{ currentBackground }}</div>
     </div>
     <div class="input-item">
-      <span class="input-label">背景透明度</span>
+      <span class="input-label">{{ $t('style.opacity') }}</span>
       <a-input
         class="input-area"
         type="range"
@@ -49,30 +49,33 @@
         max="100"
         v-model:value="currentOpacity"
       />
-      <div class="input-item-value">{{ currentOpacity }}</div>
+      <div class="input-item-value">{{ currentOpacity }}%</div>
     </div>
 
     <div class="input-item">
-      <span class="input-label">显示预览</span>
+      <span class="input-label">{{ $t('style.preview') }}</span>
       <a-switch v-model:checked="displayPreview" />
-      <span class="input-label">显示翻译</span>
-      <a-switch v-model:checked="currentTransDisplay" />
+      <sapn style="display:inline-block;width:20px;"></sapn>
+      <div style="display: inline-block;">
+        <span class="switch-label">{{ $t('style.translation') }}</span>
+        <a-switch v-model:checked="currentTransDisplay" />
+      </div>
     </div>
 
     <div v-show="currentTransDisplay">
-      <a-card size="small" title="翻译样式设置">
+      <a-card size="small" :title="$t('style.trans.title')">
         <template #extra>
-          <a @click="useSameStyle">使用相同样式</a>
+          <a @click="useSameStyle">{{ $t('style.trans.useSame') }}</a>
         </template>
         <div class="input-item">
-          <span class="input-label">翻译字体</span>
+          <span class="input-label">{{ $t('style.fontFamily') }}</span>
           <a-input
             class="input-area"
             v-model:value="currentTransFontFamily"
           />
         </div>
         <div class="input-item">
-          <span class="input-label">翻译颜色</span>
+          <span class="input-label">{{ $t('style.fontColor') }}</span>
           <a-input
             class="input-area"
             type="color"
@@ -81,7 +84,7 @@
           <div class="input-item-value">{{ currentTransFontColor }}</div>
         </div>
         <div class="input-item">
-          <span class="input-label">翻译大小</span>
+          <span class="input-label">{{ $t('style.fontSize') }}</span>
           <a-input
             class="input-area"
             type="range"
@@ -92,7 +95,6 @@
         </div>
       </a-card>
     </div>
-
   </a-card>
 
   <Teleport to="body">
@@ -109,7 +111,7 @@
           fontSize: currentFontSize + 'px',
           color: currentFontColor
         }">
-        {{ "This is a preview of subtitle styles." }}
+        {{ $t('example.original') }}
       </p>
       <p class="preview-translation" v-if="currentTransDisplay"
         :style="{
@@ -117,7 +119,7 @@
           fontSize: currentTransFontSize + 'px',
           color: currentTransFontColor
         }"
-      >这是字幕样式预览(翻译)</p>
+      >{{ $t('example.translation') }}</p>
     </div>
   </Teleport>
 
