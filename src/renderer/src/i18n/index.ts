@@ -16,3 +16,4 @@ export const i18n = createI18n({
 
 export * from './config/engine'
 export * from './config/audio'
+export * from './config/theme'

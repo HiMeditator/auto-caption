@@ -1,7 +1,9 @@
 <template>
   <div class="caption-list">
-    <div class="caption-title">
-      <span style="margin-right: 30px;">{{ $t('log.title') }}</span>
+    <div>
+      <a-app class="caption-title">
+        <span style="margin-right: 30px;">{{ $t('log.title') }}</span>
+      </a-app>
       <a-button
         type="primary"
         style="margin-right: 20px;"
@@ -106,13 +108,13 @@ function clearCaptions() {
 
 <style scoped>
 .caption-list {
-  background: #fff;
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .caption-title {
+  display: inline-block;
   font-size: 24px;
   font-weight: bold;
   margin-bottom: 10px;
@@ -139,13 +141,11 @@ function clearCaptions() {
 
 .caption-text {
   font-size: 16px;
-  color: #333;
   margin-bottom: 4px;
 }
 
 .caption-translation {
   font-size: 14px;
-  color: #666;
   padding-left: 16px;
   border-left: 3px solid #1890ff;
 }

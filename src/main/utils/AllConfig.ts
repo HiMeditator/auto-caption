@@ -1,6 +1,6 @@
 import {
-  UILanguage, Styles, CaptionItem, Controls,
-  FullConfig
+  UILanguage, UITheme, Styles, Controls,
+  CaptionItem, FullConfig
 } from '../types'
 import { app, BrowserWindow } from 'electron'
 import * as path from 'path'
@@ -35,6 +35,7 @@ const defaultControls: Controls = {
 class AllConfig {
   uiLanguage: UILanguage = 'zh';
   leftBarWidth: number = 8;
+  uiTheme: UITheme = 'system';
   styles: Styles = {...defaultStyles};
   controls: Controls = {...defaultControls};
   captionLog: CaptionItem[] = [];
@@ -46,6 +47,7 @@ class AllConfig {
     if(fs.existsSync(configPath)){
       const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'))
       if(config.uiLanguage) this.uiLanguage = config.uiLanguage
+      if(config.uiTheme) this.uiTheme = config.uiTheme
       if(config.leftBarWidth) this.leftBarWidth = config.leftBarWidth
       if(config.styles) this.setStyles(config.styles)
       if(config.controls) this.setControls(config.controls)
@@ -56,6 +58,7 @@ class AllConfig {
   public writeConfig() {
     const config = {
       uiLanguage: this.uiLanguage,
+      uiTheme: this.uiTheme,
       leftBarWidth: this.leftBarWidth,
       controls: this.controls,
       styles: this.styles
@@ -68,6 +71,7 @@ class AllConfig {
   public getFullConfig(): FullConfig {
     return {
       uiLanguage: this.uiLanguage,
+      uiTheme: this.uiTheme,
       leftBarWidth: this.leftBarWidth,
       styles: this.styles,
       controls: this.controls,

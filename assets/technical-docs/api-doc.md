@@ -31,6 +31,19 @@
 - 发送：无数据
 - 接收：`FullConfig`
 
+### `control.nativeTheme.get`
+
+**介绍：**前端获取系统当前的主题
+
+**发起方：**前端控制窗口
+
+**接收方：**后端控制窗口实例
+
+**数据类型：**
+
+- 发送：无数据
+- 接收：`string`
+
 ## 前端 ==> 后端
 
 ### `control.uiLanguage.change`
@@ -42,6 +55,16 @@
 **接收方：**后端控制窗口实例
 
 **数据类型：**`UILanguage`
+
+### `control.uiTheme.change`
+
+**介绍：**前端修改字界面主题，将修改同步给后端
+
+**发起方：**前端控制窗口
+
+**接收方：**后端控制窗口实例
+
+**数据类型：**`UITheme`
 
 ### `control.leftBarWidth.change`
 
@@ -165,7 +188,7 @@
 
 ## 后端 ==> 前端
 
-### `caption.uiLanguage.set`
+### `control.uiLanguage.set`
 
 **介绍：**后端将最新界面语言发送给前端，前端进行设置
 
@@ -174,6 +197,16 @@
 **接收方：**字幕窗口
 
 **数据类型：**`UILanguage`
+
+### `control.nativeTheme.change`
+
+**介绍：**系统主题发生改变
+
+**发起方：**后端
+
+**接收方：**前端控制窗口
+
+**数据类型：**`string`
 
 ### `control.engine.started`
 

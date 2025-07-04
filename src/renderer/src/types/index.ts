@@ -1,5 +1,7 @@
 export type UILanguage =  "zh" | "en" | "ja"
 
+export type UITheme = "light" | "dark" | "system"
+
 export interface Controls {
   engineEnabled: boolean,
   sourceLang: string,
@@ -35,6 +37,7 @@ export interface CaptionItem {
 
 export interface FullConfig {
   uiLanguage: UILanguage,
+  uiTheme: UITheme,
   leftBarWidth: number,
   styles: Styles,
   controls: Controls,

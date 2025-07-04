@@ -20,6 +20,15 @@
       </div>
 
       <div class="input-item">
+        <span class="input-label">{{ $t('general.theme') }}</span>
+        <a-radio-group v-model:value="uiTheme">
+          <a-radio-button value="system">{{ $t('general.system') }}</a-radio-button>
+          <a-radio-button value="light">{{ $t('general.light') }}</a-radio-button>
+          <a-radio-button value="dark">{{ $t('general.dark') }}</a-radio-button>
+        </a-radio-group>
+      </div>
+
+      <div class="input-item">
         <span class="input-label">{{ $t('general.barWidth') }}</span>
         <a-input
           type="range" class="span-input"
@@ -37,7 +46,7 @@ import { useGeneralSettingStore } from '@renderer/stores/generalSetting'
 import { InfoCircleOutlined } from '@ant-design/icons-vue';
 
 const generalSettingStore = useGeneralSettingStore()
-const { uiLanguage, leftBarWidth } = storeToRefs(generalSettingStore)
+const { uiLanguage, uiTheme, leftBarWidth } = storeToRefs(generalSettingStore)
 </script>
 
 <style scoped>

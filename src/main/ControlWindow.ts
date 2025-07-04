@@ -1,4 +1,4 @@
-import { shell, BrowserWindow, ipcMain } from 'electron'
+import { shell, BrowserWindow, ipcMain, nativeTheme } from 'electron'
 import path from 'path'
 import { is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
@@ -50,15 +50,35 @@ class ControlWindow {
   }
 
   public handleMessage() {
+    nativeTheme.on('updated', () => {
+      if(allConfig.uiTheme === 'system'){
+        if(nativeTheme.shouldUseDarkColors && this.window){
+          this.window.webContents.send('control.nativeTheme.change', 'dark')
+        }
+        else if(!nativeTheme.shouldUseDarkColors && this.window){
+          this.window.webContents.send('control.nativeTheme.change', 'light')
+        }
+      }
+    })
+
     ipcMain.handle('both.window.mounted', () => {
       return allConfig.getFullConfig()
+    })
+
+    ipcMain.handle('control.nativeTheme.get', () => {
+      if(nativeTheme.shouldUseDarkColors) return 'dark'
+      return 'light'
     })
 
     ipcMain.on('control.uiLanguage.change', (_, args) => {
       allConfig.uiLanguage = args
       if(captionWindow.window){
-        captionWindow.window.webContents.send('caption.uiLanguage.set', args)
+        captionWindow.window.webContents.send('control.uiLanguage.set', args)
       }
+    })
+
+    ipcMain.on('control.uiTheme.change', (_, args) => {
+      allConfig.uiTheme = args
     })
 
     ipcMain.on('control.leftBarWidth.change', (_, args) => {
