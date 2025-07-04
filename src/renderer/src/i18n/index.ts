@@ -4,7 +4,7 @@ import zh from './lang/zh';
 import en from './lang/en';
 import ja from './lang/ja';
 
-const i18n = createI18n({
+export const i18n = createI18n({
     legacy: false,
     locale: 'zh',
     messages: {
@@ -14,4 +14,5 @@ const i18n = createI18n({
     }
 });
 
-export default i18n;
+export * from './config/engine'
+export * from './config/audio'

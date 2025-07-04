@@ -115,7 +115,7 @@ function applyChange(){
   engineControl.customizedApp = currentCustomizedApp.value
   engineControl.customizedCommand = currentCustomizedCommand.value
 
-  engineControl.sendControlChange()
+  engineControl.sendControlsChange()
 
   notification.open({
     message: '字幕控制已更改',

@@ -6,39 +6,14 @@ import { ExclamationCircleOutlined } from '@ant-design/icons-vue'
 import { h } from 'vue'
 
 import { Controls } from '@renderer/types'
+import { engines, audioTypes } from '@renderer/i18n'
+import { useGeneralSettingStore } from './generalSetting'
 
 export const useEngineControlStore = defineStore('engineControl', () => {
-  const captionEngine = ref([
-    {
-      value: 'gummy',
-      label: '云端-阿里云-Gummy',
-      languages: [
-        { value: 'auto', label: '自动检测' },
-        { value: 'en', label: '英语' },
-        { value: 'zh', label: '中文' },
-        { value: 'ja', label: '日语' },
-        { value: 'ko', label: '韩语' },
-        { value: 'de', label: '德语' },
-        { value: 'fr', label: '法语' },
-        { value: 'ru', label: '俄语' },
-        { value: 'es', label: '西班牙语' },
-        { value: 'it', label: '意大利语' },
-      ]
-    },
-  ])
-  const audioType = ref([
-    {
-      value: 0,
-      label: '系统音频输出（扬声器）'
-    },
-    {
-      value: 1,
-      label: '系统音频输入（麦克风）'
-    }
-  ])
+  const captionEngine = ref(engines[useGeneralSettingStore().uiLanguage])
+  const audioType = ref(audioTypes[useGeneralSettingStore().uiLanguage])
 
   const engineEnabled = ref(false)
-
   const sourceLang = ref<string>('en')
   const targetLang = ref<string>('zh')
   const engine = ref<'gummy'>('gummy')
@@ -50,7 +25,7 @@ export const useEngineControlStore = defineStore('engineControl', () => {
 
   const changeSignal = ref<boolean>(false)
 
-  function sendControlChange() {
+  function sendControlsChange() {
     const controls: Controls = {
       engineEnabled: engineEnabled.value,
       sourceLang: sourceLang.value,
@@ -62,10 +37,10 @@ export const useEngineControlStore = defineStore('engineControl', () => {
       customizedApp: customizedApp.value,
       customizedCommand: customizedCommand.value
     }
-    window.electron.ipcRenderer.send('control.control.change', controls)
+    window.electron.ipcRenderer.send('control.controls.change', controls)
   }
 
-  window.electron.ipcRenderer.on('control.control.set', (_, controls) => {
+  window.electron.ipcRenderer.on('control.controls.set', (_, controls: Controls) => {
     sourceLang.value = controls.sourceLang
     targetLang.value = controls.targetLang
     engine.value = controls.engine
@@ -79,6 +54,7 @@ export const useEngineControlStore = defineStore('engineControl', () => {
   })
 
   window.electron.ipcRenderer.on('control.engine.already', () => {
+    // TODO 修改为重启
     notification.open({
       message: '字幕引擎已经启动',
       description: '字幕引擎已经启动，请勿重复启动'
@@ -104,7 +80,7 @@ export const useEngineControlStore = defineStore('engineControl', () => {
     });
   })
 
-  window.electron.ipcRenderer.on('control.error.send', (_, message) => {
+  window.electron.ipcRenderer.on('control.error.occurred', (_, message) => {
     notification.open({
       message: '发生错误',
       description: message,
@@ -126,7 +102,7 @@ export const useEngineControlStore = defineStore('engineControl', () => {
     customized,         // 是否使用自定义字幕引擎
     customizedApp,      // 自定义字幕引擎的应用程序
     customizedCommand,  // 自定义字幕引擎的命令
-    sendControlChange,  // 发送最新控制消息到后端
+    sendControlsChange,  // 发送最新控制消息到后端
     changeSignal,       // 配置改变信号
   }
 })

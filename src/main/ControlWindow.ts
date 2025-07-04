@@ -14,8 +14,8 @@ class ControlWindow {
       icon: icon,
       width: 1200,
       height: 800,
-      minWidth: 600,
-      minHeight: 400,
+      minWidth: 750,
+      minHeight: 500,
       show: false,
       center: true,
       autoHideMenuBar: true,
@@ -58,8 +58,13 @@ class ControlWindow {
   }
 
   public handleMessage() {
+    // 控制窗口初始化完毕
+    ipcMain.handle('control.window.mounted', async () => {
+      return allConfig.getControlWindowConfig()
+    })
+
     // 样式变更
-    ipcMain.on('control.style.change', (_, args) => {
+    ipcMain.on('control.styles.change', (_, args) => {
       allConfig.setStyles(args)
       if(captionWindow.window){
         allConfig.sendStyles(captionWindow.window)
@@ -67,7 +72,7 @@ class ControlWindow {
     })
 
     // 样式重置
-    ipcMain.on('control.style.reset', () => {
+    ipcMain.on('control.styles.reset', () => {
       allConfig.resetStyles()
       if(this.window){
         allConfig.sendStyles(this.window)
@@ -88,7 +93,7 @@ class ControlWindow {
     })
 
     // 字幕引擎配置更新
-    ipcMain.on('control.control.change', (_, args) => {
+    ipcMain.on('control.controls.change', (_, args) => {
       allConfig.setControls(args)
     })
 
@@ -109,13 +114,14 @@ class ControlWindow {
     })
 
     // 清空字幕记录
-    ipcMain.on('control.caption.clear', () => {
+    ipcMain.handle('control.captionLog.clear', () => {
       allConfig.captionLog.splice(0)
+      return allConfig.captionLog
     })
   }
 
   public sendErrorMessage(message: string) {
-    this.window?.webContents.send('control.error.send', message)
+    this.window?.webContents.send('control.error.occurred', message)
   }
 }
 

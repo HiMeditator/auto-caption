@@ -1,5 +1,17 @@
 export type UILanguage =  "zh" | "en" | "ja"
 
+export interface Controls {
+  engineEnabled: boolean,
+  sourceLang: string,
+  targetLang: string,
+  engine: 'gummy',
+  audio: 0 | 1,
+  translation: boolean,
+  customized: boolean,
+  customizedApp: string,
+  customizedCommand: string
+}
+
 export interface Styles {
   fontFamily: string,
   fontSize: number,
@@ -20,14 +32,9 @@ export interface CaptionItem {
   translation: string
 }
 
-export interface Controls {
-  engineEnabled: boolean,
-  sourceLang: string,
-  targetLang: string,
-  engine: 'gummy',
-  audio: 0 | 1,
-  translation: boolean,
-  customized: boolean,
-  customizedApp: string,
-  customizedCommand: string
+export interface ControlWindowConfig {
+  uiLanguage: UILanguage,
+  leftBarWidth: number,
+  styles: Styles,
+  controls: Controls
 }

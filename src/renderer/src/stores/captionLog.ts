@@ -5,21 +5,21 @@ import { CaptionItem } from '../types'
 export const useCaptionLogStore = defineStore('captionLog', () => {
   const captionData = ref<CaptionItem[]>([])
 
-  window.electron.ipcRenderer.on('both.log.add', (_, log) => {
-    if(captionData.value.length && log.index === captionData.value[captionData.value.length - 1].index) {
-      captionData.value.splice(captionData.value.length - 1, 1, log)
-    }
-    else {
-      captionData.value.push(log)
-    }
-  })
-
   function clear() {
-    captionData.value = []
-    window.electron.ipcRenderer.send('control.caption.clear')
+    window.electron.ipcRenderer.invoke('control.captionLog.clear').then((data: CaptionItem[]) => {
+      captionData.value = data
+    })
   }
 
-  window.electron.ipcRenderer.on('both.log.set', (_, logs) => {
+  window.electron.ipcRenderer.on('both.captionLog.add', (_, log) => {
+    captionData.value.push(log)
+  })
+
+  window.electron.ipcRenderer.on('both.captionLog.upd', (_, log) => {
+    captionData.value.splice(captionData.value.length - 1, 1, log)
+  })
+
+  window.electron.ipcRenderer.on('both.captionLog.set', (_, logs) => {
     captionData.value = logs
   })
 

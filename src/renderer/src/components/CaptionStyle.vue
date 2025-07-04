@@ -168,7 +168,7 @@ function applyStyle(){
   captionStyle.transFontSize = currentTransFontSize.value;
   captionStyle.transFontColor = currentTransFontColor.value;
 
-  captionStyle.sendStyleChange();
+  captionStyle.sendStylesChange();
 }
 
 function backStyle(){
@@ -185,7 +185,7 @@ function backStyle(){
 }
 
 function resetStyle() {
-  captionStyle.sendStyleReset();
+  captionStyle.sendStylesReset();
 }
 
 watch(changeSignal, (val) => {

@@ -26,7 +26,7 @@ export const useCaptionStyleStore = defineStore('captionStyle', () => {
     return addOpicityToColor(background.value, opacity.value)
   })
 
-  function sendStyleChange() {
+  function sendStylesChange() {
     const styles: Styles = {
       fontFamily: fontFamily.value,
       fontSize: fontSize.value,
@@ -38,14 +38,14 @@ export const useCaptionStyleStore = defineStore('captionStyle', () => {
       transFontSize: transFontSize.value,
       transFontColor: transFontColor.value
     }
-    window.electron.ipcRenderer.send('control.style.change', styles)
+    window.electron.ipcRenderer.send('control.styles.change', styles)
   }
 
-  function sendStyleReset() {
-    window.electron.ipcRenderer.send('control.style.reset')
+  function sendStylesReset() {
+    window.electron.ipcRenderer.send('control.styles.reset')
   }
 
-  window.electron.ipcRenderer.on('caption.style.set', (_, args) => {
+  window.electron.ipcRenderer.on('caption.styles.set', (_, args: Styles) => {
     fontFamily.value = args.fontFamily
     fontSize.value = args.fontSize
     fontColor.value = args.fontColor
@@ -69,8 +69,8 @@ export const useCaptionStyleStore = defineStore('captionStyle', () => {
     transFontSize,      // 翻译字体大小
     transFontColor,     // 翻译字体颜色
     backgroundRGBA,     // 带透明度的背景颜色
-    sendStyleChange,    // 发送样式改变
-    sendStyleReset,     // 恢复默认样式
+    sendStylesChange,   // 发送样式改变
+    sendStylesReset,    // 恢复默认样式
     changeSignal        // 样式改变信号
   }
 })
