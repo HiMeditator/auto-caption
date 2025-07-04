@@ -3,7 +3,6 @@ import path from 'path'
 import { is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { controlWindow } from './ControlWindow'
-import { allConfig } from './utils/AllConfig'
 
 class CaptionWindow {
   window: BrowserWindow | undefined;
@@ -26,13 +25,6 @@ class CaptionWindow {
         sandbox: false
       }
     })
-
-    setTimeout(() => {
-      if (this.window) {
-        allConfig.sendStyles(this.window);
-        allConfig.sendCaptionLog(this.window, 'set');
-      }
-    }, 1000);
 
     this.window.on('ready-to-show', () => {
       this.window?.show()
@@ -57,7 +49,6 @@ class CaptionWindow {
   }
 
   public handleMessage() {
-    // 激活控制窗口
     ipcMain.on('caption.controlWindow.activate', () => {
       if(!controlWindow.window){
         controlWindow.createWindow()
@@ -67,21 +58,18 @@ class CaptionWindow {
       }
     })
 
-    // 字幕窗口高度发生变化
     ipcMain.on('caption.windowHeight.change', (_, height) => {
       if(this.window){
         this.window.setSize(this.window.getSize()[0], height)
       }
     })
 
-    // 关闭字幕窗口
     ipcMain.on('caption.window.close', () => {
       if(this.window){
         this.window.close()
       }
     })
 
-    // 是否固定在最前面
     ipcMain.on('caption.pin.set', (_, pinned) => {
       if(this.window){
         this.window.setAlwaysOnTop(pinned)

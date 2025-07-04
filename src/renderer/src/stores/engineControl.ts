@@ -4,12 +4,15 @@ import { defineStore } from 'pinia'
 import { notification } from 'ant-design-vue'
 import { ExclamationCircleOutlined } from '@ant-design/icons-vue'
 import { h } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import { Controls } from '@renderer/types'
 import { engines, audioTypes } from '@renderer/i18n'
 import { useGeneralSettingStore } from './generalSetting'
 
 export const useEngineControlStore = defineStore('engineControl', () => {
+  const { t } = useI18n()
+
   const captionEngine = ref(engines[useGeneralSettingStore().uiLanguage])
   const audioType = ref(audioTypes[useGeneralSettingStore().uiLanguage])
 
@@ -40,7 +43,7 @@ export const useEngineControlStore = defineStore('engineControl', () => {
     window.electron.ipcRenderer.send('control.controls.change', controls)
   }
 
-  window.electron.ipcRenderer.on('control.controls.set', (_, controls: Controls) => {
+  function setControls(controls: Controls) {
     sourceLang.value = controls.sourceLang
     targetLang.value = controls.targetLang
     engine.value = controls.engine
@@ -51,38 +54,36 @@ export const useEngineControlStore = defineStore('engineControl', () => {
     customizedApp.value = controls.customizedApp
     customizedCommand.value = controls.customizedCommand
     changeSignal.value = true
+  }
+
+  window.electron.ipcRenderer.on('control.controls.set', (_, controls: Controls) => {
+    setControls(controls)
   })
 
-  window.electron.ipcRenderer.on('control.engine.already', () => {
-    // TODO 修改为重启
-    notification.open({
-      message: '字幕引擎已经启动',
-      description: '字幕引擎已经启动，请勿重复启动'
-    });
-  })
-
-  window.electron.ipcRenderer.on('control.engine.started', () => {
+  window.electron.ipcRenderer.on('control.engine.started', (_, args) => {
     const str0 =
-      `原语言：${sourceLang.value}，是否翻译：${translation.value?'是':'否'}，` +
-      `字幕引擎：${engine.value}，音频类型：${audio.value ? '输入音频' : '输出音频'}` +
-      (translation.value ? `，翻译语言：${targetLang.value}` : '');
-    const str1 = `类型：自定义引擎，引擎路径：${customizedApp.value}，命令参数：${customizedCommand.value}`;
+      `${t('noti.sLang')}${sourceLang.value}${t('noti.trans')}${translation.value?'yes':'no'}` +
+      `${t('noti.engine')}${engine.value}${t('noti.audio')}${audio.value?t('noti.sysin'):t('noti.sysout')}` +
+      (translation.value ? `${t('noti.tLang')}${targetLang.value}` : '');
+    const str1 = `${t('noti.custom')}${customizedApp.value}${t('noti.args')}${customizedCommand.value}`;
     notification.open({
-      message: '字幕引擎启动',
-      description: (customized.value && customizedApp.value) ? str1 : str0
+      message: t('noti.started'),
+      description:
+        ((customized.value && customizedApp.value) ? str1 : str0) +
+        `${t('noti.pidInfo')}${args}`
     });
   })
 
   window.electron.ipcRenderer.on('control.engine.stopped', () => {
     notification.open({
-      message: '字幕引擎停止',
-      description: '可点击“启动字幕引擎”按钮重新启动'
+      message: t('noti.stopped'),
+      description: t('noti.stoppedInfo')
     });
   })
 
   window.electron.ipcRenderer.on('control.error.occurred', (_, message) => {
     notification.open({
-      message: '发生错误',
+      message: t('noti.error'),
       description: message,
       duration: null,
       placement: 'topLeft',
@@ -102,7 +103,8 @@ export const useEngineControlStore = defineStore('engineControl', () => {
     customized,         // 是否使用自定义字幕引擎
     customizedApp,      // 自定义字幕引擎的应用程序
     customizedCommand,  // 自定义字幕引擎的命令
-    sendControlsChange,  // 发送最新控制消息到后端
+    setControls,        // 设置引擎配置
+    sendControlsChange, // 发送最新控制消息到后端
     changeSignal,       // 配置改变信号
   }
 })

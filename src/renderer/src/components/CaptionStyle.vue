@@ -54,8 +54,8 @@
 
     <div class="input-item">
       <span class="input-label">{{ $t('style.preview') }}</span>
-      <a-switch v-model:checked="displayPreview" />
-      <sapn style="display:inline-block;width:20px;"></sapn>
+      <a-switch v-model:checked="currentPreview" />
+      <span style="display:inline-block;width:20px;"></span>
       <div style="display: inline-block;">
         <span class="switch-label">{{ $t('style.translation') }}</span>
         <a-switch v-model:checked="currentTransDisplay" />
@@ -99,7 +99,7 @@
 
   <Teleport to="body">
     <div
-      v-if="displayPreview"
+      v-if="currentPreview"
       class="preview-container"
       :style="{
         backgroundColor: addOpicityToColor(currentBackground, currentOpacity)
@@ -129,6 +129,10 @@
 import { ref, watch } from 'vue'
 import { useCaptionStyleStore } from '@renderer/stores/captionStyle'
 import { storeToRefs } from 'pinia'
+import { notification } from 'ant-design-vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const captionStyle = useCaptionStyleStore()
 const { changeSignal } = storeToRefs(captionStyle)
@@ -138,11 +142,11 @@ const currentFontSize = ref<number>(24)
 const currentFontColor = ref<string>('#000000')
 const currentBackground = ref<string>('#dbe2ef')
 const currentOpacity = ref<number>(50)
+const currentPreview = ref<boolean>(true)
 const currentTransDisplay = ref<boolean>(true)
 const currentTransFontFamily = ref<string>('sans-serif')
 const currentTransFontSize = ref<number>(24)
 const currentTransFontColor = ref<string>('#000000')
-const displayPreview = ref<boolean>(true)
 
 function addOpicityToColor(color: string, opicity: number) {
   const opicityValue = Math.round(opicity * 255 / 100);
@@ -162,13 +166,18 @@ function applyStyle(){
   captionStyle.fontColor = currentFontColor.value;
   captionStyle.background = currentBackground.value;
   captionStyle.opacity = currentOpacity.value;
-
+  captionStyle.showPreview = currentPreview.value;
   captionStyle.transDisplay = currentTransDisplay.value;
   captionStyle.transFontFamily = currentTransFontFamily.value;
   captionStyle.transFontSize = currentTransFontSize.value;
   captionStyle.transFontColor = currentTransFontColor.value;
 
   captionStyle.sendStylesChange();
+
+    notification.open({
+    message: t('noti.engineChange'),
+    description: t('noti.changeInfo')
+  });
 }
 
 function backStyle(){
@@ -177,7 +186,7 @@ function backStyle(){
   currentFontColor.value = captionStyle.fontColor;
   currentBackground.value = captionStyle.background;
   currentOpacity.value = captionStyle.opacity;
-
+  currentPreview.value = captionStyle.showPreview;
   currentTransDisplay.value = captionStyle.transDisplay;
   currentTransFontFamily.value = captionStyle.transFontFamily;
   currentTransFontSize.value = captionStyle.transFontSize;

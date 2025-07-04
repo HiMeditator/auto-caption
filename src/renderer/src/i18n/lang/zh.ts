@@ -1,12 +1,34 @@
 export default {
   example: {
-    "original": "This is a preview of subtitle styles.",
+    "original": "This is a preview of caption styles.",
     "translation": "（翻译）这是字幕样式预览。"
+  },
+  noti: {
+    "restarted": "字幕引擎重启成功",
+    "started": "字幕引擎启动成功",
+    "sLang": "源语言：",
+    "trans": "，是否翻译：",
+    "engine": "，字幕引擎：",
+    "audio": "，音频类型：",
+    "sysout": "系统音频输出（扬声器）",
+    "sysin": "系统音频输入（麦克风）",
+    "tLang": "，翻译语言：",
+    "custom": "类型：自定义引擎，引擎路径：",
+    "args": "，命令参数：",
+    "pidInfo": "，字幕引擎进程 PID：",
+    "stopped": "字幕引擎停止",
+    "stoppedInfo": "字幕引擎已经停止，可点击“启动字幕引擎”按钮重新启动",
+    "error": "发生错误",
+    "engineChange": "字幕引擎配置已更改",
+    "changeInfo": "如果字幕引擎已经启动，需要重启字幕引擎修改才会生效",
+    "styleChange": "字幕样式修改已更改",
+    "styleInfo": "字幕样式修改已经生效"
   },
   general: {
     "title": "通用设置",
     "uiLanguage": "界面语言",
-    "barWidth": "左侧宽度"
+    "barWidth": "左侧宽度",
+    "note": "通用设置修改后立即生效。注意字幕引擎设置和字幕样式的设置修改后需要点击应用后才会生效。"
   },
   engine: {
     "title": "字幕引擎设置",

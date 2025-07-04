@@ -10,6 +10,7 @@ export class CaptionEngine {
   appPath: string = ''
   command: string[] = []
   process: any | undefined
+  processStatus: 'running' | 'stopping' | 'stopped' = 'stopped'
 
   private getApp(): boolean {
     if (allConfig.controls.customized && allConfig.controls.customizedApp) {
@@ -60,7 +61,9 @@ export class CaptionEngine {
   }
 
   public start() {
-    if (this.process) { this.stop() }
+    if (this.processStatus!== 'stopped') {
+      return
+    }
     if(!this.getApp()){ return }
 
     try {
@@ -72,13 +75,16 @@ export class CaptionEngine {
       return
     }
 
-    console.log('[INFO] Caption Engine Started')
+    this.processStatus = 'running'
+    console.log('[INFO] Caption Engine Started, PID:', this.process.pid)
 
     allConfig.controls.engineEnabled = true
-
     if(controlWindow.window){
       allConfig.sendControls(controlWindow.window)
-      controlWindow.window.webContents.send('control.engine.started')
+      controlWindow.window.webContents.send(
+        'control.engine.started',
+        this.process.pid
+      )
     }
 
     this.process.stdout.on('data', (data: any) => {
@@ -107,12 +113,17 @@ export class CaptionEngine {
       allConfig.controls.engineEnabled = false
       if(controlWindow.window){
         allConfig.sendControls(controlWindow.window)
+        controlWindow.window.webContents.send('control.engine.stopped')
       }
+      this.processStatus = 'stopped'
+      console.log('[INFO] Caption engine process stopped')
     });
   }
 
   public stop() {
+    if(this.processStatus !== 'running') return
     if (this.process) {
+      console.log('[INFO] Trying to stop process, PID:', this.process.pid)
       if (process.platform === "win32" && this.process.pid) {
         exec(`taskkill /pid ${this.process.pid} /t /f`, (error) => {
           if (error) {
@@ -124,12 +135,8 @@ export class CaptionEngine {
         this.process.kill('SIGKILL');
       }
     }
-    this.process = undefined;
-    allConfig.controls.engineEnabled = false;
-    console.log('[INFO] Caption engine process stopped')
-    if(controlWindow.window) {
-      allConfig.sendControls(controlWindow.window)
-    }
+    this.processStatus = 'stopping'
+    console.log('[INFO] Caption engine process stopping')
   }
 }
 

@@ -1,16 +1,36 @@
 export default {
   example: {
     "original": "这是字幕样式预览。",
-    "translation": "(Translation) This is a preview of subtitle styles."
+    "translation": "(Translation) This is a preview of caption styles."
+  },
+  noti: {
+    "restarted": "Caption Engine Restarted Successfully",
+    "started": "Caption Engine Started Successfully",
+    "sLang": "Source language: ",
+    "trans": ", translation: ",
+    "engine": ", caption engine: ",
+    "audio": ", audio type: ",
+    "sysout": "system audio output (speaker)",
+    "sysin": "system audio input (microphone)",
+    "tLang": ", target language: ",
+    "custom": "Type: Custom engine, engine path: ",
+    "args": ", command arguments: ",
+    "pidInfo": ", caption engine process PID: ",
+    "stopped": "Caption Engine Stopped",
+    "stoppedInfo": "The caption engine has stopped. You can click the 'Start Caption Engine' button to restart it.",
+    "error": "An error occurred",
+    "engineChange": "Cpation Engine Configuration Changed",
+    "changeInfo": "If the caption engine is already running, you need to restart it for the changes to take effect."
   },
   general: {
     "title": "General Settings",
     "uiLanguage": "Language",
-    "barWidth": "Width"
+    "barWidth": "Width",
+    "note": "General Settings take effect immediately. Please note that changes to the Caption Engine Settings and Caption Style Settings will only take effect after clicking Apply."
   },
   engine: {
     "title": "Caption Engine Settings",
-    "applyChange": "Apply Chnages",
+    "applyChange": "Apply Changes",
     "cancelChange": "Cancel Changes",
     "sourceLang": "Source",
     "transLang": "Translation",

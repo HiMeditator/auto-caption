@@ -1,5 +1,14 @@
 <template>
   <a-card size="small" :title="$t('general.title')">
+    <template #extra>
+      <a-popover>
+        <template #content>
+          <p class="general-note">{{ $t('general.note') }}</p>
+        </template>
+        <a><InfoCircleOutlined /></a>
+      </a-popover>
+    </template>
+
     <div>
       <div class="input-item">
         <span class="input-label">{{ $t('general.uiLanguage') }}</span>
@@ -9,6 +18,7 @@
           <a-radio-button value="ja">日本語</a-radio-button>
         </a-radio-group>
       </div>
+
       <div class="input-item">
         <span class="input-label">{{ $t('general.barWidth') }}</span>
         <a-input
@@ -24,6 +34,7 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
 import { useGeneralSettingStore } from '@renderer/stores/generalSetting'
+import { InfoCircleOutlined } from '@ant-design/icons-vue';
 
 const generalSettingStore = useGeneralSettingStore()
 const { uiLanguage, leftBarWidth } = storeToRefs(generalSettingStore)
@@ -34,5 +45,10 @@ const { uiLanguage, leftBarWidth } = storeToRefs(generalSettingStore)
 
 .span-input {
   width: 100px;
+}
+
+.general-note {
+  padding: 10px 10px 0;
+  max-width: min(36vw, 400px);
 }
 </style>

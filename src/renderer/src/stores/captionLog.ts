@@ -6,9 +6,8 @@ export const useCaptionLogStore = defineStore('captionLog', () => {
   const captionData = ref<CaptionItem[]>([])
 
   function clear() {
-    window.electron.ipcRenderer.invoke('control.captionLog.clear').then((data: CaptionItem[]) => {
-      captionData.value = data
-    })
+    captionData.value = []
+    window.electron.ipcRenderer.send('control.captionLog.clear')
   }
 
   window.electron.ipcRenderer.on('both.captionLog.add', (_, log) => {

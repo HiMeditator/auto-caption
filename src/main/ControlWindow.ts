@@ -28,14 +28,6 @@ class ControlWindow {
 
     allConfig.readConfig()
 
-    setTimeout(() => {
-      if (this.window) {
-        allConfig.sendStyles(this.window)
-        allConfig.sendControls(this.window)
-        allConfig.sendCaptionLog(this.window, 'set')
-      }
-    }, 1000);
-
     this.window.on('ready-to-show', () => {
       this.window?.show()
     })
@@ -58,12 +50,21 @@ class ControlWindow {
   }
 
   public handleMessage() {
-    // 控制窗口初始化完毕
-    ipcMain.handle('control.window.mounted', async () => {
-      return allConfig.getControlWindowConfig()
+    ipcMain.handle('both.window.mounted', () => {
+      return allConfig.getFullConfig()
     })
 
-    // 样式变更
+    ipcMain.on('control.uiLanguage.change', (_, args) => {
+      allConfig.uiLanguage = args
+      if(captionWindow.window){
+        captionWindow.window.webContents.send('caption.uiLanguage.set', args)
+      }
+    })
+
+    ipcMain.on('control.leftBarWidth.change', (_, args) => {
+      allConfig.leftBarWidth = args
+    })
+
     ipcMain.on('control.styles.change', (_, args) => {
       allConfig.setStyles(args)
       if(captionWindow.window){
@@ -71,7 +72,6 @@ class ControlWindow {
       }
     })
 
-    // 样式重置
     ipcMain.on('control.styles.reset', () => {
       allConfig.resetStyles()
       if(this.window){
@@ -82,7 +82,6 @@ class ControlWindow {
       }
     })
 
-    // 激活字幕窗口
     ipcMain.on('control.captionWindow.activate', () => {
       if(!captionWindow.window){
         captionWindow.createWindow()
@@ -92,31 +91,20 @@ class ControlWindow {
       }
     })
 
-    // 字幕引擎配置更新
     ipcMain.on('control.controls.change', (_, args) => {
       allConfig.setControls(args)
     })
 
-    // 启动字幕引擎
     ipcMain.on('control.engine.start', () => {
-      if(allConfig.controls.engineEnabled){
-        this.window?.webContents.send('control.engine.already')
-      }
-      else {
-        captionEngine.start()
-      }
+      captionEngine.start()
     })
 
-    // 停止字幕引擎
     ipcMain.on('control.engine.stop', () => {
       captionEngine.stop()
-      this.window?.webContents.send('control.engine.stopped')
     })
 
-    // 清空字幕记录
-    ipcMain.handle('control.captionLog.clear', () => {
+    ipcMain.on('control.captionLog.clear', () => {
       allConfig.captionLog.splice(0)
-      return allConfig.captionLog
     })
   }
 

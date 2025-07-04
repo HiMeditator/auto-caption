@@ -31,11 +31,12 @@
     >{{ $t('status.openCaption') }}</a-button>
     <a-button
       class="control-button"
+      :disabled="engineEnabled"
       @click="startEngine"
-    >{{  engineEnabled ? $t('status.restartEngine') : $t('status.startEngine') }}</a-button>
-    <!-- TODO 添加重启字幕引擎功能 -->
+    >{{ $t('status.startEngine') }}</a-button>
     <a-button
      danger class="control-button"
+     :disabled="!engineEnabled"
      @click="stopEngine"
     >{{ $t('status.stopEngine') }}</a-button>
   </div>

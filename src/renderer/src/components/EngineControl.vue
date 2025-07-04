@@ -40,7 +40,7 @@
     <div class="input-item">
       <span class="input-label">{{ $t('engine.enableTranslation') }}</span>
       <a-switch v-model:checked="currentTranslation" />
-      <sapn style="display:inline-block;width:20px;"></sapn>
+      <span style="display:inline-block;width:20px;"></span>
       <div style="display: inline-block;">
         <span class="switch-label">{{ $t('engine.customEngine') }}</span>
         <a-switch v-model:checked="currentCustomized" />
@@ -82,6 +82,10 @@ import { storeToRefs } from 'pinia'
 import { useEngineControlStore } from '@renderer/stores/engineControl'
 import { notification } from 'ant-design-vue'
 import { InfoCircleOutlined } from '@ant-design/icons-vue';
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
 const engineControl = useEngineControlStore()
 const { captionEngine, audioType, changeSignal } = storeToRefs(engineControl)
 
@@ -118,8 +122,8 @@ function applyChange(){
   engineControl.sendControlsChange()
 
   notification.open({
-    message: '字幕控制已更改',
-    description: '如果字幕引擎已经启动，需要关闭后重启才会生效'
+    message: t('noti.engineChange'),
+    description: t('noti.changeInfo')
   });
 }
 

@@ -18,6 +18,7 @@ export interface Styles {
   fontColor: string,
   background: string,
   opacity: number,
+  showPreview: boolean,
   transDisplay: boolean,
   transFontFamily: string,
   transFontSize: number,
@@ -32,9 +33,10 @@ export interface CaptionItem {
   translation: string
 }
 
-export interface ControlWindowConfig {
+export interface FullConfig {
   uiLanguage: UILanguage,
   leftBarWidth: number,
   styles: Styles,
-  controls: Controls
+  controls: Controls,
+  captionLog: CaptionItem[]
 }

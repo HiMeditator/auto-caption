@@ -12,9 +12,17 @@ export const useGeneralSettingStore = defineStore('generalSetting', () => {
 
   watch(uiLanguage, (newValue) => {
     i18n.global.locale.value = newValue
-    console.log(newValue)
     useEngineControlStore().captionEngine = engines[newValue]
     useEngineControlStore().audioType = audioTypes[newValue]
+    window.electron.ipcRenderer.send('control.uiLanguage.change', newValue)
+  })
+
+  watch(leftBarWidth, (newValue) => {
+    window.electron.ipcRenderer.send('control.leftBarWidth.change', newValue)
+  })
+
+  window.electron.ipcRenderer.on('caption.uiLanguage.set', (_, args: UILanguage) => {
+    uiLanguage.value = args
   })
 
   return {

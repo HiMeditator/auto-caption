@@ -1,6 +1,6 @@
 import {
   UILanguage, Styles, CaptionItem, Controls,
-  ControlWindowConfig
+  FullConfig
 } from '../types'
 import { app, BrowserWindow } from 'electron'
 import * as path from 'path'
@@ -12,6 +12,7 @@ const defaultStyles: Styles = {
   fontColor: '#000000',
   background: '#dbe2ef',
   opacity: 80,
+  showPreview: true,
   transDisplay: true,
   transFontFamily: 'sans-serif',
   transFontSize: 24,
@@ -55,6 +56,7 @@ class AllConfig {
   public writeConfig() {
     const config = {
       uiLanguage: this.uiLanguage,
+      leftBarWidth: this.leftBarWidth,
       controls: this.controls,
       styles: this.styles
     }
@@ -63,12 +65,13 @@ class AllConfig {
     console.log('[INFO] Write Config to:', configPath)
   }
 
-  public getControlWindowConfig(): ControlWindowConfig {
+  public getFullConfig(): FullConfig {
     return {
       uiLanguage: this.uiLanguage,
       leftBarWidth: this.leftBarWidth,
       styles: this.styles,
-      controls: this.controls
+      controls: this.controls,
+      captionLog: this.captionLog
     }
   }
 
@@ -86,12 +89,12 @@ class AllConfig {
   }
 
   public sendStyles(window: BrowserWindow) {
-    window.webContents.send('caption.styles.set', this.styles)
+    window.webContents.send('both.styles.set', this.styles)
     console.log(`[INFO] Send Styles to #${window.id}:`, this.styles)
   }
 
   public setControls(args: Controls) {
-    const engineEnabled = args.engineEnabled
+    const engineEnabled = this.controls.engineEnabled
     for(let key in this.controls){
       if(key in args) {
         this.controls[key] = args[key]
@@ -108,7 +111,11 @@ class AllConfig {
 
   public updateCaptionLog(log: CaptionItem) {
     let command: 'add' | 'upd' = 'add'
-    if(this.captionLog.length && this.captionLog[this.captionLog.length - 1].index === log.index) {
+    if(
+      this.captionLog.length &&
+      this.captionLog[this.captionLog.length - 1].index === log.index &&
+      this.captionLog[this.captionLog.length - 1].time_s === log.time_s
+    ) {
       this.captionLog.splice(this.captionLog.length - 1, 1, log)
       command = 'upd'
     }
