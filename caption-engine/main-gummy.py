@@ -27,7 +27,11 @@ def convert_audio_to_text(s_lang, t_lang, audio_type):
             if not stream.stream: continue
             data = stream.stream.read(stream.CHUNK)
             data = mergeStreamChannels(data, stream.CHANNELS)
-            gummy.translator.send_audio_frame(data)
+            try:
+                gummy.translator.send_audio_frame(data)
+            except:
+                gummy.translator.start()
+                gummy.translator.send_audio_frame(data)
         except KeyboardInterrupt:
             stream.closeStream()
             gummy.translator.stop()

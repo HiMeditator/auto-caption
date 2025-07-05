@@ -6,4 +6,4 @@ out
 *.log*
 __pycache__
 subenv
-python-subprocess/build
+caption-engine/build

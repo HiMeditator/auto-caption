@@ -35,7 +35,7 @@ def getDefaultLoopbackDevice(mic: pyaudio.PyAudio, info = True)->dict:
             print("Run `python -m pyaudiowpatch` to check available devices.")
             print("Exiting...")
             exit()
-            
+
     if(info): print(f"Output Stream Device: #{default_speaker['index']} {default_speaker['name']}")
     return default_speaker
 
@@ -64,7 +64,7 @@ def mergeStreamChannels(data, channels):
 class AudioStream:
     """
     获取系统音频流
-    
+
     参数：
         audio_type: （默认）0-系统音频输出流，1-系统音频输入流
     """
@@ -116,7 +116,7 @@ class AudioStream:
             input_device_index = self.INDEX
         )
         return self.stream
-    
+
     def closeStream(self):
         """
         关闭系统音频输出流

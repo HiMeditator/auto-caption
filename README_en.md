@@ -65,7 +65,7 @@ npm install
 >
 > The gummy subtitle engine in this project is a Python subprocess, packaged into an executable file using pyinstaller. The code for running the subtitle engine subprocess is in the `src\main\utils\engine.ts` file.
 
-First, enter the `python-subprocess` folder and execute the following command to create a virtual environment:
+First, enter the `caption-engine` folder and execute the following command to create a virtual environment:
 
 ```bash
 python -m venv subenv
@@ -92,7 +92,7 @@ Then build the project using `pyinstaller`:
 pyinstaller --onefile main-gummy.py
 ```
 
-At this point, the project is built. You can find the corresponding executable file in the `python-subprocess/dist` folder. You can proceed with further operations.
+At this point, the project is built. You can find the corresponding executable file in the `caption-engine/dist` folder. You can proceed with further operations.
 
 ### Run the Project
 
