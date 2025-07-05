@@ -37,13 +37,13 @@ export class CaptionEngine {
       if (is.dev) {
         this.appPath = path.join(
           app.getAppPath(),
-          'python-subprocess', 'dist', gummyName
+          'caption-engine', 'dist', gummyName
         )
       }
       else {
         this.appPath = path.join(
           process.resourcesPath,
-          'python-subprocess', 'dist', gummyName
+          'caption-engine', 'dist', gummyName
         )
       }
       this.command = []

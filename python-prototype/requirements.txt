@@ -1,4 +1,0 @@
-numpy
-dashscope
-pyaudio
-pyaudiowpatch

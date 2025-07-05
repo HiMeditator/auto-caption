@@ -10,8 +10,8 @@ files:
   - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
 extraResources:
-  from: ./python-subprocess/dist/main-gummy.exe
-  to: ./python-subprocess/dist/main-gummy.exe
+  from: ./caption-engine/dist/main-gummy.exe
+  to: ./caption-engine/dist/main-gummy.exe
 asarUnpack:
   - resources/**
 win:

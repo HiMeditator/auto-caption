@@ -2,7 +2,7 @@ from dashscope.audio.asr import (
     TranslationRecognizerCallback,
     TranscriptionResult,
     TranslationResult,
-    TranslationRecognizerRealtime    
+    TranslationRecognizerRealtime
 )
 from datetime import datetime
 import json
@@ -17,11 +17,13 @@ class Callback(TranslationRecognizerCallback):
         self.usage = 0
         self.cur_id = -1
         self.time_str = ''
-    
+
     def on_open(self) -> None:
+        # print("on_open")
         pass
 
     def on_close(self) -> None:
+        # print("on_close")
         pass
 
     def on_event(
@@ -44,11 +46,11 @@ class Callback(TranslationRecognizerCallback):
                 caption['time_s'] = self.time_str
             caption['time_t'] = datetime.now().strftime('%H:%M:%S')
             caption['translation'] = ""
-        
+
         if translation_result is not None:
             lang = translation_result.get_language_list()[0]
             caption['translation'] = translation_result.get_translation(lang).text
-        
+
         if usage:
             self.usage += usage['duration']
 

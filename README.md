@@ -59,7 +59,7 @@ npm install
 >
 > 本项目的 gummy 字幕引擎是一个 python 子程序，通过 pyinstaller 打包为可执行文件。 运行字幕引擎子程序的代码在 `src\main\utils\engine.ts` 文件中。
 
-首先进入 `python-subprocess` 文件夹，执行如下指令创建虚拟环境：
+首先进入 `caption-engine` 文件夹，执行如下指令创建虚拟环境：
 
 ```bash
 python -m venv subenv
@@ -86,7 +86,7 @@ pip install -r requirements.txt
 pyinstaller --onefile main-gummy.py
 ```
 
-此时项目构建完成，在进入 `python-subprocess/dist` 文件夹可见对应的可执行文件。即可进行后续操作。
+此时项目构建完成，在进入 `caption-engine/dist` 文件夹可见对应的可执行文件。即可进行后续操作。
 
 ### 运行项目
 

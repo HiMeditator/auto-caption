@@ -39,7 +39,7 @@ export interface CaptionItem {
 如果使用 python 语言，可以参考以下方式将数据传递给主程序：
 
 ```python
-# python-subprocess\audio2text\gummy.py
+# caption-engine\audio2text\gummy.py
 ...
     def send_to_node(self, data):
         """
@@ -84,4 +84,4 @@ export interface CaptionItem {
 
 ## 参考代码
 
-本项目 `python-subprocess` 文件夹下的 `main-gummy.py` 文件为默认字幕引擎的入口代码。`src\main\utils\engine.ts` 为服务端获取字幕引擎数据和进行处理的代码。可以根据需要阅读了解字幕引擎的实现细节和完整运行过程。
+本项目 `caption-engine` 文件夹下的 `main-gummy.py` 文件为默认字幕引擎的入口代码。`src\main\utils\engine.ts` 为服务端获取字幕引擎数据和进行处理的代码。可以根据需要阅读了解字幕引擎的实现细节和完整运行过程。
