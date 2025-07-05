@@ -47,7 +47,7 @@
       <p class="about-desc">{{ $t('status.about.desc') }}</p>
       <a-divider />
       <div class="about-info">
-        <p><b>{{ $t('status.about.version') }}</b><a-tag color="green">v0.1.0</a-tag></p>
+        <p><b>{{ $t('status.about.version') }}</b><a-tag color="green">v0.2.0</a-tag></p>
         <p>
           <b>{{ $t('status.about.author') }}</b>
           <a
@@ -66,10 +66,19 @@
         <p>
           <b>{{ $t('status.about.manual') }}</b>
           <a
-            href="https://github.com/HiMeditator/auto-caption/blob/main/assets/user-manual_zh.md"
+            :href="`https://github.com/HiMeditator/auto-caption/tree/main/docs/user-manual/${$t('lang')}.md`"
             target="_blank"
           >
-            <a-tag color="blue">GitHub | user-manual_zh.md</a-tag>
+            <a-tag color="blue">GitHub | user-manual/{{ $t('lang') }}.md</a-tag>
+          </a>
+        </p>
+        <p>
+          <b>{{ $t('status.about.engineDoc') }}</b>
+          <a
+            :href="`https://github.com/HiMeditator/auto-caption/tree/main/docs/engine-manual/${$t('lang')}.md`"
+            target="_blank"
+          >
+            <a-tag color="blue">GitHub | engine-manual/{{ $t('lang') }}.md</a-tag>
           </a>
         </p>
       </div>
