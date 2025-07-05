@@ -20,14 +20,16 @@ export default {
     "stoppedInfo": "The caption engine has stopped. You can click the 'Start Caption Engine' button to restart it.",
     "error": "An error occurred",
     "engineChange": "Cpation Engine Configuration Changed",
-    "changeInfo": "If the caption engine is already running, you need to restart it for the changes to take effect."
+    "changeInfo": "If the caption engine is already running, you need to restart it for the changes to take effect.",
+    "styleChange": "Caption Style Changed",
+    "styleInfo": "Caption style changes have been saved and applied."
   },
   general: {
     "title": "General Settings",
     "uiLanguage": "Language",
     "barWidth": "Width",
     "note": "General Settings take effect immediately. Please note that changes to the Caption Engine Settings and Caption Style Settings will only take effect after clicking Apply.",
-    "theme": "theme",
+    "theme": "Theme",
     "light": "light",
     "dark": "dark",
     "system": "system"
@@ -57,6 +59,7 @@ export default {
     "applyStyle": "Apply",
     "cancelChange": "Cancel",
     "resetStyle": "Reset",
+    "longCaption": "LongCaption",
     "fontFamily": "Font Family",
     "fontColor": "Font Color",
     "fontSize": "Font Size",

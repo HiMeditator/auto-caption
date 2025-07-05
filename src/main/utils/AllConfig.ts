@@ -7,6 +7,7 @@ import * as path from 'path'
 import * as fs from 'fs'
 
 const defaultStyles: Styles = {
+  lineBreak: 1,
   fontFamily: 'sans-serif',
   fontSize: 24,
   fontColor: '#000000',

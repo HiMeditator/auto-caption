@@ -5,6 +5,16 @@
       <a @click="backStyle">{{ $t('style.cancelChange') }}</a> |
       <a @click="resetStyle">{{ $t('style.resetStyle') }}</a>
     </template>
+
+    <div class="input-item">
+      <span class="input-label">{{ $t('style.longCaption') }}</span>
+      <a-select
+        class="input-area"
+        v-model:value="currentLineBreak"
+        :options="captionStyle.iBreakOptions"
+      ></a-select>
+    </div>
+
     <div class="input-item">
       <span class="input-label">{{ $t('style.fontFamily') }}</span>
       <a-input
@@ -105,21 +115,26 @@
         backgroundColor: addOpicityToColor(currentBackground, currentOpacity)
       }"
     >
-      <p class="preview-caption"
+      <p :class="[captionStyle.lineBreak?'':'left-ellipsis']"
         :style="{
           fontFamily: currentFontFamily,
           fontSize: currentFontSize + 'px',
           color: currentFontColor
-        }">
-        {{ $t('example.original') }}
+      }">
+        <span v-if="captionData.length">{{ captionData[captionData.length-1].text }}</span>
+        <span v-else>{{ $t('example.original') }}</span>
       </p>
-      <p class="preview-translation" v-if="currentTransDisplay"
+      <p :class="[captionStyle.lineBreak?'':'left-ellipsis']"
+        v-if="currentTransDisplay"
         :style="{
           fontFamily: currentTransFontFamily,
           fontSize: currentTransFontSize + 'px',
           color: currentTransFontColor
         }"
-      >{{ $t('example.translation') }}</p>
+      >
+        <span v-if="captionData.length">{{ captionData[captionData.length-1].translation }}</span>
+        <span v-else>{{ $t('example.translation') }}</span>
+      </p>
     </div>
   </Teleport>
 
@@ -131,12 +146,17 @@ import { useCaptionStyleStore } from '@renderer/stores/captionStyle'
 import { storeToRefs } from 'pinia'
 import { notification } from 'ant-design-vue'
 import { useI18n } from 'vue-i18n'
+import { useCaptionLogStore } from '@renderer/stores/captionLog';
+
+const captionLog = useCaptionLogStore();
+const { captionData } = storeToRefs(captionLog);
 
 const { t } = useI18n()
 
 const captionStyle = useCaptionStyleStore()
 const { changeSignal } = storeToRefs(captionStyle)
 
+const currentLineBreak = ref<number>(0)
 const currentFontFamily = ref<string>('sans-serif')
 const currentFontSize = ref<number>(24)
 const currentFontColor = ref<string>('#000000')
@@ -161,6 +181,7 @@ function useSameStyle(){
 }
 
 function applyStyle(){
+  captionStyle.lineBreak = currentLineBreak.value;
   captionStyle.fontFamily = currentFontFamily.value;
   captionStyle.fontSize = currentFontSize.value;
   captionStyle.fontColor = currentFontColor.value;
@@ -175,12 +196,13 @@ function applyStyle(){
   captionStyle.sendStylesChange();
 
     notification.open({
-    message: t('noti.engineChange'),
-    description: t('noti.changeInfo')
+    message: t('noti.styleChange'),
+    description: t('noti.styleInfo')
   });
 }
 
 function backStyle(){
+  currentLineBreak.value = captionStyle.lineBreak;
   currentFontFamily.value = captionStyle.fontFamily;
   currentFontSize.value = captionStyle.fontSize;
   currentFontColor.value = captionStyle.fontColor;
@@ -221,7 +243,20 @@ watch(changeSignal, (val) => {
 }
 
 .preview-container p {
+  text-align: center;
   margin: 0;
   line-height: 1.5em;
+}
+
+.left-ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  direction: rtl;
+  text-align: left;
+}
+
+.left-ellipsis > span {
+  direction: ltr;
+  display: inline-block;
 }
 </style>

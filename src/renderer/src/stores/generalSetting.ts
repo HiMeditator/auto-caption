@@ -3,8 +3,9 @@ import { defineStore } from 'pinia'
 import { i18n } from '../i18n'
 import type { UILanguage, UITheme } from '../types'
 
-import { engines, audioTypes, antDesignTheme  } from '../i18n'
+import { engines, audioTypes, antDesignTheme, breakOptions  } from '../i18n'
 import { useEngineControlStore } from './engineControl'
+import { useCaptionStyleStore } from './captionStyle'
 
 export const useGeneralSettingStore = defineStore('generalSetting', () => {
   const uiLanguage = ref<UILanguage>('zh')
@@ -17,6 +18,7 @@ export const useGeneralSettingStore = defineStore('generalSetting', () => {
     i18n.global.locale.value = newValue
     useEngineControlStore().captionEngine = engines[newValue]
     useEngineControlStore().audioType = audioTypes[newValue]
+    useCaptionStyleStore().iBreakOptions = breakOptions[newValue]
     window.electron.ipcRenderer.send('control.uiLanguage.change', newValue)
   })
 
@@ -49,12 +51,16 @@ export const useGeneralSettingStore = defineStore('generalSetting', () => {
     antdTheme.value = antDesignTheme.light
     const root = document.documentElement
     root.style.setProperty('--control-background', '#fff')
+    root.style.setProperty('--tag-color', 'rgba(0, 0, 0, 0.45)')
+    root.style.setProperty('--icon-color', 'rgba(0, 0, 0, 0.88)')
   }
 
   function setDarkTheme(){
     antdTheme.value = antDesignTheme.dark
     const root = document.documentElement
     root.style.setProperty('--control-background', '#000')
+    root.style.setProperty('--tag-color', 'rgba(255, 255, 255, 0.45)')
+    root.style.setProperty('--icon-color', 'rgba(255, 255, 255, 0.85)')
   }
 
   return {

@@ -1,6 +1,6 @@
 export default {
   example: {
-    "original": "This is a preview of caption styles.",
+    "original": "This is a preview of caption styles. ",
     "translation": "（翻译）这是字幕样式预览。"
   },
   noti: {
@@ -21,8 +21,8 @@ export default {
     "error": "发生错误",
     "engineChange": "字幕引擎配置已更改",
     "changeInfo": "如果字幕引擎已经启动，需要重启字幕引擎修改才会生效",
-    "styleChange": "字幕样式修改已更改",
-    "styleInfo": "字幕样式修改已经生效"
+    "styleChange": "字幕样式已修改",
+    "styleInfo": "字幕样式修改已经保存并生效"
   },
   general: {
     "title": "通用设置",
@@ -59,6 +59,7 @@ export default {
     "applyStyle": "应用样式",
     "cancelChange": "取消更改",
     "resetStyle": "恢复默认",
+    "longCaption": "长字幕",
     "fontFamily": "字体族",
     "fontColor": "字体颜色",
     "fontSize": "字体大小",

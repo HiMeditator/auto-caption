@@ -12,7 +12,7 @@ import sys
 import argparse
 
 def convert_audio_to_text(s_lang, t_lang, audio_type):
-    sys.stdout.reconfigure(line_buffering=True)
+    sys.stdout.reconfigure(line_buffering=True) # type: ignore
     stream = AudioStream(audio_type)
     stream.openStream()
 
@@ -45,4 +45,3 @@ if __name__ == "__main__":
         args.target_language,
         0 if args.audio_type == '0' else 1
     )
-    
