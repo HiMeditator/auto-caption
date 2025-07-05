@@ -1,4 +1,5 @@
 export default {
+  lang: "ja",
   example: {
     "original": "这是字幕样式预览。",
     "translation": "（翻訳）これは字幕のスタイルのプレビューです。"
@@ -92,7 +93,8 @@ export default {
       "author": "プロジェクト作者",
       "projLink": "プロジェクトリンク",
       "manual": "ユーザーマニュアル",
-      "date": "2026 年 6 月 26 日"
+      "engineDoc": "字幕エンジンマニュアル",
+      "date": "2025 年 7 月 5 日"
     }
   },
   log: {

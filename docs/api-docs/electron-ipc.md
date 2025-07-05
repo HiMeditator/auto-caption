@@ -1,4 +1,4 @@
-# api-doc
+# electron ipc api-doc
 
 本文档主要记录主进程和渲染进程的通信约定。
 

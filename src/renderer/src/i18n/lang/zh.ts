@@ -1,4 +1,5 @@
 export default {
+  lang: "zh",
   example: {
     "original": "This is a preview of caption styles. ",
     "translation": "（翻译）这是字幕样式预览。"
@@ -92,7 +93,8 @@ export default {
       "author": "项目作者",
       "projLink": "项目链接",
       "manual": "用户手册",
-      "date": "2026 年 6 月 26 日"
+      "engineDoc": "字幕引擎手册",
+      "date": "2025 年 7 月 5 日"
     }
   },
   log: {

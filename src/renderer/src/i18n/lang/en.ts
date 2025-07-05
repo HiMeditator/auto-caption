@@ -1,4 +1,5 @@
 export default {
+  lang: "en",
   example: {
     "original": "这是字幕样式预览。",
     "translation": "(Translation) This is a preview of caption styles."
@@ -92,7 +93,8 @@ export default {
       "author": "Project Author",
       "projLink": "Project Link",
       "manual": "User Manual",
-      "date": "June 26, 2026"
+      "engineDoc": "Caption Engine Manual",
+      "date": "July 5, 2026"
     }
   },
   log: {

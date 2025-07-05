@@ -1,51 +1,57 @@
 <div align="center" >
     <img src="./resources/icon.png" width="100px" height="100px"/>
     <h1 align="center">auto-caption</h1>
-    <p>Auto Caption is a cross-platform real-time subtitle display software.</p>
+    <p>Auto Caption is a cross-platform real-time caption display software.</p>
     <p>
-        | <a href="https://github.com/HiMeditator/auto-caption/blob/main/README.md">简体中文</a>
-        | <b>English</b> |
+        | <a href="./README.md">Chinese</a>
+        | <b>English</b>
+        | <a href="./README_ja.md">Japanese</a> |
     </p>
+    <p><i>Version v0.2.0 has been released. Version v1.0.0, which is expected to add a local caption engine, is under development...</i></p>
 </div>
 
-<p style="color:red;text-align:center;">The development of the new version is underway, featuring a local subtitle engine, English/Japanese internationalization, and a dark theme. It will also include fixes for known bugs and improvements to the user experience. It is expected to be released within this month.</p>
-
-![](./assets/media/main.png)
-
-## ⚠️ Attention
-
-**The current software interface language is Chinese. English adaptation has not been done yet.**
+![](./assets/media/main_en.png)
 
 ## 📥 Download
 
 [GitHub Releases](https://github.com/HiMeditator/auto-caption/releases)
 
-## 📚 User Manual
+## 📚 Related Documentation
 
-[Auto Caption User Manual (Chinese)](./assets/user-manual_en.md)
+[Auto Caption User Manual](./docs/user-manual/en.md)
 
-[Caption Engine Documentation (Chinese)](./assets/engine-manual_en.md)
+[Caption Engine Explanation Document](./docs/engine-manual/en.md)
+
+[Project API Documentation (Chinese)](./docs/api-docs/electron-ipc.md)
 
 ### Basic Usage
 
-Currently, only an installable version for the Windows platform is provided. If using the default Gummy subtitle engine, you need to obtain an API KEY from Alibaba Cloud's Bailian platform and configure it in the environment variables to use the model properly. Related tutorials: [Get API KEY](https://help.aliyun.com/zh/model-studio/get-api-key), [Configure API Key through Environment Variables](https://help.aliyun.com/zh/model-studio/configure-api-key-through-environment-variables).
+Currently, only an installable version for the Windows platform is provided. If you want to use the default Gummy caption engine, you first need to obtain an API KEY from the Alibaba Cloud Model Studio and configure it in the environment variables. This is necessary to use the model properly.
 
-For developers, you can create a new subtitle engine. For instructions on customizing the subtitle engine, please refer to the [Caption Engine Documentation (Chinese)](./assets/engine-manual_zh.md).
+**The international version of Alibaba Cloud does not provide the Gummy model, so non-Chinese users currently cannot use the default caption engine. I am trying to develop a new local caption engine to ensure that all users have access to a default caption engine.**
 
+Relevant tutorials:
+- [Obtain API KEY (Chinese)](https://help.aliyun.com/zh/model-studio/get-api-key)
+- [Configure API Key in Environment Variables (Chinese)](https://help.aliyun.com/zh/model-studio/configure-api-key-through-environment-variables).
 
+If you want to understand how the caption engine works or if you want to develop your own caption engine, please refer to the [Caption Engine Explanation Document](./docs/engine-manual/en.md).
 ## ✨ Features
 
-- Rich subtitle style settings
-- Flexible subtitle engine selection
+- Multi-language interface support
+- Rich caption style settings
+- Flexible caption engine selection
 - Multi-language recognition and translation
-- Subtitle record display and export
-- Generate subtitles for audio output and microphone input
+- Caption record display and export
+- Generate captions for audio output and microphone input
 
-Note: The Windows platform supports generating subtitles for both audio output and microphone input, while the Linux platform only supports generating subtitles for microphone input.
+Notes:
+- The Windows platform supports generating captions for both audio output and microphone input.
+- The Linux platform currently only supports generating captions for microphone input.
+- The macOS platform is not yet supported.
 
 ## 🚀 Project Execution
 
-![](./assets/media/structure.png)
+![](./assets/media/structure_en.png)
 
 ### Install Dependencies
 
@@ -53,19 +59,9 @@ Note: The Windows platform supports generating subtitles for both audio output a
 npm install
 ```
 
-### Build Subtitle Engine
+### Build Caption Engine
 
-> #### Background
->
-> If you are a developer and want to develop a custom subtitle engine, please refer to the [Caption Engine Documentation (Chinese)](./assets/engine-manual_zh.md).
->
-> The so-called subtitle engine is actually a subprocess that will real-time acquire streaming data from system audio input (recording) or output (playing sound) and call an audio-to-text model to generate corresponding subtitles for the audio. The generated subtitles are output as JSON data converted to strings via IPC and returned to the main program. The main program reads the subtitle data, processes it, and displays it on the window.
->
-> Currently, the project uses the [Alibaba Cloud Gummy Model](https://help.aliyun.com/zh/model-studio/gummy-speech-recognition-translation/) by default, which requires obtaining an API KEY from Alibaba Cloud's Bailian platform and configuring it in the environment variables to function properly. Related tutorials: [Get API KEY](https://help.aliyun.com/zh/model-studio/get-api-key), [Configure API Key through Environment Variables](https://help.aliyun.com/zh/model-studio/configure-api-key-through-environment-variables).
->
-> The gummy subtitle engine in this project is a Python subprocess, packaged into an executable file using pyinstaller. The code for running the subtitle engine subprocess is in the `src\main\utils\engine.ts` file.
-
-First, enter the `caption-engine` folder and execute the following command to create a virtual environment:
+First, navigate to the `caption-engine` folder and execute the following command to create a virtual environment:
 
 ```bash
 python -m venv subenv
@@ -80,7 +76,7 @@ subenv/Scripts/activate
 source subenv/bin/activate
 ```
 
-Then install the dependencies (note that if you are in a Linux environment, you need to comment out `PyAudioWPatch` in `requirements.txt`, as this module is only applicable to the Windows environment):
+Next, install the dependencies (note that if you are in a Linux environment, you should comment out `PyAudioWPatch` in `requirements.txt`, as this module is only applicable to the Windows environment):
 
 ```bash
 pip install -r requirements.txt
@@ -92,23 +88,21 @@ Then build the project using `pyinstaller`:
 pyinstaller --onefile main-gummy.py
 ```
 
-At this point, the project is built. You can find the corresponding executable file in the `caption-engine/dist` folder. You can proceed with further operations.
+At this point, the project is built. You can find the executable file in the `caption-engine/dist` folder and proceed with further operations.
 
 ### Run the Project
 
 ```bash
 npm run dev
 ```
-
 ### Build the Project
 
-Please note that the software is currently not compatible with the macOS platform. Use Windows or Linux systems for building, with Windows being more recommended as it implements the full set of features.
-
+Note that the software is currently not adapted for the macOS platform. Please use Windows or Linux systems for building, with Windows being more recommended due to its full functionality.
 
 ```bash
 # For Windows
 npm run build:win
-# For macOS
+# For macOS, not avaliable yet
 npm run build:mac
 # For Linux
 npm run build:linux
