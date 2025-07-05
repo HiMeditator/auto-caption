@@ -1,8 +1,10 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import { Styles } from '@renderer/types'
+import { breakOptions } from '@renderer/i18n'
 
 export const useCaptionStyleStore = defineStore('captionStyle', () => {
+  const lineBreak = ref<number>(1)
   const fontFamily = ref<string>('sans-serif')
   const fontSize = ref<number>(24)
   const fontColor = ref<string>('#000000')
@@ -14,6 +16,7 @@ export const useCaptionStyleStore = defineStore('captionStyle', () => {
   const transFontSize = ref<number>(24)
   const transFontColor = ref<string>('#000000')
 
+  const iBreakOptions = ref(breakOptions['zh'])
   const changeSignal = ref<boolean>(false)
 
   function addOpicityToColor(color: string, opicity: number) {
@@ -28,6 +31,7 @@ export const useCaptionStyleStore = defineStore('captionStyle', () => {
 
   function sendStylesChange() {
     const styles: Styles = {
+      lineBreak: lineBreak.value,
       fontFamily: fontFamily.value,
       fontSize: fontSize.value,
       fontColor: fontColor.value,
@@ -47,6 +51,7 @@ export const useCaptionStyleStore = defineStore('captionStyle', () => {
   }
 
   function setStyles(args: Styles){
+    lineBreak.value = args.lineBreak
     fontFamily.value = args.fontFamily
     fontSize.value = args.fontSize
     fontColor.value = args.fontColor
@@ -65,6 +70,7 @@ export const useCaptionStyleStore = defineStore('captionStyle', () => {
   })
 
   return {
+    lineBreak,          // 换行方式
     fontFamily,         // 字体族
     fontSize,           // 字体大小
     fontColor,          // 字体颜色
@@ -79,6 +85,7 @@ export const useCaptionStyleStore = defineStore('captionStyle', () => {
     setStyles,          // 设置样式
     sendStylesChange,   // 发送样式改变
     sendStylesReset,    // 恢复默认样式
+    iBreakOptions,      // 换行选项
     changeSignal        // 样式改变信号
   }
 })

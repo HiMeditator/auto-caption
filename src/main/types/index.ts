@@ -15,6 +15,7 @@ export interface Controls {
 }
 
 export interface Styles {
+  lineBreak: number,
   fontFamily: string,
   fontSize: number,
   fontColor: string,

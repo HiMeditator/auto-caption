@@ -20,7 +20,7 @@
       </div>
     </div>
     <div class="caption-container">
-      <p class="preview-caption" :style="{
+      <p :class="[captionStyle.lineBreak?'':'left-ellipsis']" :style="{
         fontFamily: captionStyle.fontFamily,
         fontSize: captionStyle.fontSize + 'px',
         color: captionStyle.fontColor
@@ -28,7 +28,9 @@
         <span v-if="captionData.length">{{ captionData[captionData.length-1].text }}</span>
         <span v-else>{{ $t('example.original') }}</span>
       </p>
-      <p class="preview-translation" v-if="captionStyle.transDisplay" :style="{
+      <p :class="[captionStyle.lineBreak?'':'left-ellipsis']"
+        v-if="captionStyle.transDisplay"
+        :style="{
         fontFamily: captionStyle.transFontFamily,
         fontSize: captionStyle.transFontSize + 'px',
         color: captionStyle.transFontColor
@@ -120,5 +122,17 @@ function closeCaptionWindow() {
   margin: 0;
   line-height: 1.5em;
   padding: 0 10px 10px 10px;
+}
+
+.left-ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  direction: rtl;
+  text-align: left;
+}
+
+.left-ellipsis > span {
+  direction: ltr;
+  display: inline-block;
 }
 </style>

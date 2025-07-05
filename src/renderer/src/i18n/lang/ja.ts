@@ -20,7 +20,9 @@ export default {
     "stoppedInfo": "字幕エンジンが停止しました。再起動するには「字幕エンジンを開始」ボタンをクリックしてください。",
     "error": "エラーが発生しました",
     "engineChange": "字幕エンジンの設定が変更されました",
-    "changeInfo": "字幕エンジンがすでに起動している場合、変更を有効にするには再起動が必要です。"
+    "changeInfo": "字幕エンジンがすでに起動している場合、変更を有効にするには再起動が必要です。",
+    "styleChange": "字幕のスタイルが変更されました",
+    "styleInfo": "字幕のスタイル変更が保存され、適用されました"
   },
   general: {
     "title": "一般設定",
@@ -57,6 +59,7 @@ export default {
     "applyStyle": "適用",
     "cancelChange": "キャンセル",
     "resetStyle": "リセット",
+    "longCaption": "長い字幕",
     "fontFamily": "フォント",
     "fontColor": "カラー",
     "fontSize": "サイズ",

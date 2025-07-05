@@ -39,7 +39,7 @@ const { leftBarWidth, antdTheme } = storeToRefs(generalSettingStore)
 
 .caption-control {
   height: 100vh;
-  border-right: 1px solid #7774;
+  border-right: 1px solid var(--tag-color);
   padding: 20px;
   overflow-y: auto;
 }

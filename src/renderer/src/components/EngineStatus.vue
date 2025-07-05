@@ -107,7 +107,7 @@ function stopEngine() {
 
 <style scoped>
 .about-tag {
-  color: rgba(0,0,0,0.45);
+  color: var(--tag-color);
   margin-bottom: 16px;
 }
 
@@ -115,7 +115,7 @@ function stopEngine() {
   display: inline-block;
   font-size: 24px;
   cursor: pointer;
-  color: #1f2328;
+  color: var(--icon-color);
 }
 
 .about-modal-content {
