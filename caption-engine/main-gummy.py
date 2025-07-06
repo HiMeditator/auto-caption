@@ -8,7 +8,7 @@ elif sys.platform == 'linux':
 else:
     raise NotImplementedError(f"Unsupported platform: {sys.platform}")
 
-from audioprcs import mergeStreamChannels
+from audioprcs import mergeChunkChannels
 from audio2text import InvalidParameter, GummyTranslator
 
 
@@ -26,13 +26,13 @@ def convert_audio_to_text(s_lang, t_lang, audio_type):
 
     while True:
         try:
-            data = stream.read_chunk()
-            data = mergeStreamChannels(data, stream.CHANNELS)
+            chunk = stream.read_chunk()
+            chunk_mono = mergeChunkChannels(chunk, stream.CHANNELS)
             try:
-                gummy.send_audio_frame(data)
+                gummy.send_audio_frame(chunk_mono)
             except InvalidParameter:
                 gummy.start()
-                gummy.send_audio_frame(data)
+                gummy.send_audio_frame(chunk_mono)
         except KeyboardInterrupt:
             stream.closeStream()
             gummy.stop()

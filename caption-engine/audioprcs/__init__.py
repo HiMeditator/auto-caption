@@ -1,1 +1,1 @@
-from .streamchnl import mergeStreamChannels
+from .process import mergeChunkChannels, resampleRawChunk

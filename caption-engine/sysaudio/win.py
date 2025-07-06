@@ -65,7 +65,7 @@ class AudioStream:
     def printInfo(self):
         dev_info = f"""
         采样设备：
-            - 设备类型：{ "音频输入" if self.audio_type == 0 else "音频输出" }
+            - 设备类型：{ "音频输出" if self.audio_type == 0 else "音频输入" }
             - 序号：{self.device['index']}
             - 名称：{self.device['name']}
             - 最大输入通道数：{self.device['maxInputChannels']}
@@ -76,7 +76,7 @@ class AudioStream:
 
         音频样本块大小：{self.CHUNK}
         样本位宽：{self.SAMP_WIDTH}
-        音频数据格式：{self.FORMAT}
+        采样格式：{self.FORMAT}
         音频通道数：{self.CHANNELS}
         音频采样率：{self.RATE}
         """
