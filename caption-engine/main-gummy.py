@@ -1,40 +1,41 @@
 import sys
+import argparse
 
 if sys.platform == 'win32':
-    from sysaudio.win import AudioStream, mergeStreamChannels
+    from sysaudio.win import AudioStream
 elif sys.platform == 'linux':
-    from sysaudio.linux import AudioStream, mergeStreamChannels
+    from sysaudio.linux import AudioStream
 else:
     raise NotImplementedError(f"Unsupported platform: {sys.platform}")
 
-from audio2text.gummy import GummyTranslator
-import sys
-import argparse
+from audioprcs import mergeStreamChannels
+from audio2text import InvalidParameter, GummyTranslator
+
 
 def convert_audio_to_text(s_lang, t_lang, audio_type):
     sys.stdout.reconfigure(line_buffering=True) # type: ignore
     stream = AudioStream(audio_type)
-    stream.openStream()
 
     if t_lang == 'none':
         gummy = GummyTranslator(stream.RATE, s_lang, None)
     else:
         gummy = GummyTranslator(stream.RATE, s_lang, t_lang)
-    gummy.translator.start()
+
+    stream.openStream()
+    gummy.start()
 
     while True:
         try:
-            if not stream.stream: continue
-            data = stream.stream.read(stream.CHUNK)
+            data = stream.read_chunk()
             data = mergeStreamChannels(data, stream.CHANNELS)
             try:
-                gummy.translator.send_audio_frame(data)
-            except:
-                gummy.translator.start()
-                gummy.translator.send_audio_frame(data)
+                gummy.send_audio_frame(data)
+            except InvalidParameter:
+                gummy.start()
+                gummy.send_audio_frame(data)
         except KeyboardInterrupt:
             stream.closeStream()
-            gummy.translator.stop()
+            gummy.stop()
             break
 
 
@@ -47,5 +48,5 @@ if __name__ == "__main__":
     convert_audio_to_text(
         args.source_language,
         args.target_language,
-        0 if args.audio_type == '0' else 1
+        int(args.audio_type)
     )

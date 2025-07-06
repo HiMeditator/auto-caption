@@ -1,7 +1,6 @@
 """获取 Windows 系统音频输出流"""
 
 import pyaudiowpatch as pyaudio
-import numpy as np
 
 
 def getDefaultLoopbackDevice(mic: pyaudio.PyAudio, info = True)->dict:
@@ -40,35 +39,15 @@ def getDefaultLoopbackDevice(mic: pyaudio.PyAudio, info = True)->dict:
     return default_speaker
 
 
-def mergeStreamChannels(data, channels):
-    """
-    将当前多通道流数据合并为单通道流数据
-
-    Args:
-        data: 多通道数据
-        channels: 通道数
-
-    Returns:
-        mono_data_bytes: 单通道数据
-    """
-    # (length * channels,)
-    data_np = np.frombuffer(data, dtype=np.int16)
-    # (length, channels)
-    data_np_r = data_np.reshape(-1, channels)
-    # (length,)
-    mono_data = np.mean(data_np_r.astype(np.float32), axis=1)
-    mono_data = mono_data.astype(np.int16)
-    mono_data_bytes = mono_data.tobytes()
-    return mono_data_bytes
-
 class AudioStream:
     """
     获取系统音频流
 
-    参数：
-        audio_type: （默认）0-系统音频输出流，1-系统音频输入流
+    初始化参数：
+        audio_type: 0-系统音频输出流（默认），1-系统音频输入流
+        chunk_rate: 每秒采集音频块的数量，默认为20
     """
-    def __init__(self, audio_type=0):
+    def __init__(self, audio_type=0, chunk_rate=20):
         self.audio_type = audio_type
         self.mic = pyaudio.PyAudio()
         if self.audio_type == 0:
@@ -80,7 +59,7 @@ class AudioStream:
         self.FORMAT = pyaudio.paInt16
         self.CHANNELS = self.device["maxInputChannels"]
         self.RATE = int(self.device["defaultSampleRate"])
-        self.CHUNK = self.RATE // 20
+        self.CHUNK = self.RATE // chunk_rate
         self.INDEX = self.device["index"]
 
     def printInfo(self):
@@ -116,6 +95,13 @@ class AudioStream:
             input_device_index = self.INDEX
         )
         return self.stream
+
+    def read_chunk(self):
+        """
+        读取音频数据
+        """
+        if not self.stream: return None
+        return self.stream.read(self.CHUNK)
 
     def closeStream(self):
         """
