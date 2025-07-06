@@ -69,6 +69,14 @@ class Callback(TranslationRecognizerCallback):
             print(f"Error sending data to Node.js: {e}", file=sys.stderr)
 
 class GummyTranslator:
+    """
+    使用 Gummy 引擎流式处理的音频数据，并在标准输出中输出与 Auto Caption 软件可读取的 JSON 字符串数据
+
+    初始化参数：
+        rate: 音频采样率
+        source: 源语言代码字符串（zh, en, ja 等）
+        target: 目标语言代码字符串（zh, en, ja 等）
+    """
     def __init__(self, rate, source, target):
         self.translator = TranslationRecognizerRealtime(
             model = "gummy-realtime-v1",
@@ -80,3 +88,15 @@ class GummyTranslator:
             translation_target_languages = [target],
             callback = Callback()
         )
+
+    def start(self):
+        """启动 Gummy 引擎"""
+        self.translator.start()
+
+    def send_audio_frame(self, data):
+        """发送音频帧"""
+        self.translator.send_audio_frame(data)
+
+    def stop(self):
+        """停止 Gummy 引擎"""
+        self.translator.stop()
