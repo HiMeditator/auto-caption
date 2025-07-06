@@ -34,7 +34,7 @@ class AudioStream:
 
         音频样本块大小：{self.CHUNK}
         样本位宽：{self.SAMP_WIDTH}
-        音频数据格式：{self.FORMAT}
+        采样格式：{self.FORMAT}
         音频通道数：{self.CHANNELS}
         音频采样率：{self.RATE}
         """
