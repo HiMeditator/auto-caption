@@ -39,12 +39,12 @@ class Callback(TranslationRecognizerCallback):
             caption['text'] = transcription_result.text
             if caption['index'] != self.cur_id:
                 self.cur_id = caption['index']
-                cur_time = datetime.now().strftime('%H:%M:%S')
+                cur_time = datetime.now().strftime('%H:%M:%S.%f')[:-3]
                 caption['time_s'] = cur_time
                 self.time_str = cur_time
             else:
                 caption['time_s'] = self.time_str
-            caption['time_t'] = datetime.now().strftime('%H:%M:%S')
+            caption['time_t'] = datetime.now().strftime('%H:%M:%S.%f')[:-3]
             caption['translation'] = ""
 
         if translation_result is not None:

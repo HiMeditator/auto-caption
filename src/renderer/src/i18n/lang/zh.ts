@@ -100,6 +100,15 @@ export default {
   log: {
     "title": "字幕记录",
     "export": "导出字幕记录",
+    "copy": "复制到剪贴板",
+    "copyOptions": "复制选项",
+    "addIndex": "添加序号",
+    "copyTime": "复制时间",
+    "copyContent": "复制内容",
+    "both": "原文与翻译",
+    "source": "仅原文",
+    "translation": "仅翻译",
+    "copySuccess": "字幕已复制到剪贴板",
     "clear": "清空字幕记录"
   }
 }

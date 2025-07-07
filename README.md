@@ -77,7 +77,7 @@ $$
 48000\, \text{samples/second} \times 2\,\text{bytes/sample} \times 1\, \text{channel}  = 93.75\,\text{KB/s}
 $$
 
-模型结果回传流量消耗较小，可以不纳入考虑。
+而且引擎只会获取到音频流的时候才会上传数据，因此实际上传速率可能更小。模型结果回传流量消耗较小，可以不纳入考虑。
 
 ### Vosk 字幕引擎（本地）
 

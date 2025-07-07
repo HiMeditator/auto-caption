@@ -99,6 +99,15 @@ export default {
   },
   log: {
     "title": "Caption Log",
+    "copy": "Copy to Clipboard",
+    "copyOptions": "Copy Options",
+    "addIndex": "Add Index",
+    "copyTime": "Copy Time",
+    "copyContent": "Content",
+    "both": "Original and Translation",
+    "source": "Original Only",
+    "translation": "Translation Only",
+    "copySuccess": "Subtitle copied to clipboard",
     "export": "Export Caption Log",
     "clear": "Clear Caption Log"
   }

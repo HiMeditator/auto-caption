@@ -76,7 +76,7 @@ $$
 48000\, \text{samples/second} \times 2\,\text{bytes/sample} \times 1\, \text{channel} = 93.75\,\text{KB/s}
 $$
 
-The traffic consumption for returning the model results is relatively small and can be disregarded.
+Moreover, the engine only uploads data when it gets an audio stream, so the actual upload speed may be smaller. The traffic consumption for returning the model results is relatively small and can be disregarded.
 
 ### Vosk Subtitle Engine (Local)
 

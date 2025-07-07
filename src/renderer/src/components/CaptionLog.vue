@@ -9,15 +9,36 @@
         style="margin-right: 20px;"
         @click="exportCaptions"
         :disabled="captionData.length === 0"
-      >
-        {{ $t('log.export') }}
-      </a-button>
+      >{{ $t('log.export') }}</a-button>
+
+    <a-popover :title="$t('log.copyOptions')">
+      <template #content>
+        <div class="input-item">
+          <span class="input-label">{{ $t('log.addIndex') }}</span>
+          <a-switch v-model:checked="showIndex" />
+          <span class="input-label">{{ $t('log.copyTime') }}</span>
+          <a-switch v-model:checked="copyTime" />
+        </div>
+        <div class="input-item">
+          <span class="input-label">{{ $t('log.copyContent') }}</span>
+          <a-radio-group v-model:value="copyOption">
+            <a-radio-button value="both">{{ $t('log.both') }}</a-radio-button>
+            <a-radio-button value="source">{{ $t('log.source') }}</a-radio-button>
+            <a-radio-button value="target">{{ $t('log.translation') }}</a-radio-button>
+          </a-radio-group>
+        </div>
+      </template>
+      <a-button
+        style="margin-right: 20px;"
+        @click="copyCaptions"
+        :disabled="captionData.length === 0"
+      >{{ $t('log.copy') }}</a-button>
+      </a-popover>
+
       <a-button
         danger
         @click="clearCaptions"
-      >
-        {{ $t('log.clear') }}
-      </a-button>
+      >{{ $t('log.clear') }}</a-button>
     </div>
     <a-table
       :columns="columns"
@@ -49,8 +70,17 @@
 import { ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useCaptionLogStore } from '@renderer/stores/captionLog'
+import { message } from 'ant-design-vue'
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
+
 const captionLog = useCaptionLogStore()
 const { captionData } = storeToRefs(captionLog)
+
+const showIndex = ref(true)
+const copyTime = ref(true)
+const copyOption = ref('both')
+
 const pagination = ref({
   current: 1,
   pageSize: 10,
@@ -101,12 +131,28 @@ function exportCaptions() {
   URL.revokeObjectURL(url)
 }
 
+function copyCaptions() {
+  let content = ''
+  for(let i = 0; i < captionData.value.length; i++){
+    const item = captionData.value[i]
+    if(showIndex.value) content += `${i+1}\n`
+    if(copyTime.value) content += `${item.time_s} --> ${item.time_t}\n`.replace(/\./g, ',')
+    if(copyOption.value === 'both') content += `${item.text}\n${item.translation}\n\n`
+    else if(copyOption.value === 'source') content += `${item.text}\n\n`
+    else if(copyOption.value === 'translation') content += `${item.translation}\n\n`
+  }
+  navigator.clipboard.writeText(content)
+  message.success(t('log.copySuccess'))
+}
+
 function clearCaptions() {
   captionLog.clear()
 }
 </script>
 
 <style scoped>
+@import url(../assets/input.css);
+
 .caption-list {
   padding: 20px;
   border-radius: 8px;

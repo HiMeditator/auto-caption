@@ -99,6 +99,15 @@ export default {
   },
   log: {
     "title": "字幕ログ",
+    "copy": "クリップボードにコピー",
+    "copyOptions": "コピー設定",
+    "addIndex": "順序番号",
+    "copyTime": "時間",
+    "copyContent": "内容",
+    "both": "原文と翻訳",
+    "source": "原文のみ",
+    "translation": "翻訳のみ",
+    "copySuccess": "字幕がクリップボードにコピーされました",
     "export": "エクスポート",
     "clear": "字幕ログをクリア"
   }
