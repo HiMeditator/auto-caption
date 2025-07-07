@@ -139,7 +139,7 @@ function copyCaptions() {
     if(copyTime.value) content += `${item.time_s} --> ${item.time_t}\n`.replace(/\./g, ',')
     if(copyOption.value === 'both') content += `${item.text}\n${item.translation}\n\n`
     else if(copyOption.value === 'source') content += `${item.text}\n\n`
-    else if(copyOption.value === 'translation') content += `${item.translation}\n\n`
+    else content += `${item.translation}\n\n`
   }
   navigator.clipboard.writeText(content)
   message.success(t('log.copySuccess'))
