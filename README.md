@@ -24,7 +24,7 @@
 
 [项目 API 文档](./docs/api-docs/electron-ipc.md)
 
-### 基本使用
+## 📖 基本使用
 
 目前仅提供了 Windows 平台的可安装版本。如果要使用默认的 Gummy 字幕引擎，首先需要获取阿里云百炼平台的 API KEY 并配置到环境变量中，这样才能正常使用该模型。
 
@@ -49,6 +49,43 @@
 - Windows 平台支持生成音频输出和麦克风输入的字幕
 - Linux 平台目前仅支持生成麦克风输入的字幕
 - 目前还没有适配 macOS 平台
+
+## ⚙️ 自带字幕引擎说明
+
+目前软件自带 1 个字幕引擎，正在规划 2 个新的引擎。它们的详细信息如下。
+
+### Gummy 字幕引擎（云端）
+
+基于通义实验室[Gummy语音翻译大模型](https://help.aliyun.com/zh/model-studio/gummy-speech-recognition-translation/)进行开发，基于[阿里云百炼](https://bailian.console.aliyun.com)的 API 进行调用该云端模型。
+
+**模型详细参数：**
+
+- 音频采样率支持：16kHz及以上
+- 音频采样位数：16bit
+- 音频通道数支持：单通道
+- 可识别语言：中文、英文、日语、韩语、德语、法语、俄语、意大利语、西班牙语
+- 支持的翻译：
+  - 中文 → 英文、日语、韩语
+  - 英文 → 中文、日语、韩语
+  - 日语、韩语、德语、法语、俄语、意大利语、西班牙语 → 中文或英文
+
+**网络流量消耗：**
+
+字幕引擎使用原生采样率（假设为 48kHz）进行采样，样本位深为 16bit，上传音频为为单通道，因此上传速率约为：
+
+$$
+48000\, \text{samples/second} \times 2\,\text{bytes/sample} \times 1\, \text{channel}  = 93.75\,\text{KB/s}
+$$
+
+模型结果回传流量消耗较小，可以不纳入考虑。
+
+### Vosk 字幕引擎（本地）
+
+预计基于 [vosk-api](https://github.com/alphacep/vosk-api) 进行开发，正在实验中。
+
+### FunASR 字幕引擎（本地）
+
+如果可行，将基于 [FunASR](https://github.com/modelscope/FunASR) 进行开发。还未进行调研和可行性验证。
 
 ## 🚀 项目运行
 

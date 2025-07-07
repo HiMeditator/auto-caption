@@ -24,7 +24,7 @@
 
 [Project API Documentation (Chinese)](./docs/api-docs/electron-ipc.md)
 
-### Basic Usage
+## 📖 Basic Usage
 
 Currently, only an installable version for the Windows platform is provided. If you want to use the default Gummy caption engine, you first need to obtain an API KEY from the Alibaba Cloud Model Studio and configure it in the environment variables. This is necessary to use the model properly.
 
@@ -48,6 +48,44 @@ Notes:
 - The Windows platform supports generating captions for both audio output and microphone input.
 - The Linux platform currently only supports generating captions for microphone input.
 - The macOS platform is not yet supported.
+
+## ⚙️ Subtitle Engine Description
+
+Currently, the software comes with 1 subtitle engine, and 2 new engines are being planned. The details of these engines are as follows.
+
+### Gummy Subtitle Engine (Cloud-based)
+
+Developed based on the [Gummy Speech Translation Large Model](https://help.aliyun.com/zh/model-studio/gummy-speech-recognition-translation/) from Tongyi Lab, this cloud-based model is invoked through the API provided by [Aliyun Bailing](https://bailian.console.aliyun.com).
+
+**Model Detailed Parameters:**
+
+- Supported audio sampling rates: 16kHz and above
+- Audio bit depth: 16bit
+- Supported audio channels: Mono
+- Recognizable languages: Chinese, English, Japanese, Korean, German, French, Russian, Italian, Spanish
+- Supported translations:
+  - Chinese → English, Japanese, Korean
+  - English → Chinese, Japanese, Korean
+  - Japanese, Korean, German, French, Russian, Italian, Spanish → Chinese or English
+
+**Network Traffic Consumption:**
+
+The subtitle engine uses the native sampling rate (assuming 48kHz) for sampling, with a sample bit depth of 16bit and single-channel audio, so the upload rate is approximately:
+
+$$
+48000\, \text{samples/second} \times 2\,\text{bytes/sample} \times 1\, \text{channel} = 93.75\,\text{KB/s}
+$$
+
+The traffic consumption for returning the model results is relatively small and can be disregarded.
+
+### Vosk Subtitle Engine (Local)
+
+Expected to be developed based on [vosk-api](https://github.com/alphacep/vosk-api), currently under experimentation.
+
+### FunASR Subtitle Engine (Local)
+
+If feasible, it will be developed based on [FunASR](https://github.com/modelscope/FunASR). Research and feasibility verification have not yet been conducted.
+
 
 ## 🚀 Project Execution
 

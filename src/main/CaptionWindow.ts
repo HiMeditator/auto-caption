@@ -16,7 +16,6 @@ class CaptionWindow {
       show: false,
       frame: false,
       transparent: true,
-      alwaysOnTop: true,
       center: true,
       autoHideMenuBar: true,
       ...(process.platform === 'linux' ? { icon } : {}),
@@ -25,6 +24,8 @@ class CaptionWindow {
         sandbox: false
       }
     })
+
+    this.window.setAlwaysOnTop(true, 'screen-saver')
 
     this.window.on('ready-to-show', () => {
       this.window?.show()
@@ -72,7 +73,8 @@ class CaptionWindow {
 
     ipcMain.on('caption.pin.set', (_, pinned) => {
       if(this.window){
-        this.window.setAlwaysOnTop(pinned)
+        if(pinned) this.window.setAlwaysOnTop(true, 'screen-saver')
+        else this.window.setAlwaysOnTop(false)
       }
     })
   }
