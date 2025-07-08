@@ -27,7 +27,7 @@ export class CaptionEngine {
       if (process.platform === 'win32') {
         gummyName = 'main-gummy.exe'
       }
-      else if (process.platform === 'linux') {
+      else if (process.platform === 'darwin' || process.platform === 'linux') {
         gummyName = 'main-gummy'
       }
       else {
@@ -124,16 +124,16 @@ export class CaptionEngine {
     if(this.processStatus !== 'running') return
     if (this.process) {
       console.log('[INFO] Trying to stop process, PID:', this.process.pid)
-      if (process.platform === "win32" && this.process.pid) {
-        exec(`taskkill /pid ${this.process.pid} /t /f`, (error) => {
-          if (error) {
-            controlWindow.sendErrorMessage(i18n('engine.shutdown.error') + error)
-            console.error(`[ERROR] Failed to kill process: ${error}`)
-          }
-        });
-      } else {
-        this.process.kill('SIGKILL');
+      let cmd = `kill ${this.process.pid}`;
+      if (process.platform === "win32") {
+        cmd = `taskkill /pid ${this.process.pid} /t /f`
       }
+      exec(cmd, (error) => {
+        if (error) {
+          controlWindow.sendErrorMessage(i18n('engine.shutdown.error') + error)
+          console.error(`[ERROR] Failed to kill process: ${error}`)
+        }
+      })
     }
     this.processStatus = 'stopping'
     console.log('[INFO] Caption engine process stopping')

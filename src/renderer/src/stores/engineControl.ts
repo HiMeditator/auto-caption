@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { defineStore } from 'pinia'
 
 import { notification } from 'ant-design-vue'
@@ -12,6 +12,7 @@ import { useGeneralSettingStore } from './generalSetting'
 
 export const useEngineControlStore = defineStore('engineControl', () => {
   const { t } = useI18n()
+  const platform = ref('unknown')
 
   const captionEngine = ref(engines[useGeneralSettingStore().uiLanguage])
   const audioType = ref(audioTypes[useGeneralSettingStore().uiLanguage])
@@ -91,7 +92,14 @@ export const useEngineControlStore = defineStore('engineControl', () => {
     });
   })
 
+  watch(platform, (newValue) => {
+    if(newValue !== 'win32' && newValue !== 'darwin') {
+      audio.value = 1
+    }
+  })
+
   return {
+    platform,           // 系统平台
     captionEngine,      // 字幕引擎
     audioType,          // 音频类型
     engineEnabled,      // 字幕引擎是否启用

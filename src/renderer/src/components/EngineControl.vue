@@ -32,6 +32,7 @@
     <div class="input-item">
       <span class="input-label">{{ $t('engine.audioType') }}</span>
       <a-select
+        :disabled="platform !== 'win32' && platform !== 'darwin'"
         class="input-area"
         v-model:value="currentAudio"
         :options="audioType"
@@ -87,7 +88,7 @@ import { useI18n } from 'vue-i18n'
 const { t } = useI18n()
 
 const engineControl = useEngineControlStore()
-const { captionEngine, audioType, changeSignal } = storeToRefs(engineControl)
+const { platform, captionEngine, audioType, changeSignal } = storeToRefs(engineControl)
 
 const currentSourceLang = ref('auto')
 const currentTargetLang = ref('zh')

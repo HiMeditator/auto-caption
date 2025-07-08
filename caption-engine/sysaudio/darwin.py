@@ -1,57 +1,21 @@
-"""获取 Windows 系统音频输入/输出流"""
+"""获取 MacOS 系统音频输入/输出流"""
 
-import pyaudiowpatch as pyaudio
-
-
-def getDefaultLoopbackDevice(mic: pyaudio.PyAudio, info = True)->dict:
-    """
-    获取默认的系统音频输出的回环设备
-    Args:
-        mic (pyaudio.PyAudio): pyaudio对象
-        info (bool, optional): 是否打印设备信息
-
-    Returns:
-        dict: 系统音频输出的回环设备
-    """
-    try:
-        WASAPI_info = mic.get_host_api_info_by_type(pyaudio.paWASAPI)
-    except OSError:
-        print("Looks like WASAPI is not available on the system. Exiting...")
-        exit()
-
-    default_speaker = mic.get_device_info_by_index(WASAPI_info["defaultOutputDevice"])
-    if(info): print("wasapi_info:\n", WASAPI_info, "\n")
-    if(info): print("default_speaker:\n", default_speaker, "\n")
-
-    if not default_speaker["isLoopbackDevice"]:
-        for loopback in mic.get_loopback_device_info_generator():
-            if default_speaker["name"] in loopback["name"]:
-                default_speaker = loopback
-                if(info): print("Using loopback device:\n", default_speaker, "\n")
-                break
-        else:
-            print("Default loopback output device not found.")
-            print("Run `python -m pyaudiowpatch` to check available devices.")
-            print("Exiting...")
-            exit()
-
-    if(info): print(f"Output Stream Device: #{default_speaker['index']} {default_speaker['name']}")
-    return default_speaker
+import pyaudio
 
 
 class AudioStream:
     """
-    获取系统音频流
+    获取系统音频流（支持 BlackHole 作为系统音频输出捕获）
 
     初始化参数：
-        audio_type: 0-系统音频输出流（默认），1-系统音频输入流
+        audio_type: 0-系统音频输出流（需配合 BlackHole），1-系统音频输入流
         chunk_rate: 每秒采集音频块的数量，默认为20
     """
     def __init__(self, audio_type=0, chunk_rate=20):
         self.audio_type = audio_type
         self.mic = pyaudio.PyAudio()
         if self.audio_type == 0:
-            self.device = getDefaultLoopbackDevice(self.mic, False)
+            self.device = self.getOutputDeviceInfo()
         else:
             self.device = self.mic.get_default_input_device_info()
         self.stream = None
@@ -62,9 +26,18 @@ class AudioStream:
         self.CHUNK = self.RATE // chunk_rate
         self.INDEX = self.device["index"]
 
+    def getOutputDeviceInfo(self):
+        """查找指定关键词的输入设备"""
+        device_count = self.mic.get_device_count()
+        for i in range(device_count):
+            dev_info = self.mic.get_device_info_by_index(i)
+            if 'blackhole' in dev_info["name"].lower():    
+                return dev_info
+        raise Exception("The device containing BlackHole was not found.")
+
     def printInfo(self):
         dev_info = f"""
-        采样设备：
+        采样输入设备：
             - 设备类型：{ "音频输出" if self.audio_type == 0 else "音频输入" }
             - 序号：{self.device['index']}
             - 名称：{self.device['name']}
@@ -72,7 +45,6 @@ class AudioStream:
             - 默认低输入延迟：{self.device['defaultLowInputLatency']}s
             - 默认高输入延迟：{self.device['defaultHighInputLatency']}s
             - 默认采样率：{self.device['defaultSampleRate']}Hz
-            - 是否回环设备：{self.device['isLoopbackDevice']}
 
         音频样本块大小：{self.CHUNK}
         样本位宽：{self.SAMP_WIDTH}
@@ -89,10 +61,10 @@ class AudioStream:
         if self.stream: return self.stream
         self.stream = self.mic.open(
             format = self.FORMAT,
-            channels = self.CHANNELS,
+            channels = int(self.CHANNELS),
             rate = self.RATE,
             input = True,
-            input_device_index = self.INDEX
+            input_device_index = int(self.INDEX)
         )
         return self.stream
 

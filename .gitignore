@@ -8,3 +8,4 @@ __pycache__
 subenv
 caption-engine/build
 output.wav
+.venv

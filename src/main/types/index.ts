@@ -37,6 +37,7 @@ export interface CaptionItem {
 }
 
 export interface FullConfig {
+  platform: string,
   uiLanguage: UILanguage,
   uiTheme: UITheme,
   leftBarWidth: number,
