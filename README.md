@@ -6,7 +6,7 @@
     <img src="https://img.shields.io/github/issues/HiMeditator/auto-caption?color=orange">
     <img src="https://img.shields.io/github/languages/top/HiMeditator/auto-caption?color=royalblue">
     <img src="https://img.shields.io/github/repo-size/HiMeditator/auto-caption?color=green">
-    <img src="https://visitor-badge.laobi.icu/badge?page_id=himeditator.github.io">
+    <img src="https://visitor-badge.laobi.icu/badge?page_id=himeditator.auto-caption">
     <p>
         | <b>简体中文</b>
         | <a href="./README_en.md">English</a>

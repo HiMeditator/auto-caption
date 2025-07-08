@@ -10,8 +10,8 @@ files:
   - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
 extraResources:
-  from: ./caption-engine/dist/main-gummy
-  to: ./caption-engine/main-gummy
+  from: ./caption-engine/dist/main-gummy.exe
+  to: ./caption-engine/main-gummy.exe
 asarUnpack:
   - resources/**
 win:
