@@ -26,6 +26,7 @@ const defaultControls: Controls = {
   engine: 'gummy',
   audio: 0,
   engineEnabled: false,
+  API_KEY: '',
   translation: true,
   customized: false,
   customizedApp: '',
@@ -51,6 +52,7 @@ class AllConfig {
       if(config.uiTheme) this.uiTheme = config.uiTheme
       if(config.leftBarWidth) this.leftBarWidth = config.leftBarWidth
       if(config.styles) this.setStyles(config.styles)
+      if(process.platform !== 'win32' && process.platform !== 'darwin') config.controls.audio = 1
       if(config.controls) this.setControls(config.controls)
       console.log('[INFO] Read Config from:', configPath)
     }
@@ -71,6 +73,7 @@ class AllConfig {
 
   public getFullConfig(): FullConfig {
     return {
+      platform: process.platform,
       uiLanguage: this.uiLanguage,
       uiTheme: this.uiTheme,
       leftBarWidth: this.leftBarWidth,
@@ -80,7 +83,7 @@ class AllConfig {
     }
   }
 
-  public setStyles(args: Styles) {
+  public setStyles(args: Object) {
     for(let key in this.styles) {
       if(key in args) {
         this.styles[key] = args[key]
@@ -98,7 +101,7 @@ class AllConfig {
     console.log(`[INFO] Send Styles to #${window.id}:`, this.styles)
   }
 
-  public setControls(args: Controls) {
+  public setControls(args: Object) {
     const engineEnabled = this.controls.engineEnabled
     for(let key in this.controls){
       if(key in args) {

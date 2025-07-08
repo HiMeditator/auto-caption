@@ -1,3 +1,5 @@
+"""获取 Linux 系统音频输入流"""
+
 import pyaudio
 
 

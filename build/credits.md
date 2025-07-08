@@ -5,6 +5,8 @@
 The following icons are used under CC BY 4.0 license:
 
 - icon.png
+- icon.svg
+- icon.icns
 
 Source:
  

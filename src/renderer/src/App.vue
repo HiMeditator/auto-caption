@@ -16,6 +16,7 @@ onMounted(() => {
     useGeneralSettingStore().uiTheme = data.uiTheme
     useGeneralSettingStore().leftBarWidth = data.leftBarWidth
     useCaptionStyleStore().setStyles(data.styles)
+    useEngineControlStore().platform = data.platform
     useEngineControlStore().setControls(data.controls)
     useCaptionLogStore().captionData = data.captionLog
   })

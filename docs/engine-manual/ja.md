@@ -1,71 +1,106 @@
-# キャプションエンジンの説明文書
+# 字幕エンジンの説明文書
 
-![](../../assets/media/structure_ja.png)
+対応バージョン：v0.3.0
 
 この文書は大規模モデルを使用して翻訳されていますので、内容に正確でない部分があるかもしれません。
 
-## キャプションエンジンの紹介
+![](../../assets/media/structure_ja.png)
 
-キャプションエンジンとは、実際にはサブプログラムであり、システムの音声入力（録音）または出力（音声再生）のストリーミングデータをリアルタイムで取得し、音声をテキストに変換するモデルを呼び出して対応する音声のキャプションを生成します。生成されたキャプションはJSON形式の文字列データに変換され、標準出力を通じてメインプログラムに渡されます（メインプログラムが読み取った文字列がJSONオブジェクトとして正しく解釈できるようにする必要があります）。メインプログラムはキャプションデータを読み取り、解釈し、処理してウィンドウ上に表示します。
+## 字幕エンジンの紹介
 
-## キャプションエンジンが必要とする機能
+所謂字幕エンジンは実際にはサブプログラムであり、システムの音声入力（録音）または出力（音声再生）のストリーミングデータをリアルタイムで取得し、音声からテキストへの変換モデルを使って対応する音声の字幕を生成します。生成された字幕はJSON形式の文字列データに変換され、標準出力を通じてメインプログラムに渡されます（メインプログラムが読み取った文字列が正しいJSONオブジェクトとして解釈されることが保証される必要があります）。メインプログラムは字幕データを読み取り、解釈して処理し、ウィンドウ上に表示します。
+
+## 字幕エンジンが必要な機能
 
 ### 音声の取得
 
-まず、あなたのキャプションエンジンはシステムの音声入力（録音）または出力（音声再生）のストリーミングデータを取得する必要があります。Pythonを使用して開発する場合、PyAudioライブラリを使用してマイクからの音声入力データを取得できます（全プラットフォーム対応）。PyAudioWPatchライブラリを使用してシステムの音声出力を取得することができます（Windowsプラットフォームのみ対応）。
+まず、あなたの字幕エンジンはシステムの音声入力（録音）または出力（音声再生）のストリーミングデータを取得する必要があります。Pythonを使用して開発する場合、PyAudioライブラリを使ってマイクからの音声入力データを取得できます（全プラットフォーム共通）。また、WindowsプラットフォームではPyAudioWPatchライブラリを使ってシステムの音声出力を取得することもできます。
 
-一般的に取得される音声ストリームデータは、比較的短い時間の音声ブロックで構成されています。モデルに合わせて音声ブロックのサイズを調整する必要があります。例えば、アリババクラウドのGummyモデルでは、0.05秒の音声ブロックを使用した認識精度が0.2秒の音声ブロックよりも優れています。
+一般的に取得される音声ストリームデータは、比較的短い時間間隔の音声ブロックで構成されています。モデルに合わせて音声ブロックのサイズを調整する必要があります。例えば、アリババクラウドのGummyモデルでは、0.05秒の音声ブロックを使用した認識結果の方が0.2秒の音声ブロックよりも優れています。
 
 ### 音声の処理
 
-取得した音声ストリームは、テキストに変換する前に前処理を行う必要があるかもしれません。例えば、アリババクラウドのGummyモデルは単一チャンネルの音声ストリームしか認識できませんが、収集された音声ストリームは通常二重チャンネルです。そのため、二重チャンネルの音声ストリームを単一チャンネルに変換する必要があります。チャンネル数の変換はNumPyライブラリのメソッドを使用して行うことができます。
+取得した音声ストリームは、テキストに変換する前に前処理が必要な場合があります。例えば、アリババクラウドのGummyモデルは単一チャンネルの音声ストリームしか認識できませんが、収集された音声ストリームは通常二重チャンネルであるため、二重チャンネルの音声ストリームを単一チャンネルに変換する必要があります。チャンネル数の変換はNumPyライブラリのメソッドを使って行うことができます。
 
-既に開発済みの音声取得と音声処理モジュール（パス：`caption-engine/sysaudio`）を使用することもできます：
-
-```python
-if sys.platform == 'win32':
-    from sysaudio.win import AudioStream, mergeStreamChannels
-elif sys.platform == 'linux':
-    from sysaudio.linux import AudioStream, mergeStreamChannels
-else:
-    raise NotImplementedError(f"サポートされていないプラットフォーム: {sys.platform}")
-
-# 音声ストリームオブジェクトのインスタンスを作成
-stream = AudioStream(audio_type)
-# 音声ストリームを開く
-stream.openStream()
-while True:  # 音声データを繰り返し読み込む
-    # 音声データを読み込む
-    data = stream.stream.read(stream.CHUNK)
-    # 二重チャンネルの音声データを単一チャンネルに変換
-    data = mergeStreamChannels(data, stream.CHANNELS)
-    # 音声をテキストに変換するモデルを呼び出す
-    # ... ...
-```
+あなたは私によって開発された音声の取得（`caption-engine/sysaudio`）と音声の処理（`caption-engine/audioprcs`）モジュールを直接使用することができます。
 
 ### 音声からテキストへの変換
 
-適切な音声ストリームを得た後、それをテキストに変換することができます。通常、様々なモデルを使用してこの変換を行います。必要に応じてモデルを選択してください。
+適切な音声ストリームを得た後、それをテキストに変換することができます。通常、様々なモデルを使って音声ストリームをテキストに変換します。必要に応じてモデルを選択することができます。
+
+ほぼ完全な字幕エンジンの実装例：
+
+```python
+import sys
+import argparse
+
+# システム音声の取得に関する設定
+if sys.platform == 'win32':
+    from sysaudio.win import AudioStream
+elif sys.platform == 'darwin':
+    from sysaudio.darwin import AudioStream
+elif sys.platform == 'linux':
+    from sysaudio.linux import AudioStream
+else:
+    raise NotImplementedError(f"Unsupported platform: {sys.platform}")
+
+# 音声処理関数のインポート
+from audioprcs import mergeChunkChannels
+# 音声からテキストへの変換モジュールのインポート
+from audio2text import InvalidParameter, GummyTranslator
+
+
+def convert_audio_to_text(s_lang, t_lang, audio_type, chunk_rate, api_key):
+    # 標準出力をラインバッファリングに設定
+    sys.stdout.reconfigure(line_buffering=True) # type: ignore
+
+    # 音声の取得と音声からテキストへの変換のインスタンスを作成
+    stream = AudioStream(audio_type, chunk_rate)
+    if t_lang == 'none':
+        gummy = GummyTranslator(stream.RATE, s_lang, None, api_key)
+    else:
+        gummy = GummyTranslator(stream.RATE, s_lang, t_lang, api_key)
+
+    # インスタンスを開始
+    stream.openStream()
+    gummy.start()
+
+    while True:
+        try:
+            # 音声ストリームデータを読み込む
+            chunk = stream.read_chunk()
+            chunk_mono = mergeChunkChannels(chunk, stream.CHANNELS)
+            try:
+                # モデルを使って翻訳を行う
+                gummy.send_audio_frame(chunk_mono)
+            except InvalidParameter:
+                gummy.start()
+                gummy.send_audio_frame(chunk_mono)
+        except KeyboardInterrupt:
+            stream.closeStream()
+            gummy.stop()
+            break
+```
 
 ### データの伝送
 
-現在の音声ストリームのテキストを取得したら、それをメインプログラムに伝送する必要があります。キャプションエンジンプロセスは標準出力を通じてキャプションデータをElectronのメインプロセスに伝送します。
+現在の音声ストリームのテキストを得たら、それをメインプログラムに渡す必要があります。字幕エンジンプロセスは標準出力を通じて電子メール主プロセスに字幕データを渡します。
 
-伝送する内容はJSON文字列でなければならず、JSONオブジェクトには以下のパラメータを含める必要があります：
+渡す内容はJSON文字列でなければなりません。JSONオブジェクトには以下のパラメータを含める必要があります：
 
 ```typescript
 export interface CaptionItem {
-  index: number, // キャプション番号
-  time_s: string, // 現在のキャプションの開始時間
-  time_t: string, // 現在のキャプションの終了時間
-  text: string, // キャプションの内容
-  translation: string // キャプションの翻訳
+  index: number, // 字幕番号
+  time_s: string, // 現在の字幕開始時間
+  time_t: string, // 現在の字幕終了時間
+  text: string, // 字幕内容
+  translation: string // 字幕翻訳
 }
 ```
 
-**注意：キャプションJSONデータを出力するたびに必ずバッファをフラッシュし、Electronのメインプロセスが受け取る文字列が常にJSONオブジェクトとして解釈できるようにする必要があります。**
+**必ず、字幕JSONデータを出力するたびにバッファをフラッシュし、electron主プロセスが受け取る文字列が常にJSONオブジェクトとして解釈できるようにする必要があります。**
 
-Pythonを使用する場合、以下のようにデータをメインプログラムに伝送できます：
+Python言語を使用する場合、以下の方法でデータをメインプログラムに渡すことができます：
 
 ```python
 # caption-engine\main-gummy.py
@@ -75,44 +110,15 @@ sys.stdout.reconfigure(line_buffering=True)
 ...
     def send_to_node(self, data):
         """
-        データをNode.jsプロセスに送信
+        Node.jsプロセスにデータを送信する
         """
         try:
             json_data = json.dumps(data) + '\n'
             sys.stdout.write(json_data)
             sys.stdout.flush()
         except Exception as e:
-            print(f"Node.jsへのデータ送信エラー: {e}", file=sys.stderr)
+            print(f"Error sending data to Node.js: {e}", file=sys.stderr)
 ...
 ```
 
-データ受信側のコードは以下の通りです：
-
-```typescript
-// src\main\utils\engine.ts
-...
-    this.process.stdout.on('data', (data) => {
-      const lines = data.toString().split('\n');
-      lines.forEach((line: string) => {
-        if (line.trim()) {
-          try {
-            const caption = JSON.parse(line);
-            addCaptionLog(caption);
-          } catch (e) {
-            controlWindow.sendErrorMessage('キャプションエンジンの出力内容がJSONオブジェクトとして解析できません: ' + e)
-            console.error('[ERROR] JSON解析エラー:', e);
-          }
-        }
-      });
-    });
-
-    this.process.stderr.on('data', (data) => {
-      controlWindow.sendErrorMessage('キャプションエンジンエラー: ' + data)
-      console.error(`[ERROR] サブプロセスエラー: ${data}`);
-    });
-...
-```
-
-## 参考コード
-
-本プロジェクトの `caption-engine` フォルダにある `main-gummy.py` ファイルは、デフォルトのキャプションエンジンのエントリポイントコードです。`src\main\utils\engine.ts` はサーバーサイドでキャプションエンジンのデータを取得および処理するためのコードです。必要に応じて、キャプションエンジンの実装詳細と完全な実行プロセスを理解するために読み込むことができます。
+データ受信側のコードは

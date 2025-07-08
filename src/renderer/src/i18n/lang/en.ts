@@ -46,6 +46,8 @@ export default {
     "systemOutput": "System Audio Output (Speaker)",
     "systemInput": "System Audio Input (Microphone)",
     "enableTranslation": "Translation",
+    "showMore": "More Settings",
+    "apikey": "API KEY",
     "customEngine": "Custom Engine",
     custom: {
       "title": "Custom Caption Engine",

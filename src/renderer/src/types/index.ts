@@ -9,6 +9,7 @@ export interface Controls {
   engine: 'gummy',
   audio: 0 | 1,
   translation: boolean,
+  API_KEY: string,
   customized: boolean,
   customizedApp: string,
   customizedCommand: string
@@ -37,6 +38,7 @@ export interface CaptionItem {
 }
 
 export interface FullConfig {
+  platform: string,
   uiLanguage: UILanguage,
   uiTheme: UITheme,
   leftBarWidth: number,

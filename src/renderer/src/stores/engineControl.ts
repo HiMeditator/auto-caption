@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { defineStore } from 'pinia'
 
 import { notification } from 'ant-design-vue'
@@ -12,10 +12,11 @@ import { useGeneralSettingStore } from './generalSetting'
 
 export const useEngineControlStore = defineStore('engineControl', () => {
   const { t } = useI18n()
+  const platform = ref('unknown')
 
   const captionEngine = ref(engines[useGeneralSettingStore().uiLanguage])
   const audioType = ref(audioTypes[useGeneralSettingStore().uiLanguage])
-
+  const API_KEY = ref<string>('')
   const engineEnabled = ref(false)
   const sourceLang = ref<string>('en')
   const targetLang = ref<string>('zh')
@@ -36,6 +37,7 @@ export const useEngineControlStore = defineStore('engineControl', () => {
       engine: engine.value,
       audio: audio.value,
       translation: translation.value,
+      API_KEY: API_KEY.value,
       customized: customized.value,
       customizedApp: customizedApp.value,
       customizedCommand: customizedCommand.value
@@ -50,6 +52,7 @@ export const useEngineControlStore = defineStore('engineControl', () => {
     audio.value = controls.audio
     engineEnabled.value = controls.engineEnabled
     translation.value = controls.translation
+    API_KEY.value = controls.API_KEY
     customized.value = controls.customized
     customizedApp.value = controls.customizedApp
     customizedCommand.value = controls.customizedCommand
@@ -91,7 +94,14 @@ export const useEngineControlStore = defineStore('engineControl', () => {
     });
   })
 
+  watch(platform, (newValue) => {
+    if(newValue !== 'win32' && newValue !== 'darwin') {
+      audio.value = 1
+    }
+  })
+
   return {
+    platform,           // 系统平台
     captionEngine,      // 字幕引擎
     audioType,          // 音频类型
     engineEnabled,      // 字幕引擎是否启用
@@ -100,6 +110,7 @@ export const useEngineControlStore = defineStore('engineControl', () => {
     engine,             // 字幕引擎
     audio,              // 选择音频
     translation,        // 是否启用翻译
+    API_KEY,            // API KEY
     customized,         // 是否使用自定义字幕引擎
     customizedApp,      // 自定义字幕引擎的应用程序
     customizedCommand,  // 自定义字幕引擎的命令

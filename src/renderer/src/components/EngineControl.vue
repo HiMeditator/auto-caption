@@ -32,6 +32,7 @@
     <div class="input-item">
       <span class="input-label">{{ $t('engine.audioType') }}</span>
       <a-select
+        :disabled="platform !== 'win32' && platform !== 'darwin'"
         class="input-area"
         v-model:value="currentAudio"
         :options="audioType"
@@ -42,36 +43,51 @@
       <a-switch v-model:checked="currentTranslation" />
       <span style="display:inline-block;width:20px;"></span>
       <div style="display: inline-block;">
-        <span class="switch-label">{{ $t('engine.customEngine') }}</span>
-        <a-switch v-model:checked="currentCustomized" />
+        <span class="switch-label">{{ $t('engine.showMore') }}</span>
+        <a-switch v-model:checked="showMore" />
       </div>
     </div>
-    <div v-show="currentCustomized">
-      <a-card size="small" :title="$t('engine.custom.title')">
-        <template #extra>
-          <a-popover>
-            <template #content>
-              <p class="customize-note">{{ $t('engine.custom.note') }}</p>
-            </template>
-            <a><InfoCircleOutlined />{{ $t('engine.custom.attention') }}</a>
-          </a-popover>
-        </template>
-        <div class="input-item">
-          <span class="input-label">{{ $t('engine.custom.app') }}</span>
-          <a-input
-            class="input-area"
-            v-model:value="currentCustomizedApp"
-          ></a-input>
-        </div>
-        <div class="input-item">
-          <span class="input-label">{{ $t('engine.custom.command') }}</span>
-          <a-input
-            class="input-area"
-            v-model:value="currentCustomizedCommand"
-          ></a-input>
-        </div>
-      </a-card>
-    </div>
+    <a-card size="small" :title="$t('engine.custom.title')" v-show="showMore">
+      <div class="input-item">
+        <span class="input-label">{{ $t('engine.apikey') }}</span>
+        <a-input
+          class="input-area"
+          type="password"
+          v-model:value="currentAPI_KEY"
+        />
+      </div>
+      <div class="input-item">
+        <span style="margin-right:5px;">{{ $t('engine.customEngine') }}</span>
+        <a-switch v-model:checked="currentCustomized" />
+      </div>
+      <div v-show="currentCustomized">
+        <a-card size="small" :title="$t('engine.custom.title')">
+          <template #extra>
+            <a-popover>
+              <template #content>
+                <p class="customize-note">{{ $t('engine.custom.note') }}</p>
+              </template>
+              <a><InfoCircleOutlined />{{ $t('engine.custom.attention') }}</a>
+            </a-popover>
+          </template>
+          <div class="input-item">
+            <span class="input-label">{{ $t('engine.custom.app') }}</span>
+            <a-input
+              class="input-area"
+              v-model:value="currentCustomizedApp"
+            ></a-input>
+          </div>
+          <div class="input-item">
+            <span class="input-label">{{ $t('engine.custom.command') }}</span>
+            <a-input
+              class="input-area"
+              v-model:value="currentCustomizedCommand"
+            ></a-input>
+          </div>
+        </a-card>
+      </div>      
+    </a-card>
+
   </a-card>
   <div style="height: 20px;"></div>
 </template>
@@ -85,16 +101,17 @@ import { InfoCircleOutlined } from '@ant-design/icons-vue';
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
+const showMore = ref(false)
 
 const engineControl = useEngineControlStore()
-const { captionEngine, audioType, changeSignal } = storeToRefs(engineControl)
+const { platform, captionEngine, audioType, changeSignal } = storeToRefs(engineControl)
 
 const currentSourceLang = ref('auto')
 const currentTargetLang = ref('zh')
 const currentEngine = ref<'gummy'>('gummy')
 const currentAudio = ref<0 | 1>(0)
 const currentTranslation = ref<boolean>(false)
-
+const currentAPI_KEY = ref<string>('')
 const currentCustomized = ref<boolean>(false)
 const currentCustomizedApp = ref('')
 const currentCustomizedCommand = ref('')
@@ -114,7 +131,7 @@ function applyChange(){
   engineControl.engine = currentEngine.value
   engineControl.audio = currentAudio.value
   engineControl.translation = currentTranslation.value
-
+  engineControl.API_KEY = currentAPI_KEY.value
   engineControl.customized = currentCustomized.value
   engineControl.customizedApp = currentCustomizedApp.value
   engineControl.customizedCommand = currentCustomizedCommand.value
@@ -133,7 +150,7 @@ function cancelChange(){
   currentEngine.value = engineControl.engine
   currentAudio.value = engineControl.audio
   currentTranslation.value = engineControl.translation
-
+  currentAPI_KEY.value = engineControl.API_KEY
   currentCustomized.value = engineControl.customized
   currentCustomizedApp.value = engineControl.customizedApp
   currentCustomizedCommand.value = engineControl.customizedCommand

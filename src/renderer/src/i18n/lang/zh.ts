@@ -46,6 +46,8 @@ export default {
     "systemOutput": "系统音频输出（扬声器）",
     "systemInput": "系统音频输入（麦克风）",
     "enableTranslation": "启用翻译",
+    "showMore": "更多设置",
+    "apikey": "API KEY",
     "customEngine": "自定义引擎",
     custom: {
       "title": "自定义字幕引擎",

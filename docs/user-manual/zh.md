@@ -1,12 +1,14 @@
 # Auto Caption 用户手册
 
-对应版本：v0.2.0
+对应版本：v0.3.0
 
 ## 软件简介
 
 Auto Caption 是一个跨平台的字幕显示软件，能够实时获取系统音频输入（录音）或输出（播放声音）的流式数据，并调用音频转文字的模型生成对应音频的字幕。软件提供的默认字幕引擎（使用阿里云 Gummy 模型）支持九种语言（中、英、日、韩、德、法、俄、西、意）的识别与翻译。
 
-目前软件默认字幕引擎只有在 Windows 平台下才拥有完整功能。在 Linux 平台下只能生成音频输入（麦克风）的字幕，暂不支持音频输出（播放声音）的字幕生成。
+目前软件默认字幕引擎只有在 Windows 和 macOS 平台下才拥有完整功能，在 macOS 要获取系统音频输出需要额外配置。
+
+在 Linux 平台下只能生成音频输入（麦克风）的字幕，暂不支持音频输出（播放声音）的字幕生成。
 
 ![](../../assets/media/main_zh.png)
 
@@ -14,13 +16,17 @@ Auto Caption 是一个跨平台的字幕显示软件，能够实时获取系统�
 
 要使用默认字幕服务需要获取阿里云的 API KEY。
 
+在 macOS 平台获取音频输出需要额外配置。
+
 软件使用 Electron 构建，因此软件体积不可避免的较大。
 
 ## 软件使用
 
 ### 准备阿里云百炼平台 API KEY
 
-要使用软件提供的默认字幕引擎（阿里云 Gummy），需要从阿里云百炼平台获取 API KEY 并在本机环境变量中配置。
+要使用软件提供的默认字幕引擎（阿里云 Gummy），需要从阿里云百炼平台获取 API KEY，然后将 API KEY 添加到软件设置中或者配置到环境变量中（仅 Windows 平台支持读取环境变量中的 API KEY）。
+
+![](../../assets/media/api_zh.png)
 
 **国际版的阿里云服务并没有提供 Gummy 模型，因此目前非中国用户无法使用默认字幕引擎。我正在开发新的本地字幕引擎，以确保所有用户都有默认字幕引擎可以使用。**
 
@@ -29,6 +35,22 @@ Auto Caption 是一个跨平台的字幕显示软件，能够实时获取系统�
 - [获取 API KEY](https://help.aliyun.com/zh/model-studio/get-api-key)
 
 - [将 API Key 配置到环境变量](https://help.aliyun.com/zh/model-studio/configure-api-key-through-environment-variables)
+
+### macOS 获取系统音频输出
+
+字幕引擎无法在 macOS 平台直接获取系统的音频输出，需要安装额外的驱动。目前字幕引擎采用的是 [BlackHole](https://github.com/ExistentialAudio/BlackHole)。首先打开终端，执行以下命令中的其中一个（建议选择第一个）：
+
+```bash
+brew install blackhole-2ch
+brew install blackhole-16ch
+brew install blackhole-64ch
+```
+
+安装完成后打开 `音频 MIDI 设置`（`cmd + space` 打开搜索，可以搜索到）。观察设备列表中是否有 BlackHole 设备，如果没有需要重启电脑。
+
+在确定安装好 BlackHole 设备后，在 `音频 MIDI 设置` 页面，点击左下角的加号，选择“创建多输出设备”。在输出中包含 BlackHole 和你想要的音频输出目标。最后将该多输出设备设置为默认音频输出设备。
+
+现在字幕引擎就能捕获系统的音频输出并生成字幕了。
 
 ### 修改设置
 
