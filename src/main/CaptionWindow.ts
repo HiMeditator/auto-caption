@@ -1,7 +1,7 @@
 import { shell, BrowserWindow, ipcMain } from 'electron'
 import path from 'path'
 import { is } from '@electron-toolkit/utils'
-import icon from '../../resources/icon.png?asset'
+import icon from '../../build/icon.png?asset'
 import { controlWindow } from './ControlWindow'
 
 class CaptionWindow {
@@ -18,7 +18,6 @@ class CaptionWindow {
       transparent: true,
       center: true,
       autoHideMenuBar: true,
-      ...(process.platform === 'linux' ? { icon } : {}),
       webPreferences: {
         preload: path.join(__dirname, '../preload/index.js'),
         sandbox: false

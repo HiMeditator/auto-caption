@@ -102,7 +102,10 @@ npm install
 首先进入 `caption-engine` 文件夹，执行如下指令创建虚拟环境：
 
 ```bash
+# in ./caption-engine folder
 python -m venv subenv
+# or
+python3 -m venv subenv
 ```
 
 然后激活虚拟环境：
@@ -110,11 +113,11 @@ python -m venv subenv
 ```bash
 # Windows
 subenv/Scripts/activate
-# Linux
+# Linux or macOS
 source subenv/bin/activate
 ```
 
-然后安装依赖（注意如果是 Linux 环境，需要注释掉 `requirements.txt` 中的 `PyAudioWPatch`，该模块仅适用于 Windows 环境）：
+然后安装依赖（注意如果是 Linux 或 macOS 环境，需要注释掉 `requirements.txt` 中的 `PyAudioWPatch`，该模块仅适用于 Windows 环境）。这一步可能会报错，一般是因为构建失败，需要根据报错信息安装对应的构建工具包。
 
 ```bash
 pip install -r requirements.txt
