@@ -22,6 +22,7 @@
         v-model:value="currentFontFamily"
       />
     </div>
+
     <div class="input-item">
       <span class="input-label">{{ $t('style.fontColor') }}</span>
       <a-input
@@ -40,6 +41,16 @@
         v-model:value="currentFontSize"
       />
       <div class="input-item-value">{{ currentFontSize }}px</div>
+    </div>
+    <div class="input-item">
+      <span class="input-label">{{ $t('style.fontWeight') }}</span>
+      <a-input
+        class="input-area"
+        type="range"
+        min="1" max="9"
+        v-model:value="currentFontWeight"
+      />
+      <div class="input-item-value">{{ currentFontWeight*100 }}</div>
     </div>
     <div class="input-item">
       <span class="input-label">{{ $t('style.background') }}</span>
@@ -69,6 +80,11 @@
       <div style="display: inline-block;">
         <span class="switch-label">{{ $t('style.translation') }}</span>
         <a-switch v-model:checked="currentTransDisplay" />
+      </div>
+      <span style="display:inline-block;width:20px;"></span>
+      <div style="display: inline-block;">
+        <span class="switch-label">{{ $t('style.textShadow') }}</span>
+        <a-switch v-model:checked="currentTextShadow" />
       </div>
     </div>
 
@@ -103,6 +119,60 @@
           />
           <div class="input-item-value">{{ currentTransFontSize }}px</div>
         </div>
+        <div class="input-item">
+          <span class="input-label">{{ $t('style.fontWeight') }}</span>
+          <a-input
+            class="input-area"
+            type="range"
+            min="1" max="9"
+            v-model:value="currentTransFontWeight"
+          />
+          <div class="input-item-value">{{ currentTransFontWeight*100 }}</div>
+        </div>
+      </a-card>
+    </div>
+
+    <div v-show="currentTextShadow" style="margin-top:10px;">
+      <a-card size="small" :title="$t('style.shadow.title')">
+        <div class="input-item">
+          <span class="input-label">{{ $t('style.shadow.offsetX') }}</span>
+          <a-input
+            class="input-area"
+            type="range"
+            min="-10" max="10"
+            v-model:value="currentOffsetX"
+          />
+          <div class="input-item-value">{{ currentOffsetX }}px</div>
+        </div>
+        <div class="input-item">
+          <span class="input-label">{{ $t('style.shadow.offsetY') }}</span>
+          <a-input
+            class="input-area"
+            type="range"
+            min="-10" max="10"
+            v-model:value="currentOffsetY"
+          />
+          <div class="input-item-value">{{ currentOffsetY }}px</div>
+        </div>
+        <div class="input-item">
+          <span class="input-label">{{ $t('style.shadow.blur') }}</span>
+          <a-input
+            class="input-area"
+            type="range"
+            min="0" max="10"
+            v-model:value="currentBlur"
+          />
+          <div class="input-item-value">{{ currentBlur }}px</div>
+        </div>
+        <div class="input-item">
+          <span class="input-label">{{ $t('style.shadow.color') }}</span>
+          <a-input
+            class="input-area"
+            type="color"
+            v-model:value="currentTextShadowColor"
+          />
+          <div class="input-item-value">{{ currentTextShadowColor }}</div>
+        </div>
       </a-card>
     </div>
   </a-card>
@@ -112,14 +182,16 @@
       v-if="currentPreview"
       class="preview-container"
       :style="{
-        backgroundColor: addOpicityToColor(currentBackground, currentOpacity)
+        backgroundColor: addOpicityToColor(currentBackground, currentOpacity),
+        textShadow: currentTextShadow ? `${currentOffsetX}px ${currentOffsetY}px ${currentBlur}px ${currentTextShadowColor}` : 'none'
       }"
     >
       <p :class="[currentLineBreak?'':'left-ellipsis']"
         :style="{
           fontFamily: currentFontFamily,
           fontSize: currentFontSize + 'px',
-          color: currentFontColor
+          color: currentFontColor,
+          fontWeight: currentFontWeight * 100
       }">
         <span v-if="captionData.length">{{ captionData[captionData.length-1].text }}</span>
         <span v-else>{{ $t('example.original') }}</span>
@@ -129,7 +201,8 @@
         :style="{
           fontFamily: currentTransFontFamily,
           fontSize: currentTransFontSize + 'px',
-          color: currentTransFontColor
+          color: currentTransFontColor,
+          fontWeight: currentTransFontWeight * 100
         }"
       >
         <span v-if="captionData.length">{{ captionData[captionData.length-1].translation }}</span>
@@ -147,7 +220,6 @@ import { storeToRefs } from 'pinia'
 import { notification } from 'ant-design-vue'
 import { useI18n } from 'vue-i18n'
 import { useCaptionLogStore } from '@renderer/stores/captionLog';
-
 const captionLog = useCaptionLogStore();
 const { captionData } = storeToRefs(captionLog);
 
@@ -160,6 +232,7 @@ const currentLineBreak = ref<number>(0)
 const currentFontFamily = ref<string>('sans-serif')
 const currentFontSize = ref<number>(24)
 const currentFontColor = ref<string>('#000000')
+const currentFontWeight = ref<number>(4)
 const currentBackground = ref<string>('#dbe2ef')
 const currentOpacity = ref<number>(50)
 const currentPreview = ref<boolean>(true)
@@ -167,6 +240,12 @@ const currentTransDisplay = ref<boolean>(true)
 const currentTransFontFamily = ref<string>('sans-serif')
 const currentTransFontSize = ref<number>(24)
 const currentTransFontColor = ref<string>('#000000')
+const currentTransFontWeight = ref<number>(4)
+const currentTextShadow = ref<boolean>(false)
+const currentOffsetX = ref<number>(2)
+const currentOffsetY = ref<number>(2)
+const currentBlur = ref<number>(0)
+const currentTextShadowColor = ref<string>('#ffffff')
 
 function addOpicityToColor(color: string, opicity: number) {
   const opicityValue = Math.round(opicity * 255 / 100);
@@ -185,6 +264,7 @@ function applyStyle(){
   captionStyle.fontFamily = currentFontFamily.value;
   captionStyle.fontSize = currentFontSize.value;
   captionStyle.fontColor = currentFontColor.value;
+  captionStyle.fontWeight = currentFontWeight.value;
   captionStyle.background = currentBackground.value;
   captionStyle.opacity = currentOpacity.value;
   captionStyle.showPreview = currentPreview.value;
@@ -192,6 +272,12 @@ function applyStyle(){
   captionStyle.transFontFamily = currentTransFontFamily.value;
   captionStyle.transFontSize = currentTransFontSize.value;
   captionStyle.transFontColor = currentTransFontColor.value;
+  captionStyle.transFontWeight = currentTransFontWeight.value;
+  captionStyle.textShadow = currentTextShadow.value;
+  captionStyle.offsetX = currentOffsetX.value;
+  captionStyle.offsetY = currentOffsetY.value;
+  captionStyle.blur = currentBlur.value;
+  captionStyle.textShadowColor = currentTextShadowColor.value;
 
   captionStyle.sendStylesChange();
 
@@ -206,6 +292,7 @@ function backStyle(){
   currentFontFamily.value = captionStyle.fontFamily;
   currentFontSize.value = captionStyle.fontSize;
   currentFontColor.value = captionStyle.fontColor;
+  currentFontWeight.value = captionStyle.fontWeight;
   currentBackground.value = captionStyle.background;
   currentOpacity.value = captionStyle.opacity;
   currentPreview.value = captionStyle.showPreview;
@@ -213,6 +300,12 @@ function backStyle(){
   currentTransFontFamily.value = captionStyle.transFontFamily;
   currentTransFontSize.value = captionStyle.transFontSize;
   currentTransFontColor.value = captionStyle.transFontColor;
+  currentTransFontWeight.value = captionStyle.transFontWeight;
+  currentTextShadow.value = captionStyle.textShadow;
+  currentOffsetX.value = captionStyle.offsetX;
+  currentOffsetY.value = captionStyle.offsetY;
+  currentBlur.value = captionStyle.blur;
+  currentTextShadowColor.value = captionStyle.textShadowColor;
 }
 
 function resetStyle() {
@@ -229,6 +322,16 @@ watch(changeSignal, (val) => {
 
 <style scoped>
 @import url(../assets/input.css);
+.general-note {
+  padding: 10px 10px 0;
+  max-width: min(36vw, 400px);
+}
+
+.hover-label {
+  color: #1668dc;
+  cursor: pointer;
+  font-weight: bold;
+}
 
 .preview-container {
   line-height: 2em;

@@ -35,6 +35,8 @@ Alibaba Cloud provides detailed tutorials for this:
 
 ### Capturing System Audio Output on macOS
 
+> Based on the [Setup Multi-Output Device](https://github.com/ExistentialAudio/BlackHole/wiki/Multi-Output-Device) tutorial
+
 The caption engine cannot directly capture system audio output on macOS platform and requires additional driver installation. The current caption engine uses [BlackHole](https://github.com/ExistentialAudio/BlackHole). First open Terminal and execute one of the following commands (recommended to choose the first one):
 
 ```bash
@@ -43,9 +45,15 @@ brew install blackhole-16ch
 brew install blackhole-64ch
 ```
 
+![](../img/03.png)
+
 After installation completes, open `Audio MIDI Setup` (searchable via `cmd + space`). Check if BlackHole appears in the device list - if not, restart your computer.
 
+![](../img/04.png)
+
 Once BlackHole is confirmed installed, in the `Audio MIDI Setup` page, click the plus (+) button at bottom left and select "Create Multi-Output Device". Include both BlackHole and your desired audio output destination in the outputs. Finally, set this multi-output device as your default audio output device.
+
+![](../img/05.png)
 
 Now the caption engine can capture system audio output and generate captions.
 

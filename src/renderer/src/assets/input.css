@@ -11,6 +11,8 @@
 
 .switch-label {
   display: inline-block;
+  min-width: 80px;
+  text-align: right;
   margin-right: 10px;
 }
 

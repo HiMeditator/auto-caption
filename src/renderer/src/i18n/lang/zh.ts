@@ -66,6 +66,7 @@ export default {
     "fontFamily": "字体族",
     "fontColor": "字体颜色",
     "fontSize": "字体大小",
+    "fontWeight": "字体粗细",
     "background": "背景颜色",
     "opacity": "不透明度",
     "preview": "显示预览",
@@ -73,6 +74,14 @@ export default {
     trans: {
       "title": "翻译样式设置",
       "useSame": "使用原文样式"
+    },
+    "textShadow": "文本阴影",
+    shadow: {
+      "title": "文本阴影设置",
+      "offsetX": "X轴偏移",
+      "offsetY": "Y轴偏移",
+      "blur": "模糊半径",
+      "color": "阴影颜色"
     }
   },
   status: {
@@ -96,7 +105,7 @@ export default {
       "projLink": "项目链接",
       "manual": "用户手册",
       "engineDoc": "字幕引擎手册",
-      "date": "2025 年 7 月 5 日"
+      "date": "2025 年 7 月 9 日"
     }
   },
   log: {

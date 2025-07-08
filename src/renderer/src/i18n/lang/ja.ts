@@ -66,6 +66,7 @@ export default {
     "fontFamily": "フォント",
     "fontColor": "カラー",
     "fontSize": "サイズ",
+    "fontWeight": "文字の太さ",
     "background": "背景色",
     "opacity": "不透明度",
     "preview": "プレビュー",
@@ -73,6 +74,14 @@ export default {
     trans: {
       "title": "翻訳スタイル設定",
       "useSame": "原文のスタイルを使用"
+    },
+    "textShadow": "文字影",
+    shadow: {
+      "title": "テキストの影設定",
+      "offsetX": "Offset X",
+      "offsetY": "Offset Y",
+      "blur": "ぼかし半径",
+      "color": "影の色"
     }
   },
   status: {
@@ -96,7 +105,7 @@ export default {
       "projLink": "プロジェクトリンク",
       "manual": "ユーザーマニュアル",
       "engineDoc": "字幕エンジンマニュアル",
-      "date": "2025 年 7 月 5 日"
+      "date": "2025 年 7 月 9 日"
     }
   },
   log: {

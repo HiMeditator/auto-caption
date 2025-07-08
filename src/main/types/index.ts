@@ -20,13 +20,20 @@ export interface Styles {
   fontFamily: string,
   fontSize: number,
   fontColor: string,
+  fontWeight: number,
   background: string,
   opacity: number,
   showPreview: boolean,
   transDisplay: boolean,
   transFontFamily: string,
   transFontSize: number,
-  transFontColor: string
+  transFontColor: string,
+  transFontWeight: number,
+  textShadow: boolean,
+  offsetX: number,
+  offsetY: number,
+  blur: number,
+  textShadowColor: string
 }
 
 export interface CaptionItem {

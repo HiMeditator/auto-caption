@@ -38,6 +38,8 @@ Auto Caption 是一个跨平台的字幕显示软件，能够实时获取系统�
 
 ### macOS 获取系统音频输出
 
+> 基于 [Setup Multi-Output Device](https://github.com/ExistentialAudio/BlackHole/wiki/Multi-Output-Device) 教程编写
+
 字幕引擎无法在 macOS 平台直接获取系统的音频输出，需要安装额外的驱动。目前字幕引擎采用的是 [BlackHole](https://github.com/ExistentialAudio/BlackHole)。首先打开终端，执行以下命令中的其中一个（建议选择第一个）：
 
 ```bash
@@ -46,9 +48,15 @@ brew install blackhole-16ch
 brew install blackhole-64ch
 ```
 
+![](../img/03.png)
+
 安装完成后打开 `音频 MIDI 设置`（`cmd + space` 打开搜索，可以搜索到）。观察设备列表中是否有 BlackHole 设备，如果没有需要重启电脑。
 
+![](../img/04.png)
+
 在确定安装好 BlackHole 设备后，在 `音频 MIDI 设置` 页面，点击左下角的加号，选择“创建多输出设备”。在输出中包含 BlackHole 和你想要的音频输出目标。最后将该多输出设备设置为默认音频输出设备。
+
+![](../img/05.png)
 
 现在字幕引擎就能捕获系统的音频输出并生成字幕了。
 

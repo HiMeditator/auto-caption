@@ -14,6 +14,11 @@ export const useGeneralSettingStore = defineStore('generalSetting', () => {
 
   const antdTheme = ref<Object>(antDesignTheme['light'])
 
+  window.electron.ipcRenderer.invoke('control.nativeTheme.get').then((theme) => {
+    if(theme === 'light') setLightTheme()
+    else if(theme === 'dark') setDarkTheme()
+  })
+
   watch(uiLanguage, (newValue) => {
     i18n.global.locale.value = newValue
     useEngineControlStore().captionEngine = engines[newValue]

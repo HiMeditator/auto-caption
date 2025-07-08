@@ -2,6 +2,11 @@
     <img src="./build/icon.png" width="100px" height="100px"/>
     <h1 align="center">auto-caption</h1>
     <p>Auto Caption はクロスプラットフォームのリアルタイム字幕表示ソフトウェアです。</p>
+    <img src="https://img.shields.io/badge/version-0.3.0-blue">
+    <img src="https://img.shields.io/github/issues/HiMeditator/auto-caption?color=orange">
+    <img src="https://img.shields.io/github/languages/top/HiMeditator/auto-caption?color=royalblue">
+    <img src="https://img.shields.io/github/repo-size/HiMeditator/auto-caption?color=green">
+    <img src="https://visitor-badge.laobi.icu/badge?page_id=himeditator.github.io">
     <p>
         | <a href="./README.md">简体中文</a>
         | <a href="./README_en.md">English</a>

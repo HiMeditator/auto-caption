@@ -66,6 +66,7 @@ export default {
     "fontFamily": "Font Family",
     "fontColor": "Font Color",
     "fontSize": "Font Size",
+    "fontWeight": "Font Weight",
     "background": "Background",
     "opacity": "Opacity",
     "preview": "Preview",
@@ -73,6 +74,14 @@ export default {
     trans: {
       "title": "Translation Style Settings",
       "useSame": "Use Original Style"
+    },
+    "textShadow": "Text Shadow",
+    shadow: {
+      "title": "Text Shadow Settings",
+      "offsetX": "Offset X",
+      "offsetY": "Offset Y",
+      "blur": "Blur",
+      "color": "Color"
     }
   },
   status: {
@@ -96,7 +105,7 @@ export default {
       "projLink": "Project Link",
       "manual": "User Manual",
       "engineDoc": "Caption Engine Manual",
-      "date": "July 5, 2026"
+      "date": "July 9, 2026"
     }
   },
   log: {

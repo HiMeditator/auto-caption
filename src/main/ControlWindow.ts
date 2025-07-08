@@ -65,8 +65,11 @@ class ControlWindow {
     })
 
     ipcMain.handle('control.nativeTheme.get', () => {
-      if(nativeTheme.shouldUseDarkColors) return 'dark'
-      return 'light'
+      if(allConfig.uiTheme === 'system'){
+        if(nativeTheme.shouldUseDarkColors) return 'dark'
+        return 'light'
+      }
+      return allConfig.uiTheme
     })
 
     ipcMain.on('control.uiLanguage.change', (_, args) => {

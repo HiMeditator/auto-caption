@@ -19,11 +19,17 @@
         <CloseOutlined />
       </div>
     </div>
-    <div class="caption-container">
+    <div
+      class="caption-container"
+      :style="{
+        textShadow: captionStyle.textShadow ? `${captionStyle.offsetX}px ${captionStyle.offsetY}px ${captionStyle.blur}px ${captionStyle.textShadowColor}` : 'none'
+      }"
+    >
       <p :class="[captionStyle.lineBreak?'':'left-ellipsis']" :style="{
         fontFamily: captionStyle.fontFamily,
         fontSize: captionStyle.fontSize + 'px',
-        color: captionStyle.fontColor
+        color: captionStyle.fontColor,
+        fontWeight: captionStyle.fontWeight * 100
       }">
         <span v-if="captionData.length">{{ captionData[captionData.length-1].text }}</span>
         <span v-else>{{ $t('example.original') }}</span>
@@ -33,7 +39,8 @@
         :style="{
         fontFamily: captionStyle.transFontFamily,
         fontSize: captionStyle.transFontSize + 'px',
-        color: captionStyle.transFontColor
+        color: captionStyle.transFontColor,
+        fontWeight: captionStyle.transFontWeight * 100
       }">
         <span v-if="captionData.length">{{ captionData[captionData.length-1].translation }}</span>
         <span v-else>{{ $t('example.translation') }}</span>

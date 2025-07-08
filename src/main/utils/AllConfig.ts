@@ -11,13 +11,20 @@ const defaultStyles: Styles = {
   fontFamily: 'sans-serif',
   fontSize: 24,
   fontColor: '#000000',
+  fontWeight: 4,
   background: '#dbe2ef',
   opacity: 80,
   showPreview: true,
   transDisplay: true,
   transFontFamily: 'sans-serif',
   transFontSize: 24,
-  transFontColor: '#000000'
+  transFontColor: '#000000',
+  transFontWeight: 4,
+  textShadow: false,
+  offsetX: 2,
+  offsetY: 2,
+  blur: 0,
+  textShadowColor: '#ffffff'
 };
 
 const defaultControls: Controls = {
