@@ -9,6 +9,7 @@ export interface Controls {
   engine: 'gummy',
   audio: 0 | 1,
   translation: boolean,
+  API_KEY: string,
   customized: boolean,
   customizedApp: string,
   customizedCommand: string

@@ -19,8 +19,8 @@ export class CaptionEngine {
     }
     else if (allConfig.controls.engine === 'gummy') {
       allConfig.controls.customized = false
-      if(!process.env.DASHSCOPE_API_KEY) {
-        controlWindow.sendErrorMessage(i18n('gummy.env.missing'))
+      if(!allConfig.controls.API_KEY && !process.env.DASHSCOPE_API_KEY) {
+        controlWindow.sendErrorMessage(i18n('gummy.key.missing'))
         return false
       }
       let gummyName = ''
@@ -42,8 +42,7 @@ export class CaptionEngine {
       }
       else {
         this.appPath = path.join(
-          process.resourcesPath,
-          'caption-engine', 'dist', gummyName
+          process.resourcesPath, 'caption-engine', gummyName
         )
       }
       this.command = []
@@ -53,6 +52,9 @@ export class CaptionEngine {
         allConfig.controls.targetLang : 'none'
       )
       this.command.push('-a', allConfig.controls.audio ? '1' : '0')
+      if(allConfig.controls.API_KEY) {
+        this.command.push('-k', allConfig.controls.API_KEY)
+      }
 
       console.log('[INFO] Engine Path:', this.appPath)
       console.log('[INFO] Engine Command:', this.command)
@@ -61,7 +63,7 @@ export class CaptionEngine {
   }
 
   public start() {
-    if (this.processStatus!== 'stopped') {
+    if (this.processStatus !== 'stopped') {
       return
     }
     if(!this.getApp()){ return }
@@ -122,7 +124,7 @@ export class CaptionEngine {
 
   public stop() {
     if(this.processStatus !== 'running') return
-    if (this.process) {
+    if (this.process.pid) {
       console.log('[INFO] Trying to stop process, PID:', this.process.pid)
       let cmd = `kill ${this.process.pid}`;
       if (process.platform === "win32") {
@@ -134,6 +136,17 @@ export class CaptionEngine {
           console.error(`[ERROR] Failed to kill process: ${error}`)
         }
       })
+    }
+    else {
+      this.process = undefined;
+      allConfig.controls.engineEnabled = false
+      if(controlWindow.window){
+        allConfig.sendControls(controlWindow.window)
+        controlWindow.window.webContents.send('control.engine.stopped')
+      }
+      this.processStatus = 'stopped'
+      console.log('[INFO] Process PID undefined, caption engine process stopped')
+      return
     }
     this.processStatus = 'stopping'
     console.log('[INFO] Caption engine process stopping')

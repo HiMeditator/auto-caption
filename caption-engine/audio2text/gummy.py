@@ -4,6 +4,7 @@ from dashscope.audio.asr import (
     TranslationResult,
     TranslationRecognizerRealtime
 )
+import dashscope
 from datetime import datetime
 import json
 import sys
@@ -77,7 +78,9 @@ class GummyTranslator:
         source: 源语言代码字符串（zh, en, ja 等）
         target: 目标语言代码字符串（zh, en, ja 等）
     """
-    def __init__(self, rate, source, target):
+    def __init__(self, rate, source, target, api_key):
+        if api_key:
+            dashscope.api_key = api_key
         self.translator = TranslationRecognizerRealtime(
             model = "gummy-realtime-v1",
             format = "pcm",

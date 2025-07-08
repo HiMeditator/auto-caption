@@ -26,6 +26,7 @@ const defaultControls: Controls = {
   engine: 'gummy',
   audio: 0,
   engineEnabled: false,
+  API_KEY: '',
   translation: true,
   customized: false,
   customizedApp: '',
@@ -82,7 +83,7 @@ class AllConfig {
     }
   }
 
-  public setStyles(args: Styles) {
+  public setStyles(args: Object) {
     for(let key in this.styles) {
       if(key in args) {
         this.styles[key] = args[key]
@@ -100,7 +101,7 @@ class AllConfig {
     console.log(`[INFO] Send Styles to #${window.id}:`, this.styles)
   }
 
-  public setControls(args: Controls) {
+  public setControls(args: Object) {
     const engineEnabled = this.controls.engineEnabled
     for(let key in this.controls){
       if(key in args) {

@@ -46,6 +46,8 @@ export default {
     "systemOutput": "システムオーディオ出力（スピーカー）",
     "systemInput": "システムオーディオ入力（マイク）",
     "enableTranslation": "翻訳",
+    "showMore": "詳細設定",
+    "apikey": "API KEY",
     "customEngine": "カスタムエンジン",
     custom: {
       "title": "カスタムキャプションエンジン",

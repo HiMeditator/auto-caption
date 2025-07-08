@@ -1,5 +1,5 @@
 export default {
-  "gummy.env.missing": "DASHSCOPE_API_KEY environment variable not detected. To use the gummy engine, you need to obtain an API Key from Alibaba Cloud's Bailian platform and add it to your local environment variables.",
+  "gummy.key.missing": "API KEY is not set, and the DASHSCOPE_API_KEY environment variable is not detected. To use the gummy engine, you need to obtain an API KEY from the Alibaba Cloud Bailian platform and add it to the settings or configure it in the local environment variables.",
   "platform.unsupported": "Unsupported platform: ",
   "engine.start.error": "Caption engine failed to start: ",
   "engine.output.parse.error": "Unable to parse caption engine output as a JSON object: ",
