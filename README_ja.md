@@ -1,13 +1,13 @@
 <div align="center" >
-    <img src="./resources/icon.png" width="100px" height="100px"/>
+    <img src="./build/icon.png" width="100px" height="100px"/>
     <h1 align="center">auto-caption</h1>
     <p>Auto Caption はクロスプラットフォームのリアルタイム字幕表示ソフトウェアです。</p>
     <p>
-        | <a href="./README.md">簡体中文</a>
-        | <a href="./README_en.md">英語</a>
+        | <a href="./README.md">简体中文</a>
+        | <a href="./README_en.md">English</a>
         | <b>日本語</b> |
     </p>
-    <p><i>v0.2.0 バージョンがリリースされました。ローカル字幕エンジンを追加予定の v1.0.0 バージョンが開発中...</i></p>
+    <p><i>v0.3.0 バージョンがリリースされました。ローカル字幕エンジンを追加予定の v1.0.0 バージョンを現在開発中...</i></p>
 </div>
 
 ![](./assets/media/main_ja.png)
@@ -20,49 +20,50 @@
 
 [Auto Caption ユーザーマニュアル](./docs/user-manual/ja.md)
 
-[字幕エンジン説明文書](./docs/engine-manual/ja.md)
+[字幕エンジン説明ドキュメント](./docs/engine-manual/ja.md)
 
 [プロジェクト API ドキュメント（中国語）](./docs/api-docs/electron-ipc.md)
 
-## 📖 基本的な使用方法
+現在、Windows と macOS プラットフォーム向けのインストール可能なバージョンを提供しています。デフォルトの Gummy 字幕エンジンを使用するには、まず Alibaba Cloud Bailian プラットフォームから API KEY を取得し、その API KEY をソフトウェア設定に追加するか、環境変数に設定する必要があります（Windows プラットフォームのみ環境変数からの API KEY 読み取りをサポートしています）。
 
-現在、Windows プラットフォーム向けのインストール可能なバージョンのみ提供されています。デフォルトの Gummy 字幕エンジンを使用する場合、まず Alibaba Cloud 百煉プラットフォームの API キーを取得し、環境変数に設定する必要があります。これによりモデルが正常に動作します。
+![](./assets/media/api_ja.png)
 
-**アリババクラウドの国際版には Gummy モデルが提供されていないため、中国以外のユーザーは現在、デフォルトの字幕エンジンを使用できません。すべてのユーザーが利用できるように、新しいローカルの字幕エンジンを開発中です。**
+**国際版の Alibaba Cloud サービスには Gummy モデルが提供されていないため、現在中国以外のユーザーはデフォルトの字幕エンジンを使用できません。すべてのユーザーがデフォルトの字幕エンジンを使用できるように、新しいローカル字幕エンジンを開発中です。**
 
 関連チュートリアル：
-- [API キーの取得（中国語）](https://help.aliyun.com/zh/model-studio/get-api-key)
-- [環境変数への API キーの設定（中国語）](https://help.aliyun.com/zh/model-studio/configure-api-key-through-environment-variables)。
 
-字幕エンジンの仕組みを理解したい場合、または独自の字幕エンジンを開発したい場合は、[字幕エンジン説明文書](./docs/engine-manual/ja.md)を参照してください。
+- [API KEY の取得（中国語）](https://help.aliyun.com/zh/model-studio/get-api-key)
+- [環境変数への API Key 設定（中国語）](https://help.aliyun.com/zh/model-studio/configure-api-key-through-environment-variables)
+
+字幕エンジンの動作原理を理解したい場合、または独自の字幕エンジンを開発したい場合は、[字幕エンジン説明ドキュメント](./docs/engine-manual/ja.md)を参照してください。
+
 ## ✨ 特徴
 
-- 複数言語のインターフェースサポート
+- クロスプラットフォーム、多言語 UI サポート
 - 豊富な字幕スタイル設定
 - 柔軟な字幕エンジン選択
-- 複数言語の認識と翻訳
+- 多言語認識と翻訳
 - 字幕記録の表示とエクスポート
-- オーディオ出力とマイク入力の字幕生成
+- オーディオ出力またはマイク入力からの字幕生成
 
-注意事項：
-- Windows プラットフォームでは、オーディオ出力とマイク入力の両方の字幕生成がサポートされています。
-- Linux プラットフォームでは、現在マイク入力の字幕生成のみがサポートされています。
-- 現在、macOS プラットフォームには対応していません。
+注記：
+- Windows と macOS プラットフォームはオーディオ出力とマイク入力の両方からの字幕生成をサポートしていますが、**macOS プラットフォームでシステムオーディオ出力を取得するには設定が必要です。詳細は[Auto Caption ユーザーマニュアル](./docs/user-manual/ja.md)をご覧ください。**
+- Linux プラットフォームは現在システムオーディオ出力を取得できず、マイク入力からの字幕生成のみをサポートしています。
 
-## ⚙️ 搭載字幕エンジンの説明
+## ⚙️ 字幕エンジン説明
 
-現在のソフトウェアには 1 つの字幕エンジンが搭載されており、新しい 2 つのエンジンが計画されています。それぞれの詳細情報は以下の通りです。
+現在ソフトウェアには1つの字幕エンジンが組み込まれており、2つの新しいエンジンを計画中です。詳細は以下の通りです。
 
 ### Gummy 字幕エンジン（クラウド）
 
-通義実験室の [Gummy音声翻訳大規模モデル](https://help.aliyun.com/zh/model-studio/gummy-speech-recognition-translation/) を基に開発され、[阿里云百煉](https://bailian.console.aliyun.com) の API 経由でこのクラウドモデルを呼び出します。
+Tongyi Lab の [Gummy 音声翻訳大規模モデル](https://help.aliyun.com/zh/model-studio/gummy-speech-recognition-translation/)をベースに開発され、[Alibaba Cloud Bailian](https://bailian.console.aliyun.com) の APIを使用してこのクラウドモデルを呼び出します。
 
-**モデルの詳細パラメータ：**
+**モデル詳細パラメータ：**
 
-- 音声サンプリングレートのサポート：16kHz以上
-- 音声サンプル深度：16bit
-- 音声チャンネル数のサポート：シングルチャンネル
-- 識別可能な言語：中国語、英語、日本語、韓国語、ドイツ語、フランス語、ロシア語、イタリア語、スペイン語
+- サポートするオーディオサンプルレート：16kHz以上
+- オーディオサンプルビット深度：16bit
+- サポートするオーディオチャンネル：モノラル
+- 認識可能な言語：中国語、英語、日本語、韓国語、ドイツ語、フランス語、ロシア語、イタリア語、スペイン語
 - サポートする翻訳：
   - 中国語 → 英語、日本語、韓国語
   - 英語 → 中国語、日本語、韓国語
@@ -70,23 +71,23 @@
 
 **ネットワークトラフィック消費量：**
 
-字幕エンジンはネイティブサンプリングレート（48kHzと仮定）を使用してサンプリングを行い、サンプル深度は16bitであり、アップロードされる音声はシングルチャンネルであるため、アップロード速度は約：
+字幕エンジンはネイティブサンプルレート（48kHz と仮定）でサンプリングを行い、サンプルビット深度は 16bit、アップロードオーディオはモノラルチャンネルのため、アップロードレートは約：
 
 $$
-48000\, \text{samples/second} \times 2\,\text{bytes/sample} \times 1\, \text{channel} = 93.75\,\text{KB/s}
+48000\ \text{samples/second} \times 2\ \text{bytes/sample} \times 1\ \text{channel}  = 93.75\ \text{KB/s}
 $$
 
-また、エンジンは音声ストリームを取得したときのみデータをアップロードするため、実際のアップロード速度はさらに小さくなる可能性があります。モデルからの結果返送によるトラフィック消費は小さく、考慮する必要はありません。
+また、エンジンはオーディオストームを取得したときのみデータをアップロードするため、実際のアップロードレートはさらに小さくなる可能性があります。モデル結果の返信トラフィック消費量は小さく、ここでは考慮していません。
 
-### Vosk 字幕エンジン（ローカル）
+### Vosk字幕エンジン（ローカル）
 
-[vosk-api](https://github.com/alphacep/vosk-api) をベースにした開発を予定しており、現在試験段階にあります。
+[vosk-api](https://github.com/alphacep/vosk-api) をベースに開発予定で、現在実験中です。
 
-### FunASR 字幕エンジン（ローカル）
+### FunASR字幕エンジン（ローカル）
 
-可能であれば、[FunASR](https://github.com/modelscope/FunASR) をベースに開発を行う予定です。まだ調査および実現可能性の検証が行われていません。
+可能であれば、[FunASR](https://github.com/modelscope/FunASR) をベースに開発予定です。まだ調査と実現可能性の検証を行っていません。
 
-## 🚀 プロジェクトの実行
+## 🚀 プロジェクト実行
 
 ![](./assets/media/structure_ja.png)
 
@@ -96,51 +97,57 @@ $$
 npm install
 ```
 
-### 字幕エンジンのビルド
+### 字幕エンジンの構築
 
-まず、`caption-engine` フォルダに移動し、以下のコマンドを実行して仮想環境を作成します：
+まず `caption-engine` フォルダに入り、以下のコマンドを実行して仮想環境を作成します：
 
 ```bash
+# ./caption-engine フォルダ内
 python -m venv subenv
+# または
+python3 -m venv subenv
 ```
 
-次に、仮想環境をアクティブ化します：
+次に仮想環境をアクティブにします：
 
 ```bash
 # Windows
 subenv/Scripts/activate
-# Linux
+# Linux または macOS
 source subenv/bin/activate
 ```
 
-次に、依存関係をインストールします（Linux 環境の場合、`requirements.txt` の `PyAudioWPatch` をコメントアウトする必要があります。このモジュールは Windows 環境でのみ適用されます）：
+その後、依存関係をインストールします（Linux または macOS 環境の場合、`requirements.txt` 内の `PyAudioWPatch` をコメントアウトする必要があります。このモジュールは Windows 環境専用です）。
+
+> このステップでエラーが発生する場合があります。一般的にはビルド失敗が原因で、エラーメッセージに基づいて対応するビルドツールパッケージをインストールする必要があります。
 
 ```bash
 pip install -r requirements.txt
 ```
 
-次に、`pyinstaller` を使用してプロジェクトをビルドします：
+その後、`pyinstaller` を使用してプロジェクトをビルドします：
 
 ```bash
 pyinstaller --onefile main-gummy.py
 ```
 
-この時点でプロジェクトのビルドが完了し、`caption-engine/dist` フォルダで対応する実行ファイルを見つけることができます。その後、必要な操作を行ってください。
+これでプロジェクトのビルドが完了し、`caption-engine/dist` フォルダ内に対応する実行可能ファイルが確認できます。その後、次の操作に進むことができます。
 
-### プロジェクトの実行
+### プロジェクト実行
 
 ```bash
 npm run dev
 ```
-### プロジェクトのビルド
 
-現在、ソフトウェアは macOS プラットフォームに対応していません。Windows または Linux システムを使用してビルドしてください。完全な機能を備えた Windows プラットフォームが推奨されます。
+### プロジェクト構築
+
+現在、ソフトウェアは Windows と macOS プラットフォームでのみ構築とテストが行われており、Linux プラットフォームでの正しい動作は保証できません。
 
 ```bash
-# For Windows
+# Windows 用
 npm run build:win
-# For macOS, not avaliable yet
+# macOS 用
 npm run build:mac
-# For Linux
+# Linux 用
 npm run build:linux
 ```

@@ -1,5 +1,7 @@
 # 字幕引擎说明文档
 
+对应版本：v0.3.0
+
 ![](../../assets/media/structure_zh.png)
 
 ## 字幕引擎介绍
@@ -18,32 +20,65 @@
 
 获取到的音频流在转文字之前可能需要进行预处理。比如阿里云的 Gummy 模型只能识别单通道的音频流，而收集的音频流一般是双通道的，因此要将双通道音频流转换为单通道。通道数的转换可以使用 NumPy 库中的方法实现。
 
-你可以直接使用我开发好的音频获取和音频处理模块（路径：`caption-engine/sysaudio`）：
-
-```python
-if sys.platform == 'win32':
-    from sysaudio.win import AudioStream, mergeStreamChannels
-elif sys.platform == 'linux':
-    from sysaudio.linux import AudioStream, mergeStreamChannels
-else:
-    raise NotImplementedError(f"Unsupported platform: {sys.platform}")
-
-# 创建音频流对象实例
-stream = AudioStream(audio_type)
-# 打开音频流
-stream.openStream()
-while True: # 循环读取音频数据
-    # 读取音频数据
-    data = stream.stream.read(stream.CHUNK)
-    # 将双通道音频数据转换为单通道
-    data = mergeStreamChannels(data, stream.CHANNELS)
-    # 调用音频转文字模型
-    # ... ...
-```
+你可以直接使用我开发好的音频获取（`caption-engine/sysaudio`）和音频处理（`caption-engine/audioprcs`）模块。
 
 ### 音频转文字
 
 在得到了合适的音频流后，就可以将音频流转换为文字了。一般使用各种模型来实现音频流转文字。可根据需求自行选择模型。
+
+一个接近完整的字幕引擎实例如下：
+
+```python
+import sys
+import argparse
+
+# 引入系统音频获取勒
+if sys.platform == 'win32':
+    from sysaudio.win import AudioStream
+elif sys.platform == 'darwin':
+    from sysaudio.darwin import AudioStream
+elif sys.platform == 'linux':
+    from sysaudio.linux import AudioStream
+else:
+    raise NotImplementedError(f"Unsupported platform: {sys.platform}")
+
+# 引入音频处理函数
+from audioprcs import mergeChunkChannels
+# 引入音频转文本模块
+from audio2text import InvalidParameter, GummyTranslator
+
+
+def convert_audio_to_text(s_lang, t_lang, audio_type, chunk_rate, api_key):
+    # 设置标准输出为行缓冲
+    sys.stdout.reconfigure(line_buffering=True) # type: ignore
+
+    # 创建音频获取和语音转文字实例
+    stream = AudioStream(audio_type, chunk_rate)
+    if t_lang == 'none':
+        gummy = GummyTranslator(stream.RATE, s_lang, None, api_key)
+    else:
+        gummy = GummyTranslator(stream.RATE, s_lang, t_lang, api_key)
+
+    # 启动实例
+    stream.openStream()
+    gummy.start()
+
+    while True:
+        try:
+            # 读取音频流数据
+            chunk = stream.read_chunk()
+            chunk_mono = mergeChunkChannels(chunk, stream.CHANNELS)
+            try:
+                # 调用模型进行翻译
+                gummy.send_audio_frame(chunk_mono)
+            except InvalidParameter:
+                gummy.start()
+                gummy.send_audio_frame(chunk_mono)
+        except KeyboardInterrupt:
+            stream.closeStream()
+            gummy.stop()
+            break
+```
 
 ### 数据传递
 

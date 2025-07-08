@@ -115,7 +115,7 @@
         backgroundColor: addOpicityToColor(currentBackground, currentOpacity)
       }"
     >
-      <p :class="[captionStyle.lineBreak?'':'left-ellipsis']"
+      <p :class="[currentLineBreak?'':'left-ellipsis']"
         :style="{
           fontFamily: currentFontFamily,
           fontSize: currentFontSize + 'px',
@@ -124,7 +124,7 @@
         <span v-if="captionData.length">{{ captionData[captionData.length-1].text }}</span>
         <span v-else>{{ $t('example.original') }}</span>
       </p>
-      <p :class="[captionStyle.lineBreak?'':'left-ellipsis']"
+      <p :class="[currentLineBreak?'':'left-ellipsis']"
         v-if="currentTransDisplay"
         :style="{
           fontFamily: currentTransFontFamily,
