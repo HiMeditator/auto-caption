@@ -34,6 +34,7 @@ const defaultControls: Controls = {
   audio: 0,
   engineEnabled: false,
   API_KEY: '',
+  modelPath: '',
   translation: true,
   customized: false,
   customizedApp: '',

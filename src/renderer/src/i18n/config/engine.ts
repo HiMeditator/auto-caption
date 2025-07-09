@@ -16,6 +16,13 @@ export const engines = {
         { value: 'it', label: '意大利语' },
       ]
     },
+    {
+      value: 'vosk',
+      label: '本地 -  Vosk',
+      languages: [
+        { value: 'auto', label: '需要自行配置模型' },
+      ]
+    }
   ],
   en: [
     {
@@ -34,6 +41,13 @@ export const engines = {
         { value: 'it', label: 'Italian' },
       ]
     },
+    {
+      value: 'vosk',
+      label: 'Local - Vosk',
+      languages: [
+        { value: 'auto', label: 'Model needs to be configured manually' },
+      ]
+    }
   ],
   ja: [
     {
@@ -52,6 +66,13 @@ export const engines = {
         { value: 'it', label: 'イタリア語' },
       ]
     },
+    {
+      value: 'vosk',
+      label: 'ローカル - Vosk',
+      languages: [
+        { value: 'auto', label: 'モデルを手動で設定する必要があります' },
+      ]
+    }
   ]
 }
 

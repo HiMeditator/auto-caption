@@ -57,7 +57,7 @@ class AudioStream:
         self.stream = None
         self.SAMP_WIDTH = pyaudio.get_sample_size(pyaudio.paInt16)
         self.FORMAT = pyaudio.paInt16
-        self.CHANNELS = self.device["maxInputChannels"]
+        self.CHANNELS = int(self.device["maxInputChannels"])
         self.RATE = int(self.device["defaultSampleRate"])
         self.CHUNK = self.RATE // chunk_rate
         self.INDEX = self.device["index"]

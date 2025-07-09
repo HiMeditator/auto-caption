@@ -2,11 +2,13 @@
     <img src="./build/icon.png" width="100px" height="100px"/>
     <h1 align="center">auto-caption</h1>
     <p>Auto Caption is a cross-platform real-time caption display software.</p>
-    <img src="https://img.shields.io/badge/version-0.3.0-blue">
-    <img src="https://img.shields.io/github/issues/HiMeditator/auto-caption?color=orange">
-    <img src="https://img.shields.io/github/languages/top/HiMeditator/auto-caption?color=royalblue">
-    <img src="https://img.shields.io/github/repo-size/HiMeditator/auto-caption?color=green">
-    <img src="https://visitor-badge.laobi.icu/badge?page_id=himeditator.auto-caption">
+    <p>
+      <img src="https://img.shields.io/badge/version-0.3.0-blue">
+      <img src="https://img.shields.io/github/issues/HiMeditator/auto-caption?color=orange">
+      <img src="https://img.shields.io/github/languages/top/HiMeditator/auto-caption?color=royalblue">
+      <img src="https://img.shields.io/github/repo-size/HiMeditator/auto-caption?color=green">
+      <img src="https://visitor-badge.laobi.icu/badge?page_id=himeditator.auto-caption">
+    </p>
     <p>
         | <a href="./README.md">简体中文</a>
         | <b>English</b>

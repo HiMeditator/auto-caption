@@ -13,26 +13,20 @@ export class CaptionEngine {
   processStatus: 'running' | 'stopping' | 'stopped' = 'stopped'
 
   private getApp(): boolean {
+    allConfig.controls.customized = false
     if (allConfig.controls.customized && allConfig.controls.customizedApp) {
       this.appPath = allConfig.controls.customizedApp
       this.command = [allConfig.controls.customizedCommand]
+      allConfig.controls.customized = true
     }
     else if (allConfig.controls.engine === 'gummy') {
-      allConfig.controls.customized = false
       if(!allConfig.controls.API_KEY && !process.env.DASHSCOPE_API_KEY) {
         controlWindow.sendErrorMessage(i18n('gummy.key.missing'))
         return false
       }
-      let gummyName = ''
+      let gummyName = 'main-gummy'
       if (process.platform === 'win32') {
-        gummyName = 'main-gummy.exe'
-      }
-      else if (process.platform === 'darwin' || process.platform === 'linux') {
-        gummyName = 'main-gummy'
-      }
-      else {
-        controlWindow.sendErrorMessage(i18n('platform.unsupported') + process.platform)
-        throw new Error(i18n('platform.unsupported'))
+        gummyName += '.exe'
       }
       if (is.dev) {
         this.appPath = path.join(
@@ -55,10 +49,29 @@ export class CaptionEngine {
       if(allConfig.controls.API_KEY) {
         this.command.push('-k', allConfig.controls.API_KEY)
       }
-
-      console.log('[INFO] Engine Path:', this.appPath)
-      console.log('[INFO] Engine Command:', this.command)
     }
+    else if(allConfig.controls.engine === 'vosk'){
+      let voskName = 'main-vosk'
+      if (process.platform === 'win32') {
+        voskName += '.exe'
+      }
+      if (is.dev) {
+        this.appPath = path.join(
+          app.getAppPath(),
+          'caption-engine', 'dist', voskName
+        )
+      }
+      else {
+        this.appPath = path.join(
+          process.resourcesPath, 'caption-engine', voskName
+        )
+      }
+      this.command = []
+      this.command.push('-a', allConfig.controls.audio ? '1' : '0')
+      this.command.push('-m', `"${allConfig.controls.modelPath}"`)
+    }
+    console.log('[INFO] Engine Path:', this.appPath)
+    console.log('[INFO] Engine Command:', this.command)
     return true
   }
 

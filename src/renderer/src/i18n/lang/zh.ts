@@ -48,6 +48,7 @@ export default {
     "enableTranslation": "启用翻译",
     "showMore": "更多设置",
     "apikey": "API KEY",
+    "modelPath": "模型路径",
     "customEngine": "自定义引擎",
     custom: {
       "title": "自定义字幕引擎",
