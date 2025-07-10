@@ -7,5 +7,6 @@ out
 __pycache__
 subenv
 caption-engine/build
+caption-engine/models
 output.wav
 .venv

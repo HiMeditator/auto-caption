@@ -3,4 +3,5 @@ numpy
 samplerate
 PyAudio
 PyAudioWPatch # Windows only
+vosk
 pyinstaller

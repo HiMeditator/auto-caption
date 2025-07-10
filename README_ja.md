@@ -2,17 +2,23 @@
     <img src="./build/icon.png" width="100px" height="100px"/>
     <h1 align="center">auto-caption</h1>
     <p>Auto Caption はクロスプラットフォームのリアルタイム字幕表示ソフトウェアです。</p>
-    <img src="https://img.shields.io/badge/version-0.3.0-blue">
-    <img src="https://img.shields.io/github/issues/HiMeditator/auto-caption?color=orange">
-    <img src="https://img.shields.io/github/languages/top/HiMeditator/auto-caption?color=royalblue">
-    <img src="https://img.shields.io/github/repo-size/HiMeditator/auto-caption?color=green">
-    <img src="https://visitor-badge.laobi.icu/badge?page_id=himeditator.auto-caption">
+    <p>
+      <a href="https://github.com/HiMeditator/auto-caption/releases">
+        <img src="https://img.shields.io/badge/release-0.4.0-blue">
+      </a>
+      <a href="https://github.com/HiMeditator/auto-caption/issues">
+        <img src="https://img.shields.io/github/issues/HiMeditator/auto-caption?color=orange">
+      </a>
+      <img src="https://img.shields.io/github/languages/top/HiMeditator/auto-caption?color=royalblue">
+      <img src="https://img.shields.io/github/repo-size/HiMeditator/auto-caption?color=green">
+      <img src="https://img.shields.io/github/stars/HiMeditator/auto-caption?style=social">
+    </p>
     <p>
         | <a href="./README.md">简体中文</a>
         | <a href="./README_en.md">English</a>
         | <b>日本語</b> |
     </p>
-    <p><i>v0.3.0 バージョンがリリースされました。ローカル字幕エンジンを追加予定の v1.0.0 バージョンを現在開発中...</i></p>
+    <p><i>Voskローカル字幕エンジンを含む v0.4.0 バージョンがリリースされました。<b>現在、ローカル字幕エンジンには翻訳機能が含まれておりません</b>。ローカル翻訳モジュールは現在も開発中です...</i></p>
 </div>
 
 ![](./assets/media/main_ja.png)
@@ -29,18 +35,24 @@
 
 [プロジェクト API ドキュメント（中国語）](./docs/api-docs/electron-ipc.md)
 
-現在、Windows と macOS プラットフォーム向けのインストール可能なバージョンを提供しています。デフォルトの Gummy 字幕エンジンを使用するには、まず Alibaba Cloud Bailian プラットフォームから API KEY を取得し、その API KEY をソフトウェア設定に追加するか、環境変数に設定する必要があります（Windows プラットフォームのみ環境変数からの API KEY 読み取りをサポートしています）。
+## 📖 基本使い方
 
-![](./assets/media/api_ja.png)
+現在、Windows と macOS プラットフォーム向けのインストール可能なバージョンを提供しています。
 
-**国際版の Alibaba Cloud サービスには Gummy モデルが提供されていないため、現在中国以外のユーザーはデフォルトの字幕エンジンを使用できません。すべてのユーザーがデフォルトの字幕エンジンを使用できるように、新しいローカル字幕エンジンを開発中です。**
+> 阿里雲の国際版サービスでは Gummy モデルを提供していないため、現在中国以外のユーザーは Gummy 字幕エンジンを使用できません。
 
-関連チュートリアル：
+デフォルトの Gummy 字幕エンジン（クラウドベースのモデルを使用した音声認識と翻訳）を使用するには、まず阿里雲百煉プラットフォームから API KEY を取得する必要があります。その後、API KEY をソフトウェア設定に追加するか、環境変数に設定します（Windows プラットフォームのみ環境変数からの API KEY 読み取りをサポート）。関連チュートリアル：
 
 - [API KEY の取得（中国語）](https://help.aliyun.com/zh/model-studio/get-api-key)
-- [環境変数への API Key 設定（中国語）](https://help.aliyun.com/zh/model-studio/configure-api-key-through-environment-variables)
+- [環境変数を通じて API Key を設定（中国語）](https://help.aliyun.com/zh/model-studio/configure-api-key-through-environment-variables)
 
-字幕エンジンの動作原理を理解したい場合、または独自の字幕エンジンを開発したい場合は、[字幕エンジン説明ドキュメント](./docs/engine-manual/ja.md)を参照してください。
+> Vosk モデルの認識精度は低いため、注意してご使用ください。
+
+Vosk ローカル字幕エンジンを使用するには、まず [Vosk Models](https://alphacephei.com/vosk/models) ページから必要なモデルをダウンロードし、ローカルに解凍した後、モデルフォルダのパスをソフトウェア設定に追加してください。現在、Vosk 字幕エンジンは字幕の翻訳をサポートしていません。
+
+![](./assets/media/vosk_ja.png)
+
+**上記の字幕エンジンがご要望を満たさず、かつ Python の知識をお持ちの場合、独自の字幕エンジンを開発することも可能です。詳細な説明は[字幕エンジン説明書](./docs/engine-manual/ja.md)をご参照ください。**
 
 ## ✨ 特徴
 
@@ -57,7 +69,7 @@
 
 ## ⚙️ 字幕エンジン説明
 
-現在ソフトウェアには1つの字幕エンジンが組み込まれており、2つの新しいエンジンを計画中です。詳細は以下の通りです。
+現在ソフトウェアには2つの字幕エンジンが組み込まれており、1つの新しいエンジンを計画中です。詳細は以下の通りです。
 
 ### Gummy 字幕エンジン（クラウド）
 
@@ -86,7 +98,7 @@ $$
 
 ### Vosk字幕エンジン（ローカル）
 
-[vosk-api](https://github.com/alphacep/vosk-api) をベースに開発予定で、現在実験中です。
+[vosk-api](https://github.com/alphacep/vosk-api) をベースに開発されています。現在は音声に対応する原文の生成のみをサポートしており、翻訳コンテンツはサポートしていません。
 
 ### FunASR字幕エンジン（ローカル）
 
@@ -133,7 +145,8 @@ pip install -r requirements.txt
 その後、`pyinstaller` を使用してプロジェクトをビルドします：
 
 ```bash
-pyinstaller --onefile main-gummy.py
+pyinstaller ./main-gummy.spec
+pyinstaller ./main-vosk.spec
 ```
 
 これでプロジェクトのビルドが完了し、`caption-engine/dist` フォルダ内に対応する実行可能ファイルが確認できます。その後、次の操作に進むことができます。
@@ -155,4 +168,20 @@ npm run build:win
 npm run build:mac
 # Linux 用
 npm run build:linux
+```
+
+注意: プラットフォームに応じて、プロジェクトルートディレクトリにある `electron-builder.yml` ファイルの設定内容を変更する必要があります:
+
+```yml
+extraResources:
+  # Windows用
+  - from: ./caption-engine/dist/main-gummy.exe
+    to: ./caption-engine/main-gummy.exe
+  - from: ./caption-engine/dist/main-vosk.exe
+    to: ./caption-engine/main-vosk.exe
+  # macOSとLinux用
+  # - from: ./caption-engine/dist/main-gummy
+  #   to: ./caption-engine/main-gummy
+  # - from: ./caption-engine/dist/main-vosk
+  #   to: ./caption-engine/main-vosk
 ```

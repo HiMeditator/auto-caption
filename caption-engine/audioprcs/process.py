@@ -47,3 +47,22 @@ def resampleRawChunk(chunk, channels, orig_sr, target_sr, mode="sinc_best"):
     chunk_mono_r =  samplerate.resample(chunk_mono, ratio, converter_type=mode)
     chunk_mono_r = np.round(chunk_mono_r).astype(np.int16)
     return chunk_mono_r.tobytes()
+
+def resampleMonoChunk(chunk, orig_sr, target_sr, mode="sinc_best"):
+    """
+    将当前单通道音频块进行重采样
+
+    Args:
+        chunk: (bytes)单通道音频数据块
+        orig_sr: 原始采样率
+        target_sr: 目标采样率
+        mode: 重采样模式，可选：'sinc_best' | 'sinc_medium' | 'sinc_fastest' | 'zero_order_hold' | 'linear'
+
+    Return:
+        (bytes)单通道音频数据块
+    """
+    chunk_np = np.frombuffer(chunk, dtype=np.int16)
+    ratio = target_sr / orig_sr
+    chunk_r =  samplerate.resample(chunk_np, ratio, converter_type=mode)
+    chunk_r = np.round(chunk_r).astype(np.int16)
+    return chunk_r.tobytes()

@@ -16,13 +16,14 @@ export const useEngineControlStore = defineStore('engineControl', () => {
 
   const captionEngine = ref(engines[useGeneralSettingStore().uiLanguage])
   const audioType = ref(audioTypes[useGeneralSettingStore().uiLanguage])
-  const API_KEY = ref<string>('')
   const engineEnabled = ref(false)
   const sourceLang = ref<string>('en')
   const targetLang = ref<string>('zh')
-  const engine = ref<'gummy'>('gummy')
+  const engine = ref<string>('gummy')
   const audio = ref<0 | 1>(0)
   const translation = ref<boolean>(true)
+  const API_KEY = ref<string>('')
+  const modelPath = ref<string>('')
   const customized = ref<boolean>(false)
   const customizedApp = ref<string>('')
   const customizedCommand = ref<string>('')
@@ -38,6 +39,7 @@ export const useEngineControlStore = defineStore('engineControl', () => {
       audio: audio.value,
       translation: translation.value,
       API_KEY: API_KEY.value,
+      modelPath: modelPath.value,
       customized: customized.value,
       customizedApp: customizedApp.value,
       customizedCommand: customizedCommand.value
@@ -53,10 +55,18 @@ export const useEngineControlStore = defineStore('engineControl', () => {
     engineEnabled.value = controls.engineEnabled
     translation.value = controls.translation
     API_KEY.value = controls.API_KEY
+    modelPath.value = controls.modelPath
     customized.value = controls.customized
     customizedApp.value = controls.customizedApp
     customizedCommand.value = controls.customizedCommand
     changeSignal.value = true
+  }
+
+  function emptyModelPathErr() {
+    notification.open({
+      message: t('noti.empty'),
+      description: t('noti.emptyInfo')
+    });
   }
 
   window.electron.ipcRenderer.on('control.controls.set', (_, controls: Controls) => {
@@ -102,7 +112,7 @@ export const useEngineControlStore = defineStore('engineControl', () => {
 
   return {
     platform,           // 系统平台
-    captionEngine,      // 字幕引擎
+    captionEngine,      // 字幕引擎列表
     audioType,          // 音频类型
     engineEnabled,      // 字幕引擎是否启用
     sourceLang,         // 源语言
@@ -111,11 +121,13 @@ export const useEngineControlStore = defineStore('engineControl', () => {
     audio,              // 选择音频
     translation,        // 是否启用翻译
     API_KEY,            // API KEY
+    modelPath,          // vosk 模型路径
     customized,         // 是否使用自定义字幕引擎
     customizedApp,      // 自定义字幕引擎的应用程序
     customizedCommand,  // 自定义字幕引擎的命令
     setControls,        // 设置引擎配置
     sendControlsChange, // 发送最新控制消息到后端
+    emptyModelPathErr,  // 模型路径为空时显示警告
     changeSignal,       // 配置改变信号
   }
 })

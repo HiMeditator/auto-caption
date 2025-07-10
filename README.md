@@ -2,17 +2,23 @@
     <img src="./build/icon.png" width="100px" height="100px"/>
     <h1 align="center">auto-caption</h1>
     <p>Auto Caption 是一个跨平台的实时字幕显示软件。</p>
-    <img src="https://img.shields.io/badge/version-0.3.0-blue">
-    <img src="https://img.shields.io/github/issues/HiMeditator/auto-caption?color=orange">
-    <img src="https://img.shields.io/github/languages/top/HiMeditator/auto-caption?color=royalblue">
-    <img src="https://img.shields.io/github/repo-size/HiMeditator/auto-caption?color=green">
-    <img src="https://visitor-badge.laobi.icu/badge?page_id=himeditator.auto-caption">
+    <p>
+      <a href="https://github.com/HiMeditator/auto-caption/releases">
+        <img src="https://img.shields.io/badge/release-0.4.0-blue">
+      </a>
+      <a href="https://github.com/HiMeditator/auto-caption/issues">
+        <img src="https://img.shields.io/github/issues/HiMeditator/auto-caption?color=orange">
+      </a>
+      <img src="https://img.shields.io/github/languages/top/HiMeditator/auto-caption?color=royalblue">
+      <img src="https://img.shields.io/github/repo-size/HiMeditator/auto-caption?color=green">
+      <img src="https://img.shields.io/github/stars/HiMeditator/auto-caption?style=social">
+    </p>
     <p>
         | <b>简体中文</b>
         | <a href="./README_en.md">English</a>
         | <a href="./README_ja.md">日本語</a> |
     </p>
-    <p><i>v0.3.0版本已经发布。预计将添加本地字幕引擎的v1.0.0版本仍正在开发中...</i></p>
+    <p><i>包含 Vosk 本地字幕引擎的 v0.4.0 版本已经发布。<b>目前本地字幕引擎不含翻译</b>，本地翻译模块仍正在开发中...</i></p>
 </div>
 
 ![](./assets/media/main_zh.png)
@@ -31,18 +37,24 @@
 
 ## 📖 基本使用
 
-目前提供了 Windows 和 macOS 平台的可安装版本。如果要使用默认的 Gummy 字幕引擎，首先需要获取阿里云百炼平台的 API KEY，然后将 API KEY 添加到软件设置中或者配置到环境变量中（仅 Windows 平台支持读取环境变量中的 API KEY），这样才能正常使用该模型。
+目前提供了 Windows 和 macOS 平台的可安装版本。
 
-![](./assets/media/api_zh.png)
+> 国际版的阿里云服务并没有提供 Gummy 模型，因此目前非中国用户无法使用 Gummy 字幕引擎。
 
-**国际版的阿里云服务并没有提供 Gummy 模型，因此目前非中国用户无法使用默认字幕引擎。我正在开发新的本地字幕引擎，以确保所有用户都有默认字幕引擎可以使用。**
-
-相关教程：
+如果要使用默认的 Gummy 字幕引擎（使用云端模型进行语音识别和翻译），首先需要获取阿里云百炼平台的 API KEY，然后将 API KEY 添加到软件设置中或者配置到环境变量中（仅 Windows 平台支持读取环境变量中的 API KEY），这样才能正常使用该模型。相关教程：
 
 - [获取 API KEY](https://help.aliyun.com/zh/model-studio/get-api-key)
 - [将 API Key 配置到环境变量](https://help.aliyun.com/zh/model-studio/configure-api-key-through-environment-variables)
 
-如果你想了解字幕引擎的工作原理，或者你想开发自己的字幕引擎，请参考[字幕引擎说明文档](./docs/engine-manual/zh.md)。
+> Vosk 模型的识别效果较差，请谨慎使用。
+
+如果要使用 Vosk 本地字幕引擎，首先需要在 [Vosk Models](https://alphacephei.com/vosk/models) 页面下载你需要的模型，并将模型解压到本地，并将模型文件夹的路径添加到软件的设置中。目前 Vosk 字幕引擎还不支持翻译字幕内容。
+
+![](./assets/media/vosk_zh.png)
+
+
+**如果你觉得上述字幕引擎不能满足你的需求，而且你会 Python，那么你可以考虑开发自己的字幕引擎。详细说明请参考[字幕引擎说明文档](./docs/engine-manual/zh.md)。**
+
 ## ✨ 特性
 
 - 跨平台、多界面语言支持
@@ -58,7 +70,7 @@
 
 ## ⚙️ 自带字幕引擎说明
 
-目前软件自带 1 个字幕引擎，正在规划 2 个新的引擎。它们的详细信息如下。
+目前软件自带 2 个字幕引擎，正在规划 1 个新的引擎。它们的详细信息如下。
 
 ### Gummy 字幕引擎（云端）
 
@@ -87,7 +99,7 @@ $$
 
 ### Vosk 字幕引擎（本地）
 
-预计基于 [vosk-api](https://github.com/alphacep/vosk-api) 进行开发，正在实验中。
+基于 [vosk-api](https://github.com/alphacep/vosk-api) 开发。目前只支持生成音频对应的原文，不支持生成翻译内容。
 
 ### FunASR 字幕引擎（本地）
 
@@ -134,7 +146,8 @@ pip install -r requirements.txt
 然后使用 `pyinstaller` 构建项目：
 
 ```bash
-pyinstaller --onefile main-gummy.py
+pyinstaller ./main-gummy.spec
+pyinstaller ./main-vosk.spec
 ```
 
 此时项目构建完成，在进入 `caption-engine/dist` 文件夹可见对应的可执行文件。即可进行后续操作。
@@ -155,4 +168,20 @@ npm run build:win
 npm run build:mac
 # For Linux
 npm run build:linux
+```
+
+注意，根据不同的平台需要修改项目根目录下 `electron-builder.yml` 文件中的配置内容：
+
+```yml
+extraResources:
+  # For Windows
+  - from: ./caption-engine/dist/main-gummy.exe
+    to: ./caption-engine/main-gummy.exe
+  - from: ./caption-engine/dist/main-vosk.exe
+    to: ./caption-engine/main-vosk.exe
+  # For macOS and Linux
+  # - from: ./caption-engine/dist/main-gummy
+  #   to: ./caption-engine/main-gummy
+  # - from: ./caption-engine/dist/main-vosk
+  #   to: ./caption-engine/main-vosk
 ```

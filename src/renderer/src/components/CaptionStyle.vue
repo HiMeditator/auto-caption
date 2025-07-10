@@ -257,6 +257,7 @@ function useSameStyle(){
   currentTransFontFamily.value = currentFontFamily.value;
   currentTransFontSize.value = currentFontSize.value;
   currentTransFontColor.value = currentFontColor.value;
+  currentTransFontWeight.value = currentFontWeight.value;
 }
 
 function applyStyle(){

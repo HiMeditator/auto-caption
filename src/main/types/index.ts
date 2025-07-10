@@ -6,10 +6,11 @@ export interface Controls {
   engineEnabled: boolean,
   sourceLang: string,
   targetLang: string,
-  engine: 'gummy',
+  engine: string,
   audio: 0 | 1,
   translation: boolean,
   API_KEY: string,
+  modelPath: string,
   customized: boolean,
   customizedApp: string,
   customizedCommand: string

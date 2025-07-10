@@ -17,6 +17,8 @@ export default {
     "custom": "类型：自定义引擎，引擎路径：",
     "args": "，命令参数：",
     "pidInfo": "，字幕引擎进程 PID：",
+    "empty": "模型路径为空",
+    "emptyInfo": "Vosk 模型模型路径为空，请在字幕引擎设置的更多设置中设置 Vosk 模型的路径。",
     "stopped": "字幕引擎停止",
     "stoppedInfo": "字幕引擎已经停止，可点击“启动字幕引擎”按钮重新启动",
     "error": "发生错误",
@@ -48,6 +50,9 @@ export default {
     "enableTranslation": "启用翻译",
     "showMore": "更多设置",
     "apikey": "API KEY",
+    "modelPath": "模型路径",
+    "apikeyInfo": "Gummy 字幕引擎需要的 API KEY，需要在阿里云百炼平台获取。详细信息见项目用户手册。",
+    "modelPathInfo": "Vosk 字幕引擎需要的模型的文件夹路径，需要提前下载需要的模型到本地。信息详情见项目用户手册。",
     "customEngine": "自定义引擎",
     custom: {
       "title": "自定义字幕引擎",
@@ -105,7 +110,7 @@ export default {
       "projLink": "项目链接",
       "manual": "用户手册",
       "engineDoc": "字幕引擎手册",
-      "date": "2025 年 7 月 9 日"
+      "date": "2025 年 7 月 11 日"
     }
   },
   log: {

@@ -16,6 +16,7 @@
     <div class="input-item">
       <span class="input-label">{{ $t('engine.transLang') }}</span>
       <a-select
+        :disabled="currentEngine === 'vosk'"
         class="input-area"
         v-model:value="currentTargetLang"
         :options="langList.filter((item) => item.value !== 'auto')"
@@ -47,13 +48,36 @@
         <a-switch v-model:checked="showMore" />
       </div>
     </div>
-    <a-card size="small" :title="$t('engine.custom.title')" v-show="showMore">
+
+    <a-card size="small" :title="$t('engine.showMore')" v-show="showMore">
       <div class="input-item">
-        <span class="input-label">{{ $t('engine.apikey') }}</span>
+        <a-popover>
+          <template #content>
+            <p class="label-hover-info">{{ $t('engine.apikeyInfo') }}</p>
+          </template>
+          <span class="input-label info-label">{{ $t('engine.apikey') }}</span>
+        </a-popover>
         <a-input
           class="input-area"
           type="password"
           v-model:value="currentAPI_KEY"
+        />
+      </div>
+      <div class="input-item">
+        <a-popover>
+          <template #content>
+            <p class="label-hover-info">{{ $t('engine.modelPathInfo') }}</p>
+          </template>
+          <span class="input-label info-label">{{ $t('engine.modelPath') }}</span>
+        </a-popover>
+        <span
+          class="input-folder"
+          @click="selectFolderPath"
+        ><span><FolderOpenOutlined /></span></span>
+        <a-input
+          class="input-area"
+          style="width:calc(100% - 140px);"
+          v-model:value="currentModelPath"
         />
       </div>
       <div class="input-item">
@@ -85,9 +109,8 @@
             ></a-input>
           </div>
         </a-card>
-      </div>      
+      </div>
     </a-card>
-
   </a-card>
   <div style="height: 20px;"></div>
 </template>
@@ -95,9 +118,10 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { storeToRefs } from 'pinia'
+import { useGeneralSettingStore } from '@renderer/stores/generalSetting'
 import { useEngineControlStore } from '@renderer/stores/engineControl'
 import { notification } from 'ant-design-vue'
-import { InfoCircleOutlined } from '@ant-design/icons-vue';
+import { FolderOpenOutlined ,InfoCircleOutlined } from '@ant-design/icons-vue';
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
@@ -108,10 +132,11 @@ const { platform, captionEngine, audioType, changeSignal } = storeToRefs(engineC
 
 const currentSourceLang = ref('auto')
 const currentTargetLang = ref('zh')
-const currentEngine = ref<'gummy'>('gummy')
+const currentEngine = ref<string>('gummy')
 const currentAudio = ref<0 | 1>(0)
 const currentTranslation = ref<boolean>(false)
 const currentAPI_KEY = ref<string>('')
+const currentModelPath = ref<string>('')
 const currentCustomized = ref<boolean>(false)
 const currentCustomizedApp = ref('')
 const currentCustomizedCommand = ref('')
@@ -132,6 +157,7 @@ function applyChange(){
   engineControl.audio = currentAudio.value
   engineControl.translation = currentTranslation.value
   engineControl.API_KEY = currentAPI_KEY.value
+  engineControl.modelPath = currentModelPath.value
   engineControl.customized = currentCustomized.value
   engineControl.customizedApp = currentCustomizedApp.value
   engineControl.customizedCommand = currentCustomizedCommand.value
@@ -151,9 +177,17 @@ function cancelChange(){
   currentAudio.value = engineControl.audio
   currentTranslation.value = engineControl.translation
   currentAPI_KEY.value = engineControl.API_KEY
+  currentModelPath.value = engineControl.modelPath
   currentCustomized.value = engineControl.customized
   currentCustomizedApp.value = engineControl.customizedApp
   currentCustomizedCommand.value = engineControl.customizedCommand
+}
+
+function selectFolderPath() {
+  window.electron.ipcRenderer.invoke('control.folder.select').then((folderPath) => {
+    if(!folderPath) return
+    currentModelPath.value = folderPath
+  })
 }
 
 watch(changeSignal, (val) => {
@@ -162,10 +196,50 @@ watch(changeSignal, (val) => {
     engineControl.changeSignal = false;
   }
 })
+
+watch(currentEngine, (val) => {
+  if(val == 'vosk'){
+    currentSourceLang.value = 'auto'
+    currentTargetLang.value = ''
+  }
+  else if(val == 'gummy'){
+    currentSourceLang.value = 'auto'
+    currentTargetLang.value = useGeneralSettingStore().uiLanguage
+  }
+})
 </script>
 
 <style scoped>
 @import url(../assets/input.css);
+
+.label-hover-info {
+  margin-top: 10px;
+  max-width: min(36vw, 380px);
+}
+
+.info-label {
+  color: #1677ff;
+  cursor: pointer;
+}
+
+.input-folder {
+  display:inline-block;
+  width: 40px;
+  font-size:1.38em;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+
+.input-folder>span {
+  padding: 0 4px;
+  border: 2px solid #1677ff;
+  color: #1677ff;
+  border-radius: 30%;
+}
+
+.input-folder:hover {
+  transform: scale(1.1);
+}
 
 .customize-note {
   padding: 10px 10px 0;
