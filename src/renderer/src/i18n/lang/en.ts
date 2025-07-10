@@ -17,6 +17,8 @@ export default {
     "custom": "Type: Custom engine, engine path: ",
     "args": ", command arguments: ",
     "pidInfo": ", caption engine process PID: ",
+    "empty": "Model Path is Empty",
+    "emptyInfo": "The Vosk model path is empty. Please set the Vosk model path in the additional settings of the subtitle engine settings.",
     "stopped": "Caption Engine Stopped",
     "stoppedInfo": "The caption engine has stopped. You can click the 'Start Caption Engine' button to restart it.",
     "error": "An error occurred",
@@ -48,6 +50,9 @@ export default {
     "enableTranslation": "Translation",
     "showMore": "More Settings",
     "apikey": "API KEY",
+    "modelPath": "Model Path",
+    "apikeyInfo": "API KEY required for the Gummy subtitle engine, which needs to be obtained from the Alibaba Cloud Bailing platform. For more details, see the project user manual.",
+    "modelPathInfo": "The folder path of the model required by the Vosk subtitle engine. You need to download the required model to your local machine in advance. For more details, see the project user manual.",
     "customEngine": "Custom Engine",
     custom: {
       "title": "Custom Caption Engine",

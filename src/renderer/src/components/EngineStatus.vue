@@ -106,6 +106,11 @@ function openCaptionWindow() {
 }
 
 function startEngine() {
+  console.log(`@@${engineControl.modelPath}##`)
+  if(engineControl.modelPath.trim() === '') {
+    engineControl.emptyModelPathErr()
+    return
+  }
   window.electron.ipcRenderer.send('control.engine.start')
 }
 

@@ -62,6 +62,13 @@ export const useEngineControlStore = defineStore('engineControl', () => {
     changeSignal.value = true
   }
 
+  function emptyModelPathErr() {
+    notification.open({
+      message: t('noti.empty'),
+      description: t('noti.emptyInfo')
+    });
+  }
+
   window.electron.ipcRenderer.on('control.controls.set', (_, controls: Controls) => {
     setControls(controls)
   })
@@ -120,6 +127,7 @@ export const useEngineControlStore = defineStore('engineControl', () => {
     customizedCommand,  // 自定义字幕引擎的命令
     setControls,        // 设置引擎配置
     sendControlsChange, // 发送最新控制消息到后端
+    emptyModelPathErr,  // 模型路径为空时显示警告
     changeSignal,       // 配置改变信号
   }
 })

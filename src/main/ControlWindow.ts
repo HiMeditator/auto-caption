@@ -1,4 +1,4 @@
-import { shell, BrowserWindow, ipcMain, nativeTheme } from 'electron'
+import { shell, BrowserWindow, ipcMain, nativeTheme, dialog } from 'electron'
 import path from 'path'
 import { is } from '@electron-toolkit/utils'
 import icon from '../../build/icon.png?asset'
@@ -70,6 +70,15 @@ class ControlWindow {
         return 'light'
       }
       return allConfig.uiTheme
+    })
+
+    ipcMain.handle('control.folder.select', async () => {
+      const result = await dialog.showOpenDialog({
+        properties: ['openDirectory']
+      });
+
+      if (result.canceled) return "";
+      return result.filePaths[0];
     })
 
     ipcMain.on('control.uiLanguage.change', (_, args) => {

@@ -50,7 +50,7 @@ def resampleRawChunk(chunk, channels, orig_sr, target_sr, mode="sinc_best"):
 
 def resampleMonoChunk(chunk, orig_sr, target_sr, mode="sinc_best"):
     """
-    将当前单通道进行重采样
+    将当前单通道音频块进行重采样
 
     Args:
         chunk: (bytes)单通道音频数据块
