@@ -6,10 +6,16 @@ files:
   - '!**/.vscode/*'
   - '!src/*'
   - '!electron.vite.config.{js,ts,mjs,cjs}'
-  - '!{.eslintcache,eslint.config.mjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
+  - '!{.eslintcache,eslint.config.mjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md}'
+  - '!{LICENSE,README.md,README_en.md,README_ja.md}'
   - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
+  - '!caption-engine/*'
+  - '!engine-test/*'
+  - '!docs/*'
+  - '!assets/*'
 extraResources:
+  # For Windows
   - from: ./caption-engine/dist/main-gummy.exe
     to: ./caption-engine/main-gummy.exe
   - from: ./caption-engine/dist/main-vosk.exe
@@ -19,11 +25,9 @@ extraResources:
   #   to: ./caption-engine/main-gummy
   # - from: ./caption-engine/dist/main-vosk
   #   to: ./caption-engine/main-vosk
-asarUnpack:
-  - resources/**
 win:
   executableName: auto-caption
-  icon: resources/icon.png
+  icon: build/icon.png
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}

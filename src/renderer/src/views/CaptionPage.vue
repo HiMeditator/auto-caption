@@ -6,7 +6,7 @@
     backgroundColor: captionStyle.backgroundRGBA
   }"
   >
-    <div class="title-bar">
+    <div class="title-bar" :style="{color: captionStyle.fontColor}">
       <div class="drag-area">&nbsp;</div>
       <div class="option-item" @click="pinCaptionWindow">
         <PushpinFilled v-if="pinned" />

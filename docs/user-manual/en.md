@@ -1,6 +1,6 @@
 # Auto Caption User Manual
 
-Corresponding Version: v0.3.0
+Corresponding Version: v0.4.0
 
 ## Software Introduction
 
@@ -14,26 +14,30 @@ On Linux platforms, it can only generate captions for audio input (microphone), 
 
 ### Software Limitations
 
-To use the default caption service, you need to obtain an API KEY from Alibaba Cloud.
+To use the Gummy caption engine, you need to obtain an API KEY from Alibaba Cloud.
 
 Additional configuration is required to capture audio output on macOS platform.
 
 The software is built using Electron, so the software size is inevitably large.
 
-## Software Usage
+## Preparation for Using Gummy Engine
 
-### Preparing the Alibaba Cloud Model Studio API KEY
+To use the default caption engine provided by the software (Alibaba Cloud Gummy), you need to obtain an API KEY from the Alibaba Cloud Bailian platform. Then add the API KEY to the software settings or configure it in environment variables (only Windows platform supports reading API KEY from environment variables).
 
-To use the default caption engine (Alibaba Cloud Gummy), you need to obtain an API KEY from the Alibaba Cloud Model Studio and configure it in your local environment variables.
+**The international version of Alibaba Cloud services does not provide the Gummy model, so non-Chinese users currently cannot use the default caption engine.**
 
-**The international version of Alibaba Cloud does not provide the Gummy model, so non-Chinese users currently cannot use the default caption engine. I am trying to develop a new local caption engine to ensure that all users have access to a default caption engine.**
+Alibaba Cloud provides detailed tutorials for this part, which can be referenced:
 
-Alibaba Cloud provides detailed tutorials for this:
+- [Obtaining API KEY (Chinese)](https://help.aliyun.com/zh/model-studio/get-api-key)
+- [Configuring API Key through Environment Variables (Chinese)](https://help.aliyun.com/zh/model-studio/configure-api-key-through-environment-variables)
 
-- [Obtain API KEY (Chinese)](https://help.aliyun.com/zh/model-studio/get-api-key)
-- [Configure API Key in Environment Variables (Chinese)](https://help.aliyun.com/zh/model-studio/configure-api-key-through-environment-variables)
+## Preparation for Using Vosk Engine
 
-### Capturing System Audio Output on macOS
+To use the Vosk local caption engine, first download your required model from the [Vosk Models](https://alphacephei.com/vosk/models) page. Then extract the downloaded model package locally and add the corresponding model folder path to the software settings. Currently, the Vosk caption engine does not support translated caption content.
+
+![](../../assets/media/vosk_en.png)
+
+## Capturing System Audio Output on macOS
 
 > Based on the [Setup Multi-Output Device](https://github.com/ExistentialAudio/BlackHole/wiki/Multi-Output-Device) tutorial
 
@@ -57,6 +61,8 @@ Once BlackHole is confirmed installed, in the `Audio MIDI Setup` page, click the
 
 Now the caption engine can capture system audio output and generate captions.
 
+## Software Usage
+
 ### Modifying Settings
 
 Caption settings can be divided into three categories: general settings, caption engine settings, and caption style settings. Note that changes to general settings take effect immediately. For the other two categories, after making changes, you need to click the "Apply" option in the upper right corner of the corresponding settings module for the changes to take effect. If you click "Cancel Changes," the current modifications will not be saved and will revert to the previous state.
@@ -77,9 +83,9 @@ In the caption control window, you can see the records of all collected captions
 
 ## Caption Engine
 
-The so-called caption engine is actually a subprocess that real-time captures system audio input (recording) or output (playback) streaming data and uses an audio-to-text model to generate captions for the corresponding audio. The generated captions are output as JSON data converted to strings and returned to the main program. The main program reads the caption data, processes it, and displays it in the window.
+The so-called caption engine is essentially a subprogram that captures real-time streaming data from system audio input (recording) or output (playback), and invokes speech-to-text models to generate corresponding captions. The generated captions are converted into JSON-formatted strings and passed to the main program through standard output. The main program reads the caption data, processes it, and displays it in the window.
 
-The software provides a default caption engine. If you need other caption engines, you can call them by enabling the custom engine option (other engines need to be developed specifically for this software). The engine path is the path to the custom caption engine on your computer, and the engine command is the runtime parameters for the custom caption engine, which need to be filled out according to the rules of the specific caption engine.
+The software provides two default caption engines. If you need other caption engines, you can invoke them by enabling the custom engine option (other engines need to be specifically developed for this software). The engine path refers to the location of the custom caption engine on your computer, while the engine command represents the runtime parameters of the custom caption engine, which should be configured according to the rules of that particular caption engine.
 
 ![](../img/02_en.png)
 

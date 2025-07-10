@@ -1,6 +1,6 @@
 # Caption Engine Documentation
 
-Corresponding Version: v0.3.0
+Corresponding Version: v0.4.0
 
 ![](../../assets/media/structure_en.png)
 
@@ -79,6 +79,10 @@ def convert_audio_to_text(s_lang, t_lang, audio_type, chunk_rate, api_key):
             gummy.stop()
             break
 ```
+
+### Caption Translation
+
+Some speech-to-text models don't provide translation functionality, requiring an additional translation module. This part can use either cloud-based translation APIs or local translation models.
 
 ### Data Transmission
 

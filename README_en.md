@@ -3,18 +3,22 @@
     <h1 align="center">auto-caption</h1>
     <p>Auto Caption is a cross-platform real-time caption display software.</p>
     <p>
-      <img src="https://img.shields.io/badge/version-0.3.0-blue">
-      <img src="https://img.shields.io/github/issues/HiMeditator/auto-caption?color=orange">
+      <a href="https://github.com/HiMeditator/auto-caption/releases">
+        <img src="https://img.shields.io/badge/release-0.4.0-blue">
+      </a>
+      <a href="https://github.com/HiMeditator/auto-caption/issues">
+        <img src="https://img.shields.io/github/issues/HiMeditator/auto-caption?color=orange">
+      </a>
       <img src="https://img.shields.io/github/languages/top/HiMeditator/auto-caption?color=royalblue">
       <img src="https://img.shields.io/github/repo-size/HiMeditator/auto-caption?color=green">
-      <img src="https://visitor-badge.laobi.icu/badge?page_id=himeditator.auto-caption">
+      <img src="https://img.shields.io/github/stars/HiMeditator/auto-caption?style=social">
     </p>
     <p>
         | <a href="./README.md">简体中文</a>
         | <b>English</b>
         | <a href="./README_ja.md">日本語</a> |
     </p>
-    <p><i>Version v0.3.0 has been released. Version v1.0.0, which is expected to add a local caption engine, is still under development...</i></p>
+    <p><i>The v0.4.0 version with Vosk local caption engine has been released. <b>Currently the local caption engine does not include translation</b>, the local translation module is still under development...</i></p>
 </div>
 
 ![](./assets/media/main_en.png)
@@ -33,18 +37,22 @@
 
 ## 📖 Basic Usage
 
-Currently, installable versions are provided for Windows and macOS platforms. To use the default Gummy caption engine, you first need to obtain an API KEY from Alibaba Cloud Bailian platform, then add the API KEY to the software settings or configure it in environment variables (only Windows platform supports reading API KEY from environment variables) to enable normal usage of this model.
+Currently, installable versions are available for Windows and macOS platforms.
 
-![](./assets/media/api_en.png)
+> The international version of Alibaba Cloud services does not provide the Gummy model, so non-Chinese users currently cannot use the Gummy caption engine.
 
-**The international version of Alibaba Cloud services does not provide the Gummy model, so currently non-Chinese users cannot use the default caption engine. I'm developing a new local caption engine to ensure all users have a default caption engine available.**
+To use the default Gummy caption engine (which uses cloud-based models for speech recognition and translation), you first need to obtain an API KEY from the Alibaba Cloud Bailian platform. Then add the API KEY to the software settings or configure it in environment variables (only Windows platform supports reading API KEY from environment variables) to properly use this model. Related tutorials:
 
-Related tutorials:
+- [Obtaining API KEY (Chinese)](https://help.aliyun.com/zh/model-studio/get-api-key)
+- [Configuring API Key through Environment Variables (Chinese)](https://help.aliyun.com/zh/model-studio/configure-api-key-through-environment-variables)
 
-- [Obtain API KEY (Chinese)](https://help.aliyun.com/zh/model-studio/get-api-key)
-- [Configure API Key in Environment Variables (Chinese)](https://help.aliyun.com/zh/model-studio/configure-api-key-through-environment-variables)
+> The recognition performance of Vosk models is suboptimal, please use with caution.
 
-If you want to understand how the caption engine works, or if you want to develop your own caption engine, please refer to [Caption Engine Documentation](./docs/engine-manual/en.md).
+To use the Vosk local caption engine, first download your required model from [Vosk Models](https://alphacephei.com/vosk/models) page, extract the model locally, and add the model folder path to the software settings. Currently, the Vosk caption engine does not support translated captions.
+
+![](./assets/media/vosk_en.png)
+
+**If you find the above caption engines don't meet your needs and you know Python, you may consider developing your own caption engine. For detailed instructions, please refer to the [Caption Engine Documentation](./docs/engine-manual/en.md).**
 
 ## ✨ Features
 
@@ -61,7 +69,7 @@ Notes:
 
 ## ⚙️ Built-in Subtitle Engines
 
-Currently, the software comes with 1 subtitle engine, with 2 new engines planned. Details are as follows.
+Currently, the software comes with 2 subtitle engines, with 1 new engine planned. Details are as follows.
 
 ### Gummy Subtitle Engine (Cloud)
 
@@ -90,7 +98,7 @@ The engine only uploads data when receiving audio streams, so the actual upload 
 
 ### Vosk Subtitle Engine (Local)
 
-Planned to be developed based on [vosk-api](https://github.com/alphacep/vosk-api), currently in experimentation.
+Developed based on [vosk-api](https://github.com/alphacep/vosk-api). Currently only supports generating original text from audio, does not support translation content.
 
 ### FunASR Subtitle Engine (Local)
 
@@ -137,7 +145,8 @@ pip install -r requirements.txt
 Then use `pyinstaller` to build the project:
 
 ```bash
-pyinstaller --onefile main-gummy.py
+pyinstaller ./main-gummy.spec
+pyinstaller ./main-vosk.spec
 ```
 
 After the build completes, you can find the executable file in the `caption-engine/dist` folder. Then proceed with subsequent operations.
@@ -159,4 +168,20 @@ npm run build:win
 npm run build:mac
 # For Linux
 npm run build:linux
+```
+
+Note: You need to modify the configuration content in the `electron-builder.yml` file in the project root directory according to different platforms:
+
+```yml
+extraResources:
+  # For Windows
+  - from: ./caption-engine/dist/main-gummy.exe
+    to: ./caption-engine/main-gummy.exe
+  - from: ./caption-engine/dist/main-vosk.exe
+    to: ./caption-engine/main-vosk.exe
+  # For macOS and Linux
+  # - from: ./caption-engine/dist/main-gummy
+  #   to: ./caption-engine/main-gummy
+  # - from: ./caption-engine/dist/main-vosk
+  #   to: ./caption-engine/main-vosk
 ```
