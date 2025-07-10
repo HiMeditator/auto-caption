@@ -23,6 +23,8 @@
 
 ![](./assets/media/main_en.png)
 
+![](./assets/media/main_mac_en.png)
+
 ## 📥 Download
 
 [GitHub Releases](https://github.com/HiMeditator/auto-caption/releases)
@@ -147,6 +149,15 @@ Then use `pyinstaller` to build the project:
 ```bash
 pyinstaller ./main-gummy.spec
 pyinstaller ./main-vosk.spec
+```
+
+Note that the path to the `vosk` library in `main-vosk.spec` might be incorrect and needs to be configured according to the actual situation.
+
+```
+# Windows
+vosk_path = str(Path('./subenv/Lib/site-packages/vosk').resolve())
+# Linux or macOS
+vosk_path = str(Path('./subenv/lib/python3.x/site-packages/vosk').resolve())
 ```
 
 After the build completes, you can find the executable file in the `caption-engine/dist` folder. Then proceed with subsequent operations.

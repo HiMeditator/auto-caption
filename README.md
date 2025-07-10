@@ -23,6 +23,8 @@
 
 ![](./assets/media/main_zh.png)
 
+![](./assets/media/main_mac_zh.png)
+
 ## 📥 下载
 
 [GitHub Releases](https://github.com/HiMeditator/auto-caption/releases)
@@ -148,6 +150,15 @@ pip install -r requirements.txt
 ```bash
 pyinstaller ./main-gummy.spec
 pyinstaller ./main-vosk.spec
+```
+
+注意 `main-vosk.spec` 文件中 `vsok` 库的路径可能不正确，需要根据实际状况配置。
+
+```
+# Windows
+vosk_path = str(Path('./subenv/Lib/site-packages/vosk').resolve())
+# Linux or macOS
+vosk_path = str(Path('./subenv/lib/python3.x/site-packages/vosk').resolve())
 ```
 
 此时项目构建完成，在进入 `caption-engine/dist` 文件夹可见对应的可执行文件。即可进行后续操作。
