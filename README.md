@@ -152,7 +152,7 @@ pyinstaller ./main-gummy.spec
 pyinstaller ./main-vosk.spec
 ```
 
-注意 `main-vosk.spec` 文件中 `vsok` 库的路径可能不正确，需要根据实际状况配置。
+注意 `main-vosk.spec` 文件中 `vosk` 库的路径可能不正确，需要根据实际状况配置。
 
 ```
 # Windows

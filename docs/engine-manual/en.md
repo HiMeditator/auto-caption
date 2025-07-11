@@ -151,6 +151,51 @@ Data receiver code is as follows:
 ...
 ```
 
+## Usage of Caption Engine
+
+### Command Line Parameter Specification
+
+The custom caption engine settings are specified via command line parameters. Common required parameters are as follows:
+
+```python
+import argparse
+
+...
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Convert system audio stream to text')
+    parser.add_argument('-s', '--source_language', default='en', help='Source language code')
+    parser.add_argument('-t', '--target_language', default='zh', help='Target language code')
+    parser.add_argument('-a', '--audio_type', default=0, help='Audio stream source: 0 for output audio stream, 1 for input audio stream')
+    parser.add_argument('-c', '--chunk_rate', default=20, help='The number of audio stream chunks collected per second.')
+    parser.add_argument('-k', '--api_key', default='', help='API KEY for Gummy model')
+    args = parser.parse_args()
+    convert_audio_to_text(
+        args.source_language,
+        args.target_language,
+        int(args.audio_type),
+        int(args.chunk_rate),
+        args.api_key
+    )
+```
+
+For example, to specify Japanese as source language, Chinese as target language, capture system audio output, and collect 0.1s audio chunks, use the following command:
+
+```bash
+python main-gummy.py -s ja -t zh -a 0 -c 10 -k <your-api-key>
+```
+
+### Packaging
+
+After development and testing, package the caption engine into an executable file using `pyinstaller`. If errors occur, check for missing dependencies.
+
+### Execution
+
+With a working caption engine, specify its path and runtime parameters in the caption software window to launch it.
+
+![](../img/02_en.png)
+
+
 ## Reference Code
 
 The `main-gummy.py` file under the `caption-engine` folder in this project serves as the entry point for the default caption engine. The `src\main\utils\engine.ts` file contains the server-side code for acquiring and processing data from the caption engine. You can read and understand the implementation details and the complete execution process of the caption engine as needed.

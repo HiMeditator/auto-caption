@@ -125,4 +125,77 @@ sys.stdout.reconfigure(line_buffering=True)
 ...
 ```
 
-データ受信側のコードは
+データ受信側のコード
+
+```typescript
+// src\main\utils\engine.ts
+...
+    this.process.stdout.on('data', (data) => {
+      const lines = data.toString().split('\n');
+      lines.forEach((line: string) => {
+        if (line.trim()) {
+          try {
+            const caption = JSON.parse(line);
+            addCaptionLog(caption);
+          } catch (e) {
+            controlWindow.sendErrorMessage('字幕エンジンの出力をJSONオブジェクトとして解析できません:' + e)
+            console.error('[ERROR] JSON解析エラー:', e);
+          }
+        }
+      });
+    });
+
+    this.process.stderr.on('data', (data) => {
+      controlWindow.sendErrorMessage('字幕エンジンエラー:' + data)
+      console.error(`[ERROR] サブプロセスエラー: ${data}`);
+    });
+...
+```
+
+## 字幕エンジンの使用方法
+
+### コマンドライン引数の指定
+
+カスタム字幕エンジンの設定はコマンドライン引数で指定します。主な必要なパラメータは以下の通りです：
+
+```python
+import argparse
+
+...
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='システムのオーディオストリームをテキストに変換')
+    parser.add_argument('-s', '--source_language', default='en', help='ソース言語コード')
+    parser.add_argument('-t', '--target_language', default='zh', help='ターゲット言語コード')
+    parser.add_argument('-a', '--audio_type', default=0, help='オーディオストリームソース: 0は出力音声、1は入力音声')
+    parser.add_argument('-c', '--chunk_rate', default=20, help='1秒間に収集するオーディオチャンク数')
+    parser.add_argument('-k', '--api_key', default='', help='GummyモデルのAPIキー')
+    args = parser.parse_args()
+    convert_audio_to_text(
+        args.source_language,
+        args.target_language,
+        int(args.audio_type),
+        int(args.chunk_rate),
+        args.api_key
+    )
+```
+
+例：原文を日本語、翻訳を中国語に指定し、システム音声出力を取得、0.1秒のオーディオデータを収集する場合：
+
+```bash
+python main-gummy.py -s ja -t zh -a 0 -c 10 -k <your-api-key>
+```
+
+### パッケージ化
+
+開発とテスト完了後、`pyinstaller`を使用して実行可能ファイルにパッケージ化します。エラーが発生した場合、依存ライブラリの不足を確認してください。
+
+### 実行
+
+利用可能な字幕エンジンが準備できたら、字幕ソフトウェアのウィンドウでエンジンのパスと実行パラメータを指定して起動します。
+
+![](../img/02_ja.png)
+
+## 参考コード
+
+本プロジェクトの`caption-engine`フォルダにある`main-gummy.py`ファイルはデフォルトの字幕エンジンのエントリーコードです。`src\main\utils\engine.ts`はサーバー側で字幕エンジンのデータを取得・処理するコードです。必要に応じて字幕エンジンの実装詳細と完全な実行プロセスを理解するために参照してください。

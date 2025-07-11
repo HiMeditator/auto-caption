@@ -32,7 +32,7 @@
 import sys
 import argparse
 
-# 引入系统音频获取勒
+# 引入系统音频获取类
 if sys.platform == 'win32':
     from sysaudio.win import AudioStream
 elif sys.platform == 'darwin':
@@ -100,7 +100,7 @@ export interface CaptionItem {
 }
 ```
 
-**注意必须确保咱们一起每输出一次字幕 JSON 数据就得刷新缓冲区，确保 electron 主进程每次接收到的字符串都可以被解释为 JSON 对象。**
+**注意必须确保每输出一次字幕 JSON 数据就得刷新缓冲区，确保 electron 主进程每次接收到的字符串都可以被解释为 JSON 对象。**
 
 如果使用 python 语言，可以参考以下方式将数据传递给主程序：
 
@@ -150,6 +150,51 @@ sys.stdout.reconfigure(line_buffering=True)
     });
 ...
 ```
+
+## 字幕引擎的使用
+
+### 命令行参数的指定
+
+自定义字幕引擎的设置提供命令行参数指定，因此需要设置好字幕引擎的参数，常见的需要的参数如下：
+
+```python
+import argparse
+
+...
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Convert system audio stream to text')
+    parser.add_argument('-s', '--source_language', default='en', help='Source language code')
+    parser.add_argument('-t', '--target_language', default='zh', help='Target language code')
+    parser.add_argument('-a', '--audio_type', default=0, help='Audio stream source: 0 for output audio stream, 1 for input audio stream')
+    parser.add_argument('-c', '--chunk_rate', default=20, help='The number of audio stream chunks collected per second.')
+    parser.add_argument('-k', '--api_key', default='', help='API KEY for Gummy model')
+    args = parser.parse_args()
+    convert_audio_to_text(
+        args.source_language,
+        args.target_language,
+        int(args.audio_type),
+        int(args.chunk_rate),
+        args.api_key
+    )
+```
+
+比如对应上面的字幕引擎，我想指定原文为日语，翻译为中文，获取系统音频输出的字幕，每次截取 0.1s 的音频数据，那么命令行参数如下：
+
+```bash
+python main-gummy.py -s ja -t zh -a 0 -c 10 -k <your-api-key>
+```
+
+### 打包
+
+在完成字幕引擎的开发和测试后，需要将字幕引擎打包成可执行文件。一般使用 `pyinstaller` 进行打包。如果打包好的字幕引擎文件执行报错，可能是打包漏掉了某些依赖库，请检查是否缺少了依赖库。
+
+### 运行
+
+有了可以使用的字幕引擎，就可以在字幕软件窗口中通过指定字幕引擎的路径和字幕引擎的运行指令（参数）来启动字幕引擎了。
+
+![](../img/02_zh.png)
+
 
 ## 参考代码
 
