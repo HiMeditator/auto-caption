@@ -60,7 +60,6 @@ class AllConfig {
       if(config.uiTheme) this.uiTheme = config.uiTheme
       if(config.leftBarWidth) this.leftBarWidth = config.leftBarWidth
       if(config.styles) this.setStyles(config.styles)
-      if(process.platform !== 'win32' && process.platform !== 'darwin') config.controls.audio = 1
       if(config.controls) this.setControls(config.controls)
       console.log('[INFO] Read Config from:', configPath)
     }

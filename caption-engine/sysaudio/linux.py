@@ -1,7 +1,34 @@
 """获取 Linux 系统音频输入流"""
 
-import pyaudio
+import subprocess
 
+def findMonitorSource():
+    result = subprocess.run(
+        ["pactl", "list", "short", "sources"],
+        stdout=subprocess.PIPE, text=True
+    )
+    lines = result.stdout.splitlines()
+
+    for line in lines:
+        parts = line.split('\t')
+        if len(parts) >= 2 and ".monitor" in parts[1]:
+            return parts[1]
+
+    raise RuntimeError("System output monitor device not found")
+
+def findInputSource():
+    result = subprocess.run(
+        ["pactl", "list", "short", "sources"],
+        stdout=subprocess.PIPE, text=True
+    )
+    lines = result.stdout.splitlines()
+
+    for line in lines:
+        parts = line.split('\t')
+        name = parts[1]
+        if ".monitor" not in name:
+            return name
+    raise RuntimeError("Microphone input device not found")
 
 class AudioStream:
     """
@@ -13,26 +40,26 @@ class AudioStream:
     """
     def __init__(self, audio_type=1,  chunk_rate=20):
         self.audio_type = audio_type
-        self.mic = pyaudio.PyAudio()
-        self.device = self.mic.get_default_input_device_info()
-        self.stream = None
-        self.SAMP_WIDTH = pyaudio.get_sample_size(pyaudio.paInt16)
-        self.FORMAT = pyaudio.paInt16
-        self.CHANNELS = self.device["maxInputChannels"]
-        self.RATE = int(self.device["defaultSampleRate"])
+
+        if self.audio_type == 0:
+            self.source = findMonitorSource()
+        else:
+            self.source = findInputSource()
+
+        self.process = None
+
+        self.SAMP_WIDTH = 2
+        self.FORMAT = 16
+        self.CHANNELS = 2
+        self.RATE = 48000
         self.CHUNK = self.RATE // chunk_rate
-        self.INDEX = self.device["index"]
 
     def printInfo(self):
         dev_info = f"""
-        采样输入设备：
-            - 设备类型：{ "音频输入（Linux平台目前仅支持该项）" }
-            - 序号：{self.device['index']}
-            - 名称：{self.device['name']}
-            - 最大输入通道数：{self.device['maxInputChannels']}
-            - 默认低输入延迟：{self.device['defaultLowInputLatency']}s
-            - 默认高输入延迟：{self.device['defaultHighInputLatency']}s
-            - 默认采样率：{self.device['defaultSampleRate']}Hz
+        音频捕获进程：
+            - 捕获类型：{"音频输出" if self.audio_type == 0 else "音频输入"}
+            - 设备源：{self.source}
+            - 捕获进程PID：{self.process.pid if self.process else "None"}
 
         音频样本块大小：{self.CHUNK}
         样本位宽：{self.SAMP_WIDTH}
@@ -44,30 +71,24 @@ class AudioStream:
 
     def openStream(self):
         """
-        打开并返回系统音频输出流
+        启动音频捕获进程
         """
-        if self.stream: return self.stream
-        self.stream = self.mic.open(
-            format = self.FORMAT,
-            channels = int(self.CHANNELS),
-            rate = self.RATE,
-            input = True,
-            input_device_index = int(self.INDEX)
+        self.process = subprocess.Popen(
+            ["parec", "-d", self.source, "--format=s16le", "--rate=48000", "--channels=2"],
+            stdout=subprocess.PIPE
         )
-        return self.stream
 
     def read_chunk(self):
         """
         读取音频数据
         """
-        if not self.stream: return None
-        return self.stream.read(self.CHUNK)
+        if self.process:
+            return self.process.stdout.read(self.CHUNK)
+        return None
 
     def closeStream(self):
         """
-        关闭系统音频输出流
+        关闭系统音频捕获进程
         """
-        if self.stream is None: return
-        self.stream.stop_stream()
-        self.stream.close()
-        self.stream = None
+        if self.process:
+            self.process.terminate()

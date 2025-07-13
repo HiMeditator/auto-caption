@@ -61,6 +61,30 @@ Once BlackHole is confirmed installed, in the `Audio MIDI Setup` page, click the
 
 Now the caption engine can capture system audio output and generate captions.
 
+## Getting System Audio Output on Linux
+
+Execute the following commands to install `pulseaudio` and `pavucontrol`:
+
+```bash
+# For Debian or Ubuntu, etc.
+sudo apt install pulseaudio pavucontrol
+# For CentOS, etc.
+sudo yum install pulseaudio pavucontrol
+```
+
+Then execute:
+
+```bash
+pactl list short sources
+```
+
+If you see output similar to the following, the configuration was successful:
+
+```bash
+220     alsa_output.pci-0000_02_02.0.3.analog-stereo.monitor    PipeWire        s16le 2ch 48000Hz       SUSPENDED
+221     alsa_input.pci-0000_02_02.0.3.analog-stereo     PipeWire        s16le 2ch 48000Hz       SUSPENDED
+```
+
 ## Software Usage
 
 ### Modifying Settings

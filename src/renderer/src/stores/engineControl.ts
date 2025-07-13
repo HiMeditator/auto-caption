@@ -104,12 +104,6 @@ export const useEngineControlStore = defineStore('engineControl', () => {
     });
   })
 
-  watch(platform, (newValue) => {
-    if(newValue !== 'win32' && newValue !== 'darwin') {
-      audio.value = 1
-    }
-  })
-
   return {
     platform,           // 系统平台
     captionEngine,      // 字幕引擎列表

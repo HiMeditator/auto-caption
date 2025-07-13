@@ -29,7 +29,6 @@ Auto Caption 是一个跨平台的字幕显示软件，能够实时获取系统�
 这部分阿里云提供了详细的教程，可参考：
 
 - [获取 API KEY](https://help.aliyun.com/zh/model-studio/get-api-key)
-
 - [将 API Key 配置到环境变量](https://help.aliyun.com/zh/model-studio/configure-api-key-through-environment-variables)
 
 ## Vosk 引擎使用前准备
@@ -61,6 +60,30 @@ brew install blackhole-64ch
 ![](../img/05.png)
 
 现在字幕引擎就能捕获系统的音频输出并生成字幕了。
+
+## Linux 获取系统音频输出
+
+执行以下命令安装 `pulseaudio` 和 `pavucontrol`：
+
+```bash
+# Debian or Ubuntu, etc.
+sudo apt install pulseaudio pavucontrol
+# CentOS, etc.
+sudo yum install pulseaudio pavucontrol
+```
+
+然后执行：
+
+```bash
+pactl list short sources
+```
+
+如果有以下类似的输出内容则配置成功：
+
+```bash
+220     alsa_output.pci-0000_02_02.0.3.analog-stereo.monitor    PipeWire        s16le 2ch 48000Hz       SUSPENDED
+221     alsa_input.pci-0000_02_02.0.3.analog-stereo     PipeWire        s16le 2ch 48000Hz       SUSPENDED
+```
 
 ## 软件使用
 

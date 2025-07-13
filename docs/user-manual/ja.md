@@ -64,6 +64,30 @@ BlackHoleのインストールが確認できたら、`オーディオ MIDI 設�
 
 これで字幕エンジンがシステムオーディオ出力をキャプチャし、字幕を生成できるようになります。
 
+## Linux でシステムオーディオ出力を取得する
+
+以下のコマンドを実行して `pulseaudio` と `pavucontrol` をインストールします:
+
+```bash
+# Debian や Ubuntu など
+sudo apt install pulseaudio pavucontrol
+# CentOS など
+sudo yum install pulseaudio pavucontrol
+```
+
+次に実行:
+
+```bash
+pactl list short sources
+```
+
+以下のような出力があれば設定は成功です:
+
+```bash
+220     alsa_output.pci-0000_02_02.0.3.analog-stereo.monitor    PipeWire        s16le 2ch 48000Hz       SUSPENDED
+221     alsa_input.pci-0000_02_02.0.3.analog-stereo     PipeWire        s16le 2ch 48000Hz       SUSPENDED
+```
+
 ## ソフトウェアの使い方
 
 ### 設定の変更

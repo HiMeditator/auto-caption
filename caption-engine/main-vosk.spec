@@ -1,8 +1,12 @@
 # -*- mode: python ; coding: utf-8 -*-
 
 from pathlib import Path
+import sys
 
-vosk_path = str(Path('./subenv/Lib/site-packages/vosk').resolve())
+if sys.platform == 'win32':
+    vosk_path = str(Path('./subenv/Lib/site-packages/vosk').resolve())
+else:
+    vosk_path = str(Path('./subenv/lib/python3.12/site-packages/vosk').resolve())
 
 a = Analysis(
     ['main-vosk.py'],

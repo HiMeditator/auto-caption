@@ -118,6 +118,7 @@ export class CaptionEngine {
     });
 
     this.process.stderr.on('data', (data) => {
+      if(this.processStatus === 'stopping') return
       controlWindow.sendErrorMessage(i18n('engine.error') + data)
       console.error(`[ERROR] Subprocess Error: ${data}`);
     });

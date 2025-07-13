@@ -39,7 +39,15 @@
 
 ## 📖 Basic Usage
 
-Currently, installable versions are available for Windows and macOS platforms.
+The software has been adapted for Windows, macOS, and Linux platforms. The tested platform information is as follows:
+
+| OS Version         | Architecture | System Audio Input | System Audio Output |
+| ------------------ | ------------ | ------------------ | ------------------- |
+| Windows 11 24H2    | x64          | ✅                 | ✅                  |
+| macOS Sequoia 15.5 | arm64        | ✅ Additional config required | ✅                  |
+| Ubuntu 24.04.2     | x64          | ✅ Additional config required | ✅                  |
+
+Additional configuration is required to capture system audio output on macOS and Linux platforms. See [Auto Caption User Manual](./docs/user-manual/en.md) for details.
 
 > The international version of Alibaba Cloud services does not provide the Gummy model, so non-Chinese users currently cannot use the Gummy caption engine.
 
@@ -64,10 +72,6 @@ To use the Vosk local caption engine, first download your required model from [V
 - Multi-language recognition and translation
 - Caption recording display and export
 - Generate captions for audio output or microphone input
-
-Notes:
-- Windows and macOS platforms support generating captions for both audio output and microphone input, but **macOS requires additional setup to capture system audio output. See [Auto Caption User Manual](./docs/user-manual/en.md) for details.**
-- Linux platform currently cannot capture system audio output, only supports generating subtitles for microphone input.
 
 ## ⚙️ Built-in Subtitle Engines
 
@@ -136,12 +140,21 @@ subenv/Scripts/activate
 source subenv/bin/activate
 ```
 
-Then install dependencies (note: for Linux or macOS environments, you need to comment out `PyAudioWPatch` in `requirements.txt`, as this module is only for Windows environments).
-
-> This step may report errors, usually due to build failures. You need to install corresponding build tools based on the error messages.
+Then install dependencies (this step may fail, usually due to build failures - you'll need to install the corresponding tool packages based on the error messages):
 
 ```bash
-pip install -r requirements.txt
+# Windows
+pip install -r requirements_win.txt
+# macOS
+pip install -r requirements_darwin.txt
+# Linux
+pip install -r requirements_linux.txt
+```
+
+If you encounter errors when installing the `samplerate` module on Linux systems, you can try installing it separately with this command:
+
+```bash
+pip install samplerate --only-binary=:all:
 ```
 
 Then use `pyinstaller` to build the project:

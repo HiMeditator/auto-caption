@@ -33,7 +33,6 @@
     <div class="input-item">
       <span class="input-label">{{ $t('engine.audioType') }}</span>
       <a-select
-        :disabled="platform !== 'win32' && platform !== 'darwin'"
         class="input-area"
         v-model:value="currentAudio"
         :options="audioType"

@@ -1,0 +1,5 @@
+dashscope
+numpy
+vosk
+pyinstaller
+samplerate # pip install samplerate --only-binary=:all:
