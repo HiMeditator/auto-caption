@@ -1,24 +1,11 @@
 <template>
   <div
-  class="caption-page"
-  ref="caption"
-  :style="{
-    backgroundColor: captionStyle.backgroundRGBA
-  }"
+    class="caption-page"
+    ref="caption"
+    :style="{
+      backgroundColor: captionStyle.backgroundRGBA
+    }"
   >
-    <div class="title-bar" :style="{color: captionStyle.fontColor}">
-      <div class="drag-area">&nbsp;</div>
-      <div class="option-item" @click="pinCaptionWindow">
-        <PushpinFilled v-if="pinned" />
-        <PushpinOutlined v-else />
-      </div>
-      <div class="option-item" @click="openControlWindow">
-        <SettingOutlined />
-      </div>
-      <div class="option-item" @click="closeCaptionWindow">
-        <CloseOutlined />
-      </div>
-    </div>
     <div
       class="caption-container"
       :style="{
@@ -45,6 +32,20 @@
         <span v-if="captionData.length">{{ captionData[captionData.length-1].translation }}</span>
         <span v-else>{{ $t('example.translation') }}</span>
       </p>
+    </div>
+
+    <div class="title-bar" :style="{color: captionStyle.fontColor}">
+      <div class="option-item" @click="closeCaptionWindow">
+        <CloseOutlined />
+      </div>
+      <div class="option-item" @click="openControlWindow">
+        <SettingOutlined />
+      </div>
+      <div class="option-item" @click="pinCaptionWindow">
+        <PushpinFilled v-if="pinned" />
+        <PushpinOutlined v-else />
+      </div>
+      <div class="drag-area"></div>
     </div>
   </div>
 </template>
@@ -97,38 +98,21 @@ function closeCaptionWindow() {
   border-radius: 8px;
   box-sizing: border-box;
   border: 1px solid #3333;
-}
-
-.title-bar {
   display: flex;
-  align-items: center;
-}
-
-.drag-area {
-  padding: 5px;
-  flex-grow: 1;
-  -webkit-app-region: drag;
-}
-
-.option-item {
-  display: inline-block;
-  padding: 5px 10px;
-  cursor: pointer;
-}
-
-.option-item:hover {
-  background-color: #2221;
 }
 
 .caption-container {
+  display: inline-block;
+  width: calc(100% - 32px);
   -webkit-app-region: drag;
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 
 .caption-container p {
   text-align: center;
   margin: 0;
-  line-height: 1.5em;
-  padding: 0 10px 10px 10px;
+  line-height: 1.6em;
 }
 
 .left-ellipsis {
@@ -141,5 +125,31 @@ function closeCaptionWindow() {
 .left-ellipsis > span {
   direction: ltr;
   display: inline-block;
+}
+
+.title-bar {
+  width: 32px;
+  display: flex;
+  flex-direction: column;
+  vertical-align: top;
+}
+
+.option-item {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+.option-item:hover {
+  background-color: #2221;
+}
+
+.drag-area {
+  display: inline-flex;
+  flex-grow: 1;
+  -webkit-app-region: drag;
 }
 </style>

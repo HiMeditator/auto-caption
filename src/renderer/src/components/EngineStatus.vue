@@ -106,7 +106,6 @@ function openCaptionWindow() {
 }
 
 function startEngine() {
-  console.log(`@@${engineControl.modelPath}##`)
   if(engineControl.engine === 'vosk' && engineControl.modelPath.trim() === '') {
     engineControl.emptyModelPathErr()
     return

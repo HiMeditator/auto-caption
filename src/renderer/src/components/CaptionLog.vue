@@ -4,46 +4,102 @@
       <a-app class="caption-title">
         <span style="margin-right: 30px;">{{ $t('log.title') }}</span>
       </a-app>
-      <a-button
-        type="primary"
-        style="margin-right: 20px;"
-        @click="exportCaptions"
-        :disabled="captionData.length === 0"
-      >{{ $t('log.export') }}</a-button>
-
-    <a-popover :title="$t('log.copyOptions')">
-      <template #content>
-        <div class="input-item">
-          <span class="input-label">{{ $t('log.addIndex') }}</span>
-          <a-switch v-model:checked="showIndex" />
-          <span class="input-label">{{ $t('log.copyTime') }}</span>
-          <a-switch v-model:checked="copyTime" />
-        </div>
-        <div class="input-item">
-          <span class="input-label">{{ $t('log.copyContent') }}</span>
-          <a-radio-group v-model:value="copyOption">
-            <a-radio-button value="both">{{ $t('log.both') }}</a-radio-button>
-            <a-radio-button value="source">{{ $t('log.source') }}</a-radio-button>
-            <a-radio-button value="target">{{ $t('log.translation') }}</a-radio-button>
-          </a-radio-group>
-        </div>
-      </template>
-      <a-button
-        style="margin-right: 20px;"
-        @click="copyCaptions"
-        :disabled="captionData.length === 0"
-      >{{ $t('log.copy') }}</a-button>
+      <a-popover :title="$t('log.baseTime')">
+        <template #content>
+          <div class="base-time">
+            <div class="base-time-container">
+              <a-input
+                type="number" min="0"
+                v-model:value="baseHH"
+              ></a-input>
+              <span class="base-time-label">{{ $t('log.hour') }}</span>
+            </div>
+          </div><span style="margin: 0 4px;">:</span>
+          <div class="base-time">
+            <div class="base-time-container">
+              <a-input
+                type="number" min="0" max="59"
+                v-model:value="baseMM"
+              ></a-input>
+              <span class="base-time-label">{{ $t('log.min') }}</span>
+            </div>
+          </div><span style="margin: 0 4px;">:</span>
+          <div class="base-time">
+            <div class="base-time-container">
+              <a-input
+                type="number" min="0" max="59"
+                v-model:value="baseSS"
+              ></a-input>
+              <span class="base-time-label">{{ $t('log.sec') }}</span>
+            </div>
+          </div><span style="margin: 0 4px;">.</span>
+          <div class="base-time">
+            <div class="base-time-container">
+              <a-input
+                type="number" min="0" max="999"
+                v-model:value="baseMS"
+              ></a-input>
+              <span class="base-time-label">{{ $t('log.ms') }}</span>
+            </div>
+          </div>
+        </template>
+        <a-button
+          type="primary"
+          style="margin-right: 20px;"
+          @click="changeBaseTime"
+          :disabled="captionData.length === 0"
+        >{{ $t('log.changeTime') }}</a-button>
       </a-popover>
-
+      <a-popover :title="$t('log.exportOptions')">
+        <template #content>
+          <div class="input-item">
+            <span class="input-label">{{ $t('log.exportFormat') }}</span>
+            <a-radio-group v-model:value="exportFormat">
+              <a-radio-button value="srt">.srt</a-radio-button>
+              <a-radio-button value="json">.json</a-radio-button>
+            </a-radio-group>
+          </div>
+        </template>
+        <a-button
+          style="margin-right: 20px;"
+          @click="exportCaptions"
+          :disabled="captionData.length === 0"
+        >{{ $t('log.export') }}</a-button>
+      </a-popover>
+      <a-popover :title="$t('log.copyOptions')">
+        <template #content>
+          <div class="input-item">
+            <span class="input-label">{{ $t('log.addIndex') }}</span>
+            <a-switch v-model:checked="showIndex" />
+            <span class="input-label">{{ $t('log.copyTime') }}</span>
+            <a-switch v-model:checked="copyTime" />
+          </div>
+          <div class="input-item">
+            <span class="input-label">{{ $t('log.copyContent') }}</span>
+            <a-radio-group v-model:value="copyOption">
+              <a-radio-button value="both">{{ $t('log.both') }}</a-radio-button>
+              <a-radio-button value="source">{{ $t('log.source') }}</a-radio-button>
+              <a-radio-button value="target">{{ $t('log.translation') }}</a-radio-button>
+            </a-radio-group>
+          </div>
+        </template>
+        <a-button
+          style="margin-right: 20px;"
+          @click="copyCaptions"
+          :disabled="captionData.length === 0"
+        >{{ $t('log.copy') }}</a-button>
+      </a-popover>
       <a-button
         danger
         @click="clearCaptions"
       >{{ $t('log.clear') }}</a-button>
     </div>
+
     <a-table
       :columns="columns"
       :data-source="captionData"
       v-model:pagination="pagination"
+      style="margin-top: 10px;"
     >
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'index'">
@@ -72,14 +128,22 @@ import { storeToRefs } from 'pinia'
 import { useCaptionLogStore } from '@renderer/stores/captionLog'
 import { message } from 'ant-design-vue'
 import { useI18n } from 'vue-i18n'
+import * as tc from '../utils/timeCalc'
+
 const { t } = useI18n()
 
 const captionLog = useCaptionLogStore()
 const { captionData } = storeToRefs(captionLog)
 
+const exportFormat = ref('srt')
 const showIndex = ref(true)
 const copyTime = ref(true)
 const copyOption = ref('both')
+
+const baseHH = ref<number>(0)
+const baseMM = ref<number>(0)
+const baseSS = ref<number>(0)
+const baseMS = ref<number>(0)
 
 const pagination = ref({
   current: 1,
@@ -117,18 +181,56 @@ const columns = [
   },
 ]
 
+function changeBaseTime() {
+  if(baseHH.value < 0) baseHH.value = 0
+  if(baseMM.value < 0) baseMM.value = 0
+  if(baseMM.value > 59) baseMM.value = 59
+  if(baseSS.value < 0) baseSS.value = 0
+  if(baseSS.value > 59) baseSS.value = 59
+  if(baseMS.value < 0) baseMS.value = 0
+  if(baseMS.value > 999) baseMS.value = 999
+  const newBase: tc.Time = {
+    hh: Number(baseHH.value),
+    mm: Number(baseMM.value),
+    ss: Number(baseSS.value),
+    ms: Number(baseMS.value)
+  }
+  const oldBase =  tc.getTimeFromStr(captionData.value[0].time_s)
+  const deltaMs = tc.getMsFromTime(newBase) - tc.getMsFromTime(oldBase)
+  for(let i = 0; i < captionData.value.length; i++){
+    captionData.value[i].time_s =
+      tc.getNewTimeStr(captionData.value[i].time_s, deltaMs)
+    captionData.value[i].time_t =
+      tc.getNewTimeStr(captionData.value[i].time_t, deltaMs)
+  }
+}
+
 function exportCaptions() {
-  const jsonData = JSON.stringify(captionData.value, null, 2)
-  const blob = new Blob([jsonData], { type: 'application/json' })
+  const exportData = getExportData()
+  const blob = new Blob([exportData], {
+    type: exportFormat.value === 'json' ? 'application/json' : 'text/plain'
+  })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
-  a.download = `captions-${timestamp}.json`
+  a.download = `captions-${timestamp}.${exportFormat.value}`
   document.body.appendChild(a)
   a.click()
   document.body.removeChild(a)
   URL.revokeObjectURL(url)
+}
+
+function getExportData() {
+  if(exportFormat.value === 'json') return JSON.stringify(captionData.value, null, 2)
+  let content = ''
+  for(let i = 0; i < captionData.value.length; i++){
+    const item = captionData.value[i]
+    content += `${i+1}\n`
+    content += `${item.time_s} --> ${item.time_t}\n`.replace(/\./g, ',')
+    content += `${item.text}\n${item.translation}\n\n`
+  }
+  return content
 }
 
 function copyCaptions() {
@@ -164,6 +266,23 @@ function clearCaptions() {
   font-size: 24px;
   font-weight: bold;
   margin-bottom: 10px;
+}
+
+.base-time {
+  width: 64px;
+  display: inline-block;
+}
+
+.base-time-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.base-time-label {
+  font-size: 12px;
+  color: var(--tag-color);
 }
 
 .time-cell {

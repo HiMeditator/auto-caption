@@ -335,13 +335,12 @@ watch(changeSignal, (val) => {
 }
 
 .preview-container {
-  line-height: 2em;
   width: 60%;
   text-align: center;
   position: absolute;
-  padding: 20px;
+  padding: 10px;
   border-radius: 10px;
-  left: 50%;
+  left: 64%;
   transform: translateX(-50%);
   bottom: 20px;
 }
@@ -349,7 +348,7 @@ watch(changeSignal, (val) => {
 .preview-container p {
   text-align: center;
   margin: 0;
-  line-height: 1.5em;
+  line-height: 1.6em;
 }
 
 .left-ellipsis {

@@ -115,7 +115,16 @@ export default {
   },
   log: {
     "title": "Caption Log",
+    "changeTime": "Modify Caption Time",
+    "baseTime": "First Caption Start Time",
+    "hour": "Hour",
+    "min": "Minute",
+    "sec": "Second",
+    "ms": "Millisecond",
+    "export": "Export Caption Log",
     "copy": "Copy to Clipboard",
+    "exportOptions": "Export Options",
+    "exportFormat": "Format",
     "copyOptions": "Copy Options",
     "addIndex": "Add Index",
     "copyTime": "Copy Time",
@@ -124,7 +133,6 @@ export default {
     "source": "Original Only",
     "translation": "Translation Only",
     "copySuccess": "Subtitle copied to clipboard",
-    "export": "Export Caption Log",
     "clear": "Clear Caption Log"
   }
 }

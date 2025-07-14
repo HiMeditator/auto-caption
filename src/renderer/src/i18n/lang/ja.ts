@@ -115,7 +115,16 @@ export default {
   },
   log: {
     "title": "字幕ログ",
+    "changeTime": "字幕時間を変更",
+    "baseTime": "最初の字幕開始時間",
+    "hour": "時",
+    "min": "分",
+    "sec": "秒",
+    "ms": "ミリ秒",
+    "export": "エクスポート",
     "copy": "クリップボードにコピー",
+    "exportOptions": "エクスポートオプション",
+    "exportFormat": "形式",
     "copyOptions": "コピー設定",
     "addIndex": "順序番号",
     "copyTime": "時間",
@@ -124,7 +133,6 @@ export default {
     "source": "原文のみ",
     "translation": "翻訳のみ",
     "copySuccess": "字幕がクリップボードにコピーされました",
-    "export": "エクスポート",
     "clear": "字幕ログをクリア"
   }
 }
