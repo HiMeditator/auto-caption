@@ -1,14 +1,21 @@
 # Auto Caption 用户手册
 
-对应版本：v0.4.0
+对应版本：v0.5.0
 
 ## 软件简介
 
 Auto Caption 是一个跨平台的字幕显示软件，能够实时获取系统音频输入（录音）或输出（播放声音）的流式数据，并调用音频转文字的模型生成对应音频的字幕。软件提供的默认字幕引擎（使用阿里云 Gummy 模型）支持九种语言（中、英、日、韩、德、法、俄、西、意）的识别与翻译。
 
-目前软件默认字幕引擎只有在 Windows 和 macOS 平台下才拥有完整功能，在 macOS 要获取系统音频输出需要额外配置。
+目前软件默认字幕引擎在 Windows、 macOS 和 Linux 平台下均拥有完整功能，在 macOS 要获取系统音频输出需要额外配置。
 
-在 Linux 平台下只能生成音频输入（麦克风）的字幕，暂不支持音频输出（播放声音）的字幕生成。
+测试过可正常运行的操作系统信息如下，软件不能保证在非下列版本的操作系统上正常运行。
+
+| 操作系统版本        | 处理器架构 | 获取系统音频输入 | 获取系统音频输出 |
+| ------------------ | ---------- | ---------------- | ---------------- |
+| Windows 11 24H2    | x64        | ✅                | ✅                |
+| macOS Sequoia 15.5 | arm64      | ✅需要额外配置    | ✅                |
+| Ubuntu 24.04.2     | x64        | ✅    | ✅                |
+| Kali Linux 2022.3     | x64        | ✅    | ✅                |
 
 ![](../../assets/media/main_zh.png)
 
@@ -63,26 +70,26 @@ brew install blackhole-64ch
 
 ## Linux 获取系统音频输出
 
-执行以下命令安装 `pulseaudio` 和 `pavucontrol`：
+首先在控制台执行：
+
+```bash
+pactl list short sources
+```
+
+如果有以下类似的输出内容则无需额外配置：
+
+```bash
+220     alsa_output.pci-0000_02_02.0.3.analog-stereo.monitor    PipeWire        s16le 2ch 48000Hz       SUSPENDED
+221     alsa_input.pci-0000_02_02.0.3.analog-stereo     PipeWire        s16le 2ch 48000Hz       SUSPENDED
+```
+
+否则，执行以下命令安装 `pulseaudio` 和 `pavucontrol`：
 
 ```bash
 # Debian or Ubuntu, etc.
 sudo apt install pulseaudio pavucontrol
 # CentOS, etc.
 sudo yum install pulseaudio pavucontrol
-```
-
-然后执行：
-
-```bash
-pactl list short sources
-```
-
-如果有以下类似的输出内容则配置成功：
-
-```bash
-220     alsa_output.pci-0000_02_02.0.3.analog-stereo.monitor    PipeWire        s16le 2ch 48000Hz       SUSPENDED
-221     alsa_input.pci-0000_02_02.0.3.analog-stereo     PipeWire        s16le 2ch 48000Hz       SUSPENDED
 ```
 
 ## 软件使用
@@ -103,7 +110,7 @@ pactl list short sources
 
 ### 字幕记录的导出
 
-在字幕控制窗口中可以看到当前收集的所有字幕的记录，点击“导出字幕记录”按钮，即可将字幕记录导出为 JSON 文件。
+在字幕控制窗口中可以看到当前收集的所有字幕的记录，点击“导出字幕”按钮，即可将字幕记录导出为 JSON 或 SRT 文件。
 
 ## 字幕引擎
 

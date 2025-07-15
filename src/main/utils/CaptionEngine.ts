@@ -108,7 +108,10 @@ export class CaptionEngine {
         if (line.trim()) {
           try {
             const caption = JSON.parse(line);
-            allConfig.updateCaptionLog(caption);
+            if(caption.index === undefined) {
+              console.log('[INFO] Engine Bad Output:', caption);
+            }
+            else allConfig.updateCaptionLog(caption);
           } catch (e) {
             controlWindow.sendErrorMessage(i18n('engine.output.parse.error') + e)
             console.error('[ERROR] Error parsing JSON:', e);

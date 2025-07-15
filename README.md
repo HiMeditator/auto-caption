@@ -4,7 +4,7 @@
     <p>Auto Caption 是一个跨平台的实时字幕显示软件。</p>
     <p>
       <a href="https://github.com/HiMeditator/auto-caption/releases">
-        <img src="https://img.shields.io/badge/release-0.4.0-blue">
+        <img src="https://img.shields.io/badge/release-0.5.0-blue">
       </a>
       <a href="https://github.com/HiMeditator/auto-caption/issues">
         <img src="https://img.shields.io/github/issues/HiMeditator/auto-caption?color=orange">
@@ -18,12 +18,10 @@
         | <a href="./README_en.md">English</a>
         | <a href="./README_ja.md">日本語</a> |
     </p>
-    <p><i>包含 Vosk 本地字幕引擎的 v0.4.0 版本已经发布。<b>目前本地字幕引擎不含翻译</b>，本地翻译模块仍正在开发中...</i></p>
+    <p><i>v0.5.0 版本已经发布。<b>目前 Vosk 本地字幕引擎效果较差，且不含翻译</b>，更优秀的字幕引擎正在尝试开发中...</i></p>
 </div>
 
 ![](./assets/media/main_zh.png)
-
-![](./assets/media/main_mac_zh.png)
 
 ## 📥 下载
 
@@ -43,9 +41,10 @@
 
 | 操作系统版本        | 处理器架构 | 获取系统音频输入 | 获取系统音频输出 |
 | ------------------ | ---------- | ---------------- | ---------------- |
-| Windows 11 24H2    | x64        | ✅                | ✅                |
-| macOS Sequoia 15.5 | arm64      | ✅需要额外配置    | ✅                |
-| Ubuntu 24.04.2     | x64        | ✅需要额外配置    | ✅                |
+| Windows 11 24H2    | x64        | ✅               | ✅                |
+| macOS Sequoia 15.5 | arm64      | ✅需要额外配置     | ✅                |
+| Ubuntu 24.04.2     | x64        | ✅               | ✅                |
+| Kali Linux 2022.3  | x64        | ✅               | ✅                |
 
 macOS 平台和 Linux 平台获取系统音频输出需要进行额外设置，详见[Auto Caption 用户手册](./docs/user-manual/zh.md)。
 

@@ -4,7 +4,7 @@
     <p>Auto Caption はクロスプラットフォームのリアルタイム字幕表示ソフトウェアです。</p>
     <p>
       <a href="https://github.com/HiMeditator/auto-caption/releases">
-        <img src="https://img.shields.io/badge/release-0.4.0-blue">
+        <img src="https://img.shields.io/badge/release-0.5.0-blue">
       </a>
       <a href="https://github.com/HiMeditator/auto-caption/issues">
         <img src="https://img.shields.io/github/issues/HiMeditator/auto-caption?color=orange">
@@ -18,12 +18,10 @@
         | <a href="./README_en.md">English</a>
         | <b>日本語</b> |
     </p>
-    <p><i>Voskローカル字幕エンジンを含む v0.4.0 バージョンがリリースされました。<b>現在、ローカル字幕エンジンには翻訳機能が含まれておりません</b>。ローカル翻訳モジュールは現在も開発中です...</i></p>
+    <p><i>バージョン v0.5.0 がリリースされました。<b>現在の Vosk ローカル字幕エンジンは性能が低く、翻訳機能も含まれていません</b>。より優れた字幕エンジンを開発中です...</i></p>
 </div>
 
 ![](./assets/media/main_ja.png)
-
-![](./assets/media/main_mac_ja.png)
 
 ## 📥 ダウンロード
 
@@ -43,9 +41,10 @@
 
 | OS バージョン | アーキテクチャ | システムオーディオ入力 | システムオーディオ出力 |
 | ------------------ | ------------ | ------------------ | ------------------- |
-| Windows 11 24H2    | x64          | ✅                 | ✅                  |
-| macOS Sequoia 15.5 | arm64        | ✅ 追加設定が必要  | ✅                  |
-| Ubuntu 24.04.2     | x64          | ✅ 追加設定が必要  | ✅                  |
+| Windows 11 24H2    | x64          | ✅                 | ✅                   |
+| macOS Sequoia 15.5 | arm64        | ✅ 追加設定が必要    | ✅                   |
+| Ubuntu 24.04.2     | x64          | ✅                 | ✅                   |
+| Kali Linux 2022.3  | x64          | ✅                 | ✅                   |
 
 macOSおよびLinuxプラットフォームでシステムオーディオ出力を取得するには追加設定が必要です。詳細は[Auto Captionユーザーマニュアル](./docs/user-manual/ja.md)をご覧ください。
 

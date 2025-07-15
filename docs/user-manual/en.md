@@ -1,14 +1,21 @@
 # Auto Caption User Manual
 
-Corresponding Version: v0.4.0
+Corresponding Version: v0.5.0
 
 ## Software Introduction
 
 Auto Caption is a cross-platform caption display software that can real-time capture system audio input (recording) or output (playback) streaming data and use an audio-to-text model to generate captions for the corresponding audio. The default caption engine provided by the software (using Alibaba Cloud Gummy model) supports recognition and translation in nine languages (Chinese, English, Japanese, Korean, German, French, Russian, Spanish, Italian).
 
-Currently, the default caption engine of the software only has full functionality on Windows and macOS platforms. Additional configuration is required to capture system audio output on macOS.
+The default caption engine currently has full functionality on Windows, macOS, and Linux platforms. Additional configuration is required to capture system audio output on macOS.
 
-On Linux platforms, it can only generate captions for audio input (microphone), and currently does not support generating captions for audio output (playback).
+The following operating system versions have been tested and confirmed to work properly. The software cannot guarantee normal operation on untested OS versions.
+
+| OS Version         | Architecture | Audio Input Capture | Audio Output Capture |
+| ------------------ | ------------ | ------------------- | -------------------- |
+| Windows 11 24H2    | x64          | ✅                   | ✅                    |
+| macOS Sequoia 15.5 | arm64        | ✅ Additional config required  | ✅          |
+| Ubuntu 24.04.2     | x64          | ✅                   | ✅                    |
+| Kali Linux 2022.3  | x64          | ✅                   | ✅                    |
 
 ![](../../assets/media/main_en.png)
 
@@ -63,26 +70,26 @@ Now the caption engine can capture system audio output and generate captions.
 
 ## Getting System Audio Output on Linux
 
-Execute the following commands to install `pulseaudio` and `pavucontrol`:
-
-```bash
-# For Debian or Ubuntu, etc.
-sudo apt install pulseaudio pavucontrol
-# For CentOS, etc.
-sudo yum install pulseaudio pavucontrol
-```
-
-Then execute:
+First execute in the terminal:
 
 ```bash
 pactl list short sources
 ```
 
-If you see output similar to the following, the configuration was successful:
+If you see output similar to the following, no additional configuration is needed:
 
 ```bash
 220     alsa_output.pci-0000_02_02.0.3.analog-stereo.monitor    PipeWire        s16le 2ch 48000Hz       SUSPENDED
 221     alsa_input.pci-0000_02_02.0.3.analog-stereo     PipeWire        s16le 2ch 48000Hz       SUSPENDED
+```
+
+Otherwise, install `pulseaudio` and `pavucontrol` using the following commands:
+
+```bash
+# For Debian/Ubuntu etc.
+sudo apt install pulseaudio pavucontrol
+# For CentOS etc.
+sudo yum install pulseaudio pavucontrol
 ```
 
 ## Software Usage
@@ -103,7 +110,7 @@ The following image shows the caption display window, which displays the latest 
 
 ### Exporting Caption Records
 
-In the caption control window, you can see the records of all collected captions. Click the "Export Caption Records" button to export the caption records as a JSON file.
+In the caption control window, you can see the records of all collected captions. Click the "Export Log" button to export the caption records as a JSON or SRT file.
 
 ## Caption Engine
 

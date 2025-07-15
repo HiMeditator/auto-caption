@@ -127,7 +127,7 @@ const { t } = useI18n()
 const showMore = ref(false)
 
 const engineControl = useEngineControlStore()
-const { platform, captionEngine, audioType, changeSignal } = storeToRefs(engineControl)
+const { captionEngine, audioType, changeSignal } = storeToRefs(engineControl)
 
 const currentSourceLang = ref('auto')
 const currentTargetLang = ref('zh')
@@ -230,7 +230,7 @@ watch(currentEngine, (val) => {
 }
 
 .input-folder>span {
-  padding: 0 4px;
+  padding: 0 2px;
   border: 2px solid #1677ff;
   color: #1677ff;
   border-radius: 30%;

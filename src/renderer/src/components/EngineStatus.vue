@@ -36,7 +36,11 @@
           <a-statistic
             :title="$t('status.status')"
             :value="engineEnabled?$t('status.started'):$t('status.stopped')"
-          />
+          >
+            <template #suffix v-if="engineEnabled">
+              <InfoCircleOutlined style="font-size:18px;color:#1677ff"/>
+            </template>
+          </a-statistic>
         </a-col>  
       </a-popover>      
       <a-col :span="6">
@@ -73,7 +77,7 @@
       <p class="about-desc">{{ $t('status.about.desc') }}</p>
       <a-divider />
       <div class="about-info">
-        <p><b>{{ $t('status.about.version') }}</b><a-tag color="green">v0.4.0</a-tag></p>
+        <p><b>{{ $t('status.about.version') }}</b><a-tag color="green">v0.5.0</a-tag></p>
         <p>
           <b>{{ $t('status.about.author') }}</b>
           <a
@@ -119,7 +123,7 @@ import { ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useCaptionLogStore } from '@renderer/stores/captionLog'
 import { useEngineControlStore } from '@renderer/stores/engineControl'
-import { GithubOutlined } from '@ant-design/icons-vue';
+import { GithubOutlined, InfoCircleOutlined } from '@ant-design/icons-vue';
 
 const showAbout = ref(false)
 
