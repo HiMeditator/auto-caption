@@ -54,3 +54,11 @@ export interface FullConfig {
   controls: Controls,
   captionLog: CaptionItem[]
 }
+
+export interface EngineInfo {
+  pid: number,
+  ppid: number,
+  cpu: number,
+  mem: number,
+  elapsed: number
+}

@@ -25,6 +25,7 @@
     "@electron-toolkit/preload": "^3.0.1",
     "@electron-toolkit/utils": "^4.0.0",
     "ant-design-vue": "^4.2.6",
+    "pidusage": "^4.0.1",
     "pinia": "^3.0.2",
     "vue-i18n": "^11.1.9",
     "vue-router": "^4.5.1"

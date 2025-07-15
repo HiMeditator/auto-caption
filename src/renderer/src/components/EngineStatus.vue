@@ -7,12 +7,38 @@
           :value="(customized && customizedApp)?$t('status.customized'):engine"
         />
       </a-col>
-      <a-col :span="6">
-        <a-statistic
-          :title="$t('status.status')"
-          :value="engineEnabled?$t('status.started'):$t('status.stopped')"
-        />
-      </a-col>
+      <a-popover :title="$t('status.engineStatus')"> 
+        <template #content>
+          <a-row class="engine-status">
+            <a-col :flex="1" :title="$t('status.pid')" style="cursor:pointer;">
+              <div class="engine-status-title">pid</div>
+              <div>{{ pid }}</div>
+            </a-col>
+            <a-col :flex="1" :title="$t('status.ppid')" style="cursor:pointer;">
+              <div class="engine-status-title">ppid</div>
+              <div>{{ ppid }}</div>
+            </a-col>
+            <a-col :flex="1" :title="$t('status.cpu')" style="cursor:pointer;">
+              <div class="engine-status-title">cpu</div>
+              <div>{{ cpu.toFixed(1) }}%</div>
+            </a-col>
+            <a-col :flex="1" :title="$t('status.mem')" style="cursor:pointer;">
+              <div class="engine-status-title">mem</div>
+              <div>{{ (mem/1024/1024).toFixed(2) }}MB</div>
+            </a-col>
+            <a-col :flex="1" :title="$t('status.elapsed')" style="cursor:pointer;">
+              <div class="engine-status-title">elapsed</div>
+              <div>{{ (elapsed/1000).toFixed(0) }}s</div>
+            </a-col>
+          </a-row>
+        </template>
+        <a-col :span="6" @mouseenter="getEngineInfo" style="cursor: pointer;">
+          <a-statistic
+            :title="$t('status.status')"
+            :value="engineEnabled?$t('status.started'):$t('status.stopped')"
+          />
+        </a-col>  
+      </a-popover>      
       <a-col :span="6">
         <a-statistic :title="$t('status.logNumber')" :value="captionData.length" />
       </a-col>
@@ -88,6 +114,7 @@
 </template>
 
 <script setup lang="ts">
+import { EngineInfo } from '@renderer/types'
 import { ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useCaptionLogStore } from '@renderer/stores/captionLog'
@@ -100,6 +127,12 @@ const captionLog = useCaptionLogStore()
 const { captionData } = storeToRefs(captionLog)
 const engineControl = useEngineControlStore()
 const { engineEnabled, engine, customized, customizedApp } = storeToRefs(engineControl)
+
+const pid = ref(0)
+const ppid = ref(0)
+const cpu = ref(0)
+const mem = ref(0)
+const elapsed = ref(0)
 
 function openCaptionWindow() {
   window.electron.ipcRenderer.send('control.captionWindow.activate')
@@ -116,9 +149,32 @@ function startEngine() {
 function stopEngine() {
   window.electron.ipcRenderer.send('control.engine.stop')
 }
+
+function getEngineInfo() {
+  window.electron.ipcRenderer.invoke('control.engine.info').then((data: EngineInfo) => {
+    pid.value = data.pid
+    ppid.value = data.ppid
+    cpu.value = data.cpu
+    mem.value = data.mem
+    elapsed.value = data.elapsed
+  })
+}
+
 </script>
 
 <style scoped>
+.engine-status {
+  width: max(420px, 36vw);
+  display: flex;
+  align-items: center;
+  padding: 5px 10px;
+}
+
+.engine-status-title {
+  font-size: 12px;
+  color: var(--tag-color);
+}
+
 .about-tag {
   color: var(--tag-color);
   margin-bottom: 16px;

@@ -59,6 +59,14 @@
               <a-radio-button value="json">.json</a-radio-button>
             </a-radio-group>
           </div>
+          <div class="input-item">
+            <span class="input-label">{{ $t('log.exportContent') }}</span>
+            <a-radio-group v-model:value="contentOption">
+              <a-radio-button value="both">{{ $t('log.both') }}</a-radio-button>
+              <a-radio-button value="source">{{ $t('log.source') }}</a-radio-button>
+              <a-radio-button value="target">{{ $t('log.translation') }}</a-radio-button>
+            </a-radio-group>
+          </div>
         </template>
         <a-button
           style="margin-right: 20px;"
@@ -76,7 +84,7 @@
           </div>
           <div class="input-item">
             <span class="input-label">{{ $t('log.copyContent') }}</span>
-            <a-radio-group v-model:value="copyOption">
+            <a-radio-group v-model:value="contentOption">
               <a-radio-button value="both">{{ $t('log.both') }}</a-radio-button>
               <a-radio-button value="source">{{ $t('log.source') }}</a-radio-button>
               <a-radio-button value="target">{{ $t('log.translation') }}</a-radio-button>
@@ -86,7 +94,6 @@
         <a-button
           style="margin-right: 20px;"
           @click="copyCaptions"
-          :disabled="captionData.length === 0"
         >{{ $t('log.copy') }}</a-button>
       </a-popover>
       <a-button
@@ -138,7 +145,7 @@ const { captionData } = storeToRefs(captionLog)
 const exportFormat = ref('srt')
 const showIndex = ref(true)
 const copyTime = ref(true)
-const copyOption = ref('both')
+const contentOption = ref('both')
 
 const baseHH = ref<number>(0)
 const baseMM = ref<number>(0)
@@ -228,7 +235,9 @@ function getExportData() {
     const item = captionData.value[i]
     content += `${i+1}\n`
     content += `${item.time_s} --> ${item.time_t}\n`.replace(/\./g, ',')
-    content += `${item.text}\n${item.translation}\n\n`
+    if(contentOption.value === 'both') content += `${item.text}\n${item.translation}\n\n`
+    else if(contentOption.value === 'source') content += `${item.text}\n\n`
+    else content += `${item.translation}\n\n`
   }
   return content
 }
@@ -239,8 +248,8 @@ function copyCaptions() {
     const item = captionData.value[i]
     if(showIndex.value) content += `${i+1}\n`
     if(copyTime.value) content += `${item.time_s} --> ${item.time_t}\n`.replace(/\./g, ',')
-    if(copyOption.value === 'both') content += `${item.text}\n${item.translation}\n\n`
-    else if(copyOption.value === 'source') content += `${item.text}\n\n`
+    if(contentOption.value === 'both') content += `${item.text}\n${item.translation}\n\n`
+    else if(contentOption.value === 'source') content += `${item.text}\n\n`
     else content += `${item.translation}\n\n`
   }
   navigator.clipboard.writeText(content)

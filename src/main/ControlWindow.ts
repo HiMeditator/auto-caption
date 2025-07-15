@@ -1,5 +1,7 @@
 import { shell, BrowserWindow, ipcMain, nativeTheme, dialog } from 'electron'
 import path from 'path'
+import { EngineInfo } from './types'
+import pidusage from 'pidusage'
 import { is } from '@electron-toolkit/utils'
 import icon from '../../build/icon.png?asset'
 import { captionWindow } from './CaptionWindow'
@@ -79,6 +81,20 @@ class ControlWindow {
 
       if (result.canceled) return "";
       return result.filePaths[0];
+    })
+
+    ipcMain.handle('control.engine.info', async () => {
+      const info: EngineInfo = {
+        pid: 0, ppid: 0, cpu: 0, mem: 0, elapsed: 0
+      }
+      if(captionEngine.processStatus !== 'running') return info
+      const stats = await pidusage(captionEngine.process.pid)
+      info.pid = stats.pid
+      info.ppid = stats.ppid
+      info.cpu = stats.cpu
+      info.mem = stats.memory
+      info.elapsed = stats.elapsed
+      return info
     })
 
     ipcMain.on('control.uiLanguage.change', (_, args) => {
