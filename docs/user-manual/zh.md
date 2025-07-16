@@ -16,6 +16,7 @@ Auto Caption 是一个跨平台的字幕显示软件，能够实时获取系统�
 | macOS Sequoia 15.5 | arm64      | ✅需要额外配置    | ✅                |
 | Ubuntu 24.04.2     | x64        | ✅    | ✅                |
 | Kali Linux 2022.3     | x64        | ✅    | ✅                |
+| Kylin Server V10 SP3 | x64 | ✅ | ✅ |
 
 ![](../../assets/media/main_zh.png)
 

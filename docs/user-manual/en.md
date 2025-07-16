@@ -16,6 +16,7 @@ The following operating system versions have been tested and confirmed to work p
 | macOS Sequoia 15.5 | arm64        | ✅ Additional config required  | ✅          |
 | Ubuntu 24.04.2     | x64          | ✅                   | ✅                    |
 | Kali Linux 2022.3  | x64          | ✅                   | ✅                    |
+| Kylin Server V10 SP3 | x64 | ✅ | ✅ |
 
 ![](../../assets/media/main_en.png)
 

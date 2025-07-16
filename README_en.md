@@ -45,6 +45,7 @@ The software has been adapted for Windows, macOS, and Linux platforms. The teste
 | macOS Sequoia 15.5 | arm64        | ✅ Additional config required | ✅        |
 | Ubuntu 24.04.2     | x64          | ✅                 | ✅                   |
 | Kali Linux 2022.3  | x64          | ✅                 | ✅                   |
+| Kylin Server V10 SP3 | x64 | ✅ | ✅ |
 
 Additional configuration is required to capture system audio output on macOS and Linux platforms. See [Auto Caption User Manual](./docs/user-manual/en.md) for details.
 

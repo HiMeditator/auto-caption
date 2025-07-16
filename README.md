@@ -45,6 +45,7 @@
 | macOS Sequoia 15.5 | arm64      | ✅需要额外配置     | ✅                |
 | Ubuntu 24.04.2     | x64        | ✅               | ✅                |
 | Kali Linux 2022.3  | x64        | ✅               | ✅                |
+| Kylin Server V10 SP3 | x64 | ✅ | ✅ |
 
 macOS 平台和 Linux 平台获取系统音频输出需要进行额外设置，详见[Auto Caption 用户手册](./docs/user-manual/zh.md)。
 
