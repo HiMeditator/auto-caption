@@ -93,7 +93,7 @@ export default {
     "engine": "Caption Engine",
     "engineStatus": "Caption Engine Status",
     "pid": "Process ID",
-    "ppid": "Parent Process ID", 
+    "ppid": "Parent Process ID",
     "cpu": "CPU Usage",
     "mem": "Memory Usage",
     "elapsed": "Running Time",
@@ -116,7 +116,7 @@ export default {
       "projLink": "Project Link",
       "manual": "User Manual",
       "engineDoc": "Caption Engine Manual",
-      "date": "July 15, 2025"
+      "date": "July 17, 2025"
     }
   },
   log: {

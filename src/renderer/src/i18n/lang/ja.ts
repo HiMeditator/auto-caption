@@ -94,7 +94,7 @@ export default {
     "engineStatus": "字幕エンジンの状態",
     "pid": "プロセス ID",
     "ppid": "親プロセス ID",
-    "cpu": "CPU 使用率", 
+    "cpu": "CPU 使用率",
     "mem": "メモリ使用量",
     "elapsed": "稼働時間",
     "customized": "カスタマイズ済み",
@@ -116,7 +116,7 @@ export default {
       "projLink": "プロジェクトリンク",
       "manual": "ユーザーマニュアル",
       "engineDoc": "字幕エンジンマニュアル",
-      "date": "2025 年 7 月 15 日"
+      "date": "2025 年 7 月 17 日"
     }
   },
   log: {

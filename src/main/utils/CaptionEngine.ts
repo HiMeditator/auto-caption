@@ -13,13 +13,13 @@ export class CaptionEngine {
   processStatus: 'running' | 'stopping' | 'stopped' = 'stopped'
 
   private getApp(): boolean {
-    allConfig.controls.customized = false
     if (allConfig.controls.customized && allConfig.controls.customizedApp) {
+      console.log('[INFO] Using customized engine')
       this.appPath = allConfig.controls.customizedApp
-      this.command = [allConfig.controls.customizedCommand]
-      allConfig.controls.customized = true
+      this.command = allConfig.controls.customizedCommand.split(' ')
     }
     else if (allConfig.controls.engine === 'gummy') {
+      allConfig.controls.customized = false
       if(!allConfig.controls.API_KEY && !process.env.DASHSCOPE_API_KEY) {
         controlWindow.sendErrorMessage(i18n('gummy.key.missing'))
         return false
@@ -51,6 +51,7 @@ export class CaptionEngine {
       }
     }
     else if(allConfig.controls.engine === 'vosk'){
+      allConfig.controls.customized = false
       let voskName = 'main-vosk'
       if (process.platform === 'win32') {
         voskName += '.exe'

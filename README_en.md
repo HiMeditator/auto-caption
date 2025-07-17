@@ -4,7 +4,7 @@
     <p>Auto Caption is a cross-platform real-time caption display software.</p>
     <p>
       <a href="https://github.com/HiMeditator/auto-caption/releases">
-        <img src="https://img.shields.io/badge/release-0.5.0-blue">
+        <img src="https://img.shields.io/badge/release-0.5.1-blue">
       </a>
       <a href="https://github.com/HiMeditator/auto-caption/issues">
         <img src="https://img.shields.io/github/issues/HiMeditator/auto-caption?color=orange">
@@ -18,7 +18,7 @@
         | <b>English</b>
         | <a href="./README_ja.md">日本語</a> |
     </p>
-    <p><i>Version v0.5.0 has been released. <b>The current Vosk local caption engine performs poorly and does not include translation</b>. A better caption engine is under development...</i></p>
+    <p><i>Version v0.5.1 has been released. <b>The current Vosk local caption engine performs poorly and does not include translation</b>. A better caption engine is under development...</i></p>
 </div>
 
 ![](./assets/media/main_en.png)

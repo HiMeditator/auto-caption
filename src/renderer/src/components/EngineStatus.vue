@@ -7,7 +7,7 @@
           :value="(customized && customizedApp)?$t('status.customized'):engine"
         />
       </a-col>
-      <a-popover :title="$t('status.engineStatus')"> 
+      <a-popover :title="$t('status.engineStatus')">
         <template #content>
           <a-row class="engine-status">
             <a-col :flex="1" :title="$t('status.pid')" style="cursor:pointer;">
@@ -41,8 +41,8 @@
               <InfoCircleOutlined style="font-size:18px;color:#1677ff"/>
             </template>
           </a-statistic>
-        </a-col>  
-      </a-popover>      
+        </a-col>
+      </a-popover>
       <a-col :span="6">
         <a-statistic :title="$t('status.logNumber')" :value="captionData.length" />
       </a-col>
@@ -77,7 +77,7 @@
       <p class="about-desc">{{ $t('status.about.desc') }}</p>
       <a-divider />
       <div class="about-info">
-        <p><b>{{ $t('status.about.version') }}</b><a-tag color="green">v0.5.0</a-tag></p>
+        <p><b>{{ $t('status.about.version') }}</b><a-tag color="green">v0.5.1</a-tag></p>
         <p>
           <b>{{ $t('status.about.author') }}</b>
           <a
