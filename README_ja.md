@@ -183,8 +183,6 @@ npm run dev
 
 ### プロジェクト構築
 
-現在、ソフトウェアは Windows と macOS プラットフォームでのみ構築とテストが行われており、Linux プラットフォームでの正しい動作は保証できません。
-
 ```bash
 # Windows 用
 npm run build:win

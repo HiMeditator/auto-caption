@@ -183,8 +183,6 @@ npm run dev
 
 ### 构建项目
 
-注意目前软件只在 Windows 和 macOS 平台上进行了构建和测试，无法保证软件在 Linux 平台下的正确性。
-
 ```bash
 # For windows
 npm run build:win

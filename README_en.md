@@ -183,8 +183,6 @@ npm run dev
 
 ### Build Project
 
-Note: Currently the software has only been built and tested on Windows and macOS platforms. Correct operation on Linux platform is not guaranteed.
-
 ```bash
 # For windows
 npm run build:win
