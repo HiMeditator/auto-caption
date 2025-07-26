@@ -22,7 +22,7 @@
 
 取得した音声ストリームは、テキストに変換する前に前処理が必要な場合があります。例えば、アリババクラウドのGummyモデルは単一チャンネルの音声ストリームしか認識できませんが、収集された音声ストリームは通常二重チャンネルであるため、二重チャンネルの音声ストリームを単一チャンネルに変換する必要があります。チャンネル数の変換はNumPyライブラリのメソッドを使って行うことができます。
 
-あなたは私によって開発された音声の取得（`caption-engine/sysaudio`）と音声の処理（`caption-engine/audioprcs`）モジュールを直接使用することができます。
+あなたは私によって開発された音声の取得（`engine/sysaudio`）と音声の処理（`engine/audioprcs`）モジュールを直接使用することができます。
 
 ### 音声からテキストへの変換
 
@@ -107,10 +107,10 @@ export interface CaptionItem {
 Python言語を使用する場合、以下の方法でデータをメインプログラムに渡すことができます：
 
 ```python
-# caption-engine\main-gummy.py
+# engine\main-gummy.py
 sys.stdout.reconfigure(line_buffering=True)
 
-# caption-engine\audio2text\gummy.py
+# engine\audio2text\gummy.py
 ...
     def send_to_node(self, data):
         """
@@ -198,4 +198,4 @@ python main-gummy.py -s ja -t zh -a 0 -c 10 -k <your-api-key>
 
 ## 参考コード
 
-本プロジェクトの`caption-engine`フォルダにある`main-gummy.py`ファイルはデフォルトの字幕エンジンのエントリーコードです。`src\main\utils\engine.ts`はサーバー側で字幕エンジンのデータを取得・処理するコードです。必要に応じて字幕エンジンの実装詳細と完全な実行プロセスを理解するために参照してください。
+本プロジェクトの`engine`フォルダにある`main-gummy.py`ファイルはデフォルトの字幕エンジンのエントリーコードです。`src\main\utils\engine.ts`はサーバー側で字幕エンジンのデータを取得・処理するコードです。必要に応じて字幕エンジンの実装詳細と完全な実行プロセスを理解するために参照してください。

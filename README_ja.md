@@ -122,10 +122,10 @@ npm install
 
 ### 字幕エンジンの構築
 
-まず `caption-engine` フォルダに入り、以下のコマンドを実行して仮想環境を作成します：
+まず `engine` フォルダに入り、以下のコマンドを実行して仮想環境を作成します：
 
 ```bash
-# ./caption-engine フォルダ内
+# ./engine フォルダ内
 python -m venv subenv
 # または
 python3 -m venv subenv
@@ -173,7 +173,7 @@ vosk_path = str(Path('./subenv/Lib/site-packages/vosk').resolve())
 vosk_path = str(Path('./subenv/lib/python3.x/site-packages/vosk').resolve())
 ```
 
-これでプロジェクトのビルドが完了し、`caption-engine/dist` フォルダ内に対応する実行可能ファイルが確認できます。その後、次の操作に進むことができます。
+これでプロジェクトのビルドが完了し、`engine/dist` フォルダ内に対応する実行可能ファイルが確認できます。その後、次の操作に進むことができます。
 
 ### プロジェクト実行
 
@@ -197,13 +197,13 @@ npm run build:linux
 ```yml
 extraResources:
   # Windows用
-  - from: ./caption-engine/dist/main-gummy.exe
-    to: ./caption-engine/main-gummy.exe
-  - from: ./caption-engine/dist/main-vosk.exe
-    to: ./caption-engine/main-vosk.exe
+  - from: ./engine/dist/main-gummy.exe
+    to: ./engine/main-gummy.exe
+  - from: ./engine/dist/main-vosk.exe
+    to: ./engine/main-vosk.exe
   # macOSとLinux用
-  # - from: ./caption-engine/dist/main-gummy
-  #   to: ./caption-engine/main-gummy
-  # - from: ./caption-engine/dist/main-vosk
-  #   to: ./caption-engine/main-vosk
+  # - from: ./engine/dist/main-gummy
+  #   to: ./engine/main-gummy
+  # - from: ./engine/dist/main-vosk
+  #   to: ./engine/main-vosk
 ```

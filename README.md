@@ -122,10 +122,10 @@ npm install
 
 ### 构建字幕引擎
 
-首先进入 `caption-engine` 文件夹，执行如下指令创建虚拟环境：
+首先进入 `engine` 文件夹，执行如下指令创建虚拟环境：
 
 ```bash
-# in ./caption-engine folder
+# in ./engine folder
 python -m venv subenv
 # or
 python3 -m venv subenv
@@ -173,7 +173,7 @@ vosk_path = str(Path('./subenv/Lib/site-packages/vosk').resolve())
 vosk_path = str(Path('./subenv/lib/python3.x/site-packages/vosk').resolve())
 ```
 
-此时项目构建完成，在进入 `caption-engine/dist` 文件夹可见对应的可执行文件。即可进行后续操作。
+此时项目构建完成，在进入 `engine/dist` 文件夹可见对应的可执行文件。即可进行后续操作。
 
 ### 运行项目
 
@@ -197,13 +197,13 @@ npm run build:linux
 ```yml
 extraResources:
   # For Windows
-  - from: ./caption-engine/dist/main-gummy.exe
-    to: ./caption-engine/main-gummy.exe
-  - from: ./caption-engine/dist/main-vosk.exe
-    to: ./caption-engine/main-vosk.exe
+  - from: ./engine/dist/main-gummy.exe
+    to: ./engine/main-gummy.exe
+  - from: ./engine/dist/main-vosk.exe
+    to: ./engine/main-vosk.exe
   # For macOS and Linux
-  # - from: ./caption-engine/dist/main-gummy
-  #   to: ./caption-engine/main-gummy
-  # - from: ./caption-engine/dist/main-vosk
-  #   to: ./caption-engine/main-vosk
+  # - from: ./engine/dist/main-gummy
+  #   to: ./engine/main-gummy
+  # - from: ./engine/dist/main-vosk
+  #   to: ./engine/main-vosk
 ```

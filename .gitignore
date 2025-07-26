@@ -5,8 +5,8 @@ out
 .eslintcache
 *.log*
 __pycache__
-subenv
-caption-engine/build
-caption-engine/models
-output.wav
 .venv
+subenv
+engine/build
+engine/models
+engine/test

@@ -37,7 +37,7 @@
       <a-input
         class="input-area"
         type="range"
-        min="0" max="64"
+        min="0" max="72"
         v-model:value="currentFontSize"
       />
       <div class="input-item-value">{{ currentFontSize }}px</div>
@@ -114,7 +114,7 @@
           <a-input
             class="input-area"
             type="range"
-            min="0" max="64"
+            min="0" max="72"
             v-model:value="currentTransFontSize"
           />
           <div class="input-item-value">{{ currentTransFontSize }}px</div>
@@ -159,7 +159,7 @@
           <a-input
             class="input-area"
             type="range"
-            min="0" max="10"
+            min="0" max="12"
             v-model:value="currentBlur"
           />
           <div class="input-item-value">{{ currentBlur }}px</div>

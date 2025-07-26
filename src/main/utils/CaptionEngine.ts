@@ -28,18 +28,21 @@ export class CaptionEngine {
       if (process.platform === 'win32') {
         gummyName += '.exe'
       }
+      this.command = []
       if (is.dev) {
         this.appPath = path.join(
-          app.getAppPath(),
-          'caption-engine', 'dist', gummyName
+          app.getAppPath(), 'engine',
+          'subenv', 'Scripts', 'python.exe'
         )
+        this.command.push(path.join(
+          app.getAppPath(), 'engine', 'main-gummy.py'
+        ))
       }
       else {
         this.appPath = path.join(
-          process.resourcesPath, 'caption-engine', gummyName
+          process.resourcesPath, 'engine', gummyName
         )
       }
-      this.command = []
       this.command.push('-s', allConfig.controls.sourceLang)
       this.command.push(
         '-t', allConfig.controls.translation ?
@@ -59,12 +62,12 @@ export class CaptionEngine {
       if (is.dev) {
         this.appPath = path.join(
           app.getAppPath(),
-          'caption-engine', 'dist', voskName
+          'engine', 'dist', voskName
         )
       }
       else {
         this.appPath = path.join(
-          process.resourcesPath, 'caption-engine', voskName
+          process.resourcesPath, 'engine', voskName
         )
       }
       this.command = []

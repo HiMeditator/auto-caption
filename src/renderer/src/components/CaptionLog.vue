@@ -136,6 +136,7 @@ import { useCaptionLogStore } from '@renderer/stores/captionLog'
 import { message } from 'ant-design-vue'
 import { useI18n } from 'vue-i18n'
 import * as tc from '../utils/timeCalc'
+import { CaptionItem } from '../types'
 
 const { t } = useI18n()
 
@@ -154,10 +155,9 @@ const baseMS = ref<number>(0)
 
 const pagination = ref({
   current: 1,
-  pageSize: 10,
+  pageSize: 20,
   showSizeChanger: true,
-  pageSizeOptions: ['10', '20', '50'],
-  showTotal: (total: number) => `Total: ${total}`,
+  pageSizeOptions: ['10', '20', '50', '100'],
   onChange: (page: number, pageSize: number) => {
     pagination.value.current = page
     pagination.value.pageSize = pageSize
@@ -180,6 +180,12 @@ const columns = [
     dataIndex: 'time',
     key: 'time',
     width: 160,
+    sorter: (a: CaptionItem, b: CaptionItem) => {
+      if(a.time_s <= b.time_s) return -1
+      return 1
+    },
+    sortDirections: ['descend'],
+    defaultSortOrder: 'descend',
   },
   {
     title: 'content',

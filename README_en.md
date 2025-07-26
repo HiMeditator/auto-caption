@@ -122,10 +122,10 @@ npm install
 
 ### Build Subtitle Engine
 
-First enter the `caption-engine` folder and execute the following commands to create a virtual environment:
+First enter the `engine` folder and execute the following commands to create a virtual environment:
 
 ```bash
-# in ./caption-engine folder
+# in ./engine folder
 python -m venv subenv
 # or
 python3 -m venv subenv
@@ -173,7 +173,7 @@ vosk_path = str(Path('./subenv/Lib/site-packages/vosk').resolve())
 vosk_path = str(Path('./subenv/lib/python3.x/site-packages/vosk').resolve())
 ```
 
-After the build completes, you can find the executable file in the `caption-engine/dist` folder. Then proceed with subsequent operations.
+After the build completes, you can find the executable file in the `engine/dist` folder. Then proceed with subsequent operations.
 
 ### Run Project
 
@@ -197,13 +197,13 @@ Note: You need to modify the configuration content in the `electron-builder.yml`
 ```yml
 extraResources:
   # For Windows
-  - from: ./caption-engine/dist/main-gummy.exe
-    to: ./caption-engine/main-gummy.exe
-  - from: ./caption-engine/dist/main-vosk.exe
-    to: ./caption-engine/main-vosk.exe
+  - from: ./engine/dist/main-gummy.exe
+    to: ./engine/main-gummy.exe
+  - from: ./engine/dist/main-vosk.exe
+    to: ./engine/main-vosk.exe
   # For macOS and Linux
-  # - from: ./caption-engine/dist/main-gummy
-  #   to: ./caption-engine/main-gummy
-  # - from: ./caption-engine/dist/main-vosk
-  #   to: ./caption-engine/main-vosk
+  # - from: ./engine/dist/main-gummy
+  #   to: ./engine/main-gummy
+  # - from: ./engine/dist/main-vosk
+  #   to: ./engine/main-vosk
 ```

@@ -20,7 +20,7 @@ Generally, the captured audio stream data consists of short audio chunks, and th
 
 The acquired audio stream may need preprocessing before being converted to text. For instance, Alibaba Cloud's Gummy model can only recognize single-channel audio streams, while the collected audio streams are typically dual-channel, thus requiring conversion from dual-channel to single-channel. Channel conversion can be achieved using methods in the NumPy library.
 
-You can directly use the audio acquisition (`caption-engine/sysaudio`) and audio processing (`caption-engine/audioprcs`) modules I have developed.
+You can directly use the audio acquisition (`engine/sysaudio`) and audio processing (`engine/audioprcs`) modules I have developed.
 
 ### Audio to Text Conversion
 
@@ -105,10 +105,10 @@ export interface CaptionItem {
 If using Python, you can refer to the following method to pass data to the main program:
 
 ```python
-# caption-engine\main-gummy.py
+# engine\main-gummy.py
 sys.stdout.reconfigure(line_buffering=True)
 
-# caption-engine\audio2text\gummy.py
+# engine\audio2text\gummy.py
 ...
     def send_to_node(self, data):
         """
@@ -198,4 +198,4 @@ With a working caption engine, specify its path and runtime parameters in the ca
 
 ## Reference Code
 
-The `main-gummy.py` file under the `caption-engine` folder in this project serves as the entry point for the default caption engine. The `src\main\utils\engine.ts` file contains the server-side code for acquiring and processing data from the caption engine. You can read and understand the implementation details and the complete execution process of the caption engine as needed.
+The `main-gummy.py` file under the `engine` folder in this project serves as the entry point for the default caption engine. The `src\main\utils\engine.ts` file contains the server-side code for acquiring and processing data from the caption engine. You can read and understand the implementation details and the complete execution process of the caption engine as needed.

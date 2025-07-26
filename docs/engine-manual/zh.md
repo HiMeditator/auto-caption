@@ -20,7 +20,7 @@
 
 获取到的音频流在转文字之前可能需要进行预处理。比如阿里云的 Gummy 模型只能识别单通道的音频流，而收集的音频流一般是双通道的，因此要将双通道音频流转换为单通道。通道数的转换可以使用 NumPy 库中的方法实现。
 
-你可以直接使用我开发好的音频获取（`caption-engine/sysaudio`）和音频处理（`caption-engine/audioprcs`）模块。
+你可以直接使用我开发好的音频获取（`engine/sysaudio`）和音频处理（`engine/audioprcs`）模块。
 
 ### 音频转文字
 
@@ -105,10 +105,10 @@ export interface CaptionItem {
 如果使用 python 语言，可以参考以下方式将数据传递给主程序：
 
 ```python
-# caption-engine\main-gummy.py
+# engine\main-gummy.py
 sys.stdout.reconfigure(line_buffering=True)
 
-# caption-engine\audio2text\gummy.py
+# engine\audio2text\gummy.py
 ...
     def send_to_node(self, data):
         """
@@ -198,4 +198,4 @@ python main-gummy.py -s ja -t zh -a 0 -c 10 -k <your-api-key>
 
 ## 参考代码
 
-本项目 `caption-engine` 文件夹下的 `main-gummy.py` 文件为默认字幕引擎的入口代码。`src\main\utils\engine.ts` 为服务端获取字幕引擎数据和进行处理的代码。可以根据需要阅读了解字幕引擎的实现细节和完整运行过程。
+本项目 `engine` 文件夹下的 `main-gummy.py` 文件为默认字幕引擎的入口代码。`src\main\utils\engine.ts` 为服务端获取字幕引擎数据和进行处理的代码。可以根据需要阅读了解字幕引擎的实现细节和完整运行过程。

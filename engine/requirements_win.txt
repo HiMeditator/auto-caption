@@ -1,7 +1,6 @@
 dashscope
 numpy
 samplerate
-PyAudio
 PyAudioWPatch
 vosk
 pyinstaller
