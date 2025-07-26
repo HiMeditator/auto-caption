@@ -1,11 +1,24 @@
 """获取 MacOS 系统音频输入/输出流"""
 
 import pyaudio
+from textwrap import dedent
+
+
+def get_blackhole_device(mic: pyaudio.PyAudio):
+    """
+    获取 BlackHole 设备
+    """
+    device_count = mic.get_device_count()
+    for i in range(device_count):
+        dev_info = mic.get_device_info_by_index(i)
+        if 'blackhole' in str(dev_info["name"]).lower():    
+            return dev_info
+    raise Exception("The device containing BlackHole was not found.")
 
 
 class AudioStream:
     """
-    获取系统音频流（支持 BlackHole 作为系统音频输出捕获）
+    获取系统音频流（如果要捕获输出音频，仅支持 BlackHole 作为系统音频输出捕获）
 
     初始化参数：
         audio_type: 0-系统音频输出流（需配合 BlackHole），1-系统音频输入流
@@ -15,46 +28,40 @@ class AudioStream:
         self.audio_type = audio_type
         self.mic = pyaudio.PyAudio()
         if self.audio_type == 0:
-            self.device = self.getOutputDeviceInfo()
+            self.device = get_blackhole_device(self.mic)
         else:
             self.device = self.mic.get_default_input_device_info()
+        self.stop_signal = False
         self.stream = None
-        self.SAMP_WIDTH = pyaudio.get_sample_size(pyaudio.paInt16)
+        self.INDEX = self.device["index"]
         self.FORMAT = pyaudio.paInt16
-        self.CHANNELS = self.device["maxInputChannels"]
+        self.SAMP_WIDTH = pyaudio.get_sample_size(self.FORMAT)
+        self.CHANNELS = int(self.device["maxInputChannels"])
         self.RATE = int(self.device["defaultSampleRate"])
         self.CHUNK = self.RATE // chunk_rate
-        self.INDEX = self.device["index"]
 
-    def getOutputDeviceInfo(self):
-        """查找指定关键词的输入设备"""
-        device_count = self.mic.get_device_count()
-        for i in range(device_count):
-            dev_info = self.mic.get_device_info_by_index(i)
-            if 'blackhole' in dev_info["name"].lower():    
-                return dev_info
-        raise Exception("The device containing BlackHole was not found.")
-
-    def printInfo(self):
+    def get_info(self):
         dev_info = f"""
-        采样输入设备：
+        采样设备：
             - 设备类型：{ "音频输出" if self.audio_type == 0 else "音频输入" }
-            - 序号：{self.device['index']}
-            - 名称：{self.device['name']}
+            - 设备序号：{self.device['index']}
+            - 设备名称：{self.device['name']}
             - 最大输入通道数：{self.device['maxInputChannels']}
             - 默认低输入延迟：{self.device['defaultLowInputLatency']}s
             - 默认高输入延迟：{self.device['defaultHighInputLatency']}s
             - 默认采样率：{self.device['defaultSampleRate']}Hz
+            - 是否回环设备：{self.device['isLoopbackDevice']}
 
-        音频样本块大小：{self.CHUNK}
+        设备序号：{self.INDEX}
+        样本格式：{self.FORMAT}
         样本位宽：{self.SAMP_WIDTH}
-        采样格式：{self.FORMAT}
-        音频通道数：{self.CHANNELS}
-        音频采样率：{self.RATE}
+        样本通道数：{self.CHANNELS}
+        样本采样率：{self.RATE}
+        样本块大小：{self.CHUNK}
         """
-        print(dev_info)
+        return dedent(dev_info).strip()
 
-    def openStream(self):
+    def open_stream(self):
         """
         打开并返回系统音频输出流
         """
@@ -72,14 +79,24 @@ class AudioStream:
         """
         读取音频数据
         """
+        if self.stop_signal:
+            self.close_stream()
+            return None
         if not self.stream: return None
         return self.stream.read(self.CHUNK, exception_on_overflow=False)
 
-    def closeStream(self):
+    def close_stream_signal(self):
         """
-        关闭系统音频输出流
+        线程安全的关闭系统音频输入流，不一定会立即关闭
         """
-        if self.stream is None: return
-        self.stream.stop_stream()
-        self.stream.close()
-        self.stream = None
+        self.stop_signal = True
+
+    def close_stream(self):
+        """
+        立即关闭系统音频输入流
+        """
+        if self.stream is not None:
+            self.stream.stop_stream()
+            self.stream.close()
+            self.stream = None
+        self.stop_signal = False

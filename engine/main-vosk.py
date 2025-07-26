@@ -4,17 +4,9 @@ import argparse
 from datetime import datetime
 import numpy.core.multiarray
 
-if sys.platform == 'win32':
-    from sysaudio.win import AudioStream
-elif sys.platform == 'darwin':
-    from sysaudio.darwin import AudioStream
-elif sys.platform == 'linux':
-    from sysaudio.linux import AudioStream
-else:
-    raise NotImplementedError(f"Unsupported platform: {sys.platform}")
-
+from sysaudio import AudioStream
 from vosk import Model, KaldiRecognizer, SetLogLevel
-from audioprcs import resampleRawChunk
+from utils import resample_chunk_mono
 
 SetLogLevel(-1)
 
@@ -30,7 +22,7 @@ def convert_audio_to_text(audio_type, chunk_rate, model_path):
     recognizer = KaldiRecognizer(model, 16000)
 
     stream = AudioStream(audio_type, chunk_rate)
-    stream.openStream()
+    stream.open_stream()
 
     time_str = ''
     cur_id = 0
@@ -38,7 +30,8 @@ def convert_audio_to_text(audio_type, chunk_rate, model_path):
 
     while True:
         chunk = stream.read_chunk()
-        chunk_mono = resampleRawChunk(chunk, stream.CHANNELS, stream.RATE, 16000)
+        if chunk is None: continue
+        chunk_mono = resample_chunk_mono(chunk, stream.CHANNELS, stream.RATE, 16000)
 
         caption = {}
         if recognizer.AcceptWaveform(chunk_mono):

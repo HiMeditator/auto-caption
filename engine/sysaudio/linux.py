@@ -1,8 +1,10 @@
 """获取 Linux 系统音频输入流"""
 
 import subprocess
+from textwrap import dedent
 
-def findMonitorSource():
+
+def find_monitor_source():
     result = subprocess.run(
         ["pactl", "list", "short", "sources"],
         stdout=subprocess.PIPE, text=True
@@ -16,7 +18,8 @@ def findMonitorSource():
 
     raise RuntimeError("System output monitor device not found")
 
-def findInputSource():
+
+def find_input_source():
     result = subprocess.run(
         ["pactl", "list", "short", "sources"],
         stdout=subprocess.PIPE, text=True
@@ -28,7 +31,9 @@ def findInputSource():
         name = parts[1]
         if ".monitor" not in name:
             return name
+
     raise RuntimeError("Microphone input device not found")
+
 
 class AudioStream:
     """
@@ -42,34 +47,33 @@ class AudioStream:
         self.audio_type = audio_type
 
         if self.audio_type == 0:
-            self.source = findMonitorSource()
+            self.source = find_monitor_source()
         else:
-            self.source = findInputSource()
-
+            self.source = find_input_source()
+        self.stop_signal = False
         self.process = None
-
-        self.SAMP_WIDTH = 2
         self.FORMAT = 16
+        self.SAMP_WIDTH = 2
         self.CHANNELS = 2
         self.RATE = 48000
         self.CHUNK = self.RATE // chunk_rate
 
-    def printInfo(self):
+    def get_info(self):
         dev_info = f"""
         音频捕获进程：
             - 捕获类型：{"音频输出" if self.audio_type == 0 else "音频输入"}
             - 设备源：{self.source}
-            - 捕获进程PID：{self.process.pid if self.process else "None"}
+            - 捕获进程 PID：{self.process.pid if self.process else "None"}
 
-        音频样本块大小：{self.CHUNK}
+        样本格式：{self.FORMAT}
         样本位宽：{self.SAMP_WIDTH}
-        采样格式：{self.FORMAT}
-        音频通道数：{self.CHANNELS}
-        音频采样率：{self.RATE}
+        样本通道数：{self.CHANNELS}
+        样本采样率：{self.RATE}
+        样本块大小：{self.CHUNK}
         """
         print(dev_info)
 
-    def openStream(self):
+    def open_stream(self):
         """
         启动音频捕获进程
         """
@@ -82,13 +86,23 @@ class AudioStream:
         """
         读取音频数据
         """
-        if self.process:
+        if self.stop_signal:
+            self.close_stream()
+            return None
+        if self.process and self.process.stdout:
             return self.process.stdout.read(self.CHUNK)
         return None
 
-    def closeStream(self):
+    def close_stream_signal(self):
+        """
+        线程安全的关闭系统音频输入流，不一定会立即关闭
+        """
+        self.stop_signal = True
+
+    def close_stream(self):
         """
         关闭系统音频捕获进程
         """
         if self.process:
             self.process.terminate()
+        self.stop_signal = False

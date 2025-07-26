@@ -2,6 +2,8 @@
 
 Corresponding Version: v0.5.1
 
+**Note: Due to limited personal resources, the English and Japanese documentation files for this project (except for the README document) will no longer be maintained. The content of this document may not be consistent with the latest version of the project. If you are willing to help with translation, please submit relevant Pull Requests.**
+
 ![](../../assets/media/structure_en.png)
 
 ## Introduction to the Caption Engine

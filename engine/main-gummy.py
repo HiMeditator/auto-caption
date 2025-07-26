@@ -1,21 +1,11 @@
 import sys
 import argparse
-
-if sys.platform == 'win32':
-    from sysaudio.win import AudioStream
-elif sys.platform == 'darwin':
-    from sysaudio.darwin import AudioStream
-elif sys.platform == 'linux':
-    from sysaudio.linux import AudioStream
-else:
-    raise NotImplementedError(f"Unsupported platform: {sys.platform}")
-
-from audioprcs import mergeChunkChannels
+from sysaudio import AudioStream
+from utils import merge_chunk_channels
 from audio2text import InvalidParameter, GummyTranslator
 
 
 def convert_audio_to_text(s_lang, t_lang, audio_type, chunk_rate, api_key):
-    sys.stdout.reconfigure(line_buffering=True) # type: ignore
     stream = AudioStream(audio_type, chunk_rate)
 
     if t_lang == 'none':
@@ -23,20 +13,21 @@ def convert_audio_to_text(s_lang, t_lang, audio_type, chunk_rate, api_key):
     else:
         gummy = GummyTranslator(stream.RATE, s_lang, t_lang, api_key)
 
-    stream.openStream()
+    stream.open_stream()
     gummy.start()
 
     while True:
         try:
             chunk = stream.read_chunk()
-            chunk_mono = mergeChunkChannels(chunk, stream.CHANNELS)
+            if chunk is None: continue
+            chunk_mono = merge_chunk_channels(chunk, stream.CHANNELS)
             try:
                 gummy.send_audio_frame(chunk_mono)
             except InvalidParameter:
                 gummy.start()
                 gummy.send_audio_frame(chunk_mono)
         except KeyboardInterrupt:
-            stream.closeStream()
+            stream.close_stream()
             gummy.stop()
             break
 

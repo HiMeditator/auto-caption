@@ -9,4 +9,4 @@ __pycache__
 subenv
 engine/build
 engine/models
-engine/test
+engine/notebook
