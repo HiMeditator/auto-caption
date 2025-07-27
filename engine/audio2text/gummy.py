@@ -15,18 +15,20 @@ class Callback(TranslationRecognizerCallback):
     """
     def __init__(self):
         super().__init__()
+        self.index = 0
         self.usage = 0
         self.cur_id = -1
-        self.index = 0
         self.time_str = ''
 
     def on_open(self) -> None:
+        self.usage = 0
         self.cur_id = -1
         self.time_str = ''
         stdout_cmd('info', 'Gummy translator started.')
 
     def on_close(self) -> None:
         stdout_cmd('info', 'Gummy translator closed.')
+        stdout_cmd('usage', str(self.usage))
 
     def on_event(
         self,
@@ -46,7 +48,6 @@ class Callback(TranslationRecognizerCallback):
             caption['index'] = self.index
             caption['time_s'] = self.time_str
             caption['time_t'] = datetime.now().strftime('%H:%M:%S.%f')[:-3]
-            caption['end'] = transcription_result.is_sentence_end
             caption['text'] = transcription_result.text
             caption['translation'] = ""
 
@@ -57,7 +58,8 @@ class Callback(TranslationRecognizerCallback):
         if usage:
             self.usage += usage['duration']
 
-        stdout_obj(caption)
+        if 'text' in caption:
+            stdout_obj(caption)
 
 
 class GummyTranslator:
@@ -88,7 +90,7 @@ class GummyTranslator:
         self.translator.start()
 
     def send_audio_frame(self, data):
-        """发送音频帧"""
+        """发送音频帧，擎将自动识别并将识别结果输出到标准输出中"""
         self.translator.send_audio_frame(data)
 
     def stop(self):

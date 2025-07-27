@@ -2,6 +2,7 @@ import {
   UILanguage, UITheme, Styles, Controls,
   CaptionItem, FullConfig
 } from '../types'
+import { Log } from './Log'
 import { app, BrowserWindow } from 'electron'
 import * as path from 'path'
 import * as fs from 'fs'
@@ -48,6 +49,7 @@ class AllConfig {
   uiTheme: UITheme = 'system';
   styles: Styles = {...defaultStyles};
   controls: Controls = {...defaultControls};
+  lastLogIndex: number = -1;
   captionLog: CaptionItem[] = [];
 
   constructor() {}
@@ -61,7 +63,7 @@ class AllConfig {
       if(config.leftBarWidth) this.leftBarWidth = config.leftBarWidth
       if(config.styles) this.setStyles(config.styles)
       if(config.controls) this.setControls(config.controls)
-      console.log('[INFO] Read Config from:', configPath)
+      Log.info('Read Config from:', configPath)
     }
   }
 
@@ -75,7 +77,7 @@ class AllConfig {
     }
     const configPath = path.join(app.getPath('userData'), 'config.json')
     fs.writeFileSync(configPath, JSON.stringify(config, null, 2))
-    console.log('[INFO] Write Config to:', configPath)
+    Log.info('Write Config to:', configPath)
   }
 
   public getFullConfig(): FullConfig {
@@ -96,7 +98,7 @@ class AllConfig {
         this.styles[key] = args[key]
       }
     }
-    console.log('[INFO] Set Styles:', this.styles)
+    Log.info('Set Styles:', this.styles)
   }
 
   public resetStyles() {
@@ -105,7 +107,7 @@ class AllConfig {
 
   public sendStyles(window: BrowserWindow) {
     window.webContents.send('both.styles.set', this.styles)
-    console.log(`[INFO] Send Styles to #${window.id}:`, this.styles)
+    Log.info(`Send Styles to #${window.id}:`, this.styles)
   }
 
   public setControls(args: Object) {
@@ -116,27 +118,28 @@ class AllConfig {
       }
     }
     this.controls.engineEnabled = engineEnabled
-    console.log('[INFO] Set Controls:', this.controls)
+    Log.info('Set Controls:', this.controls)
   }
 
   public sendControls(window: BrowserWindow) {
     window.webContents.send('control.controls.set', this.controls)
-    console.log(`[INFO] Send Controls to #${window.id}:`, this.controls)
+    Log.info(`Send Controls to #${window.id}:`, this.controls)
   }
 
   public updateCaptionLog(log: CaptionItem) {
     let command: 'add' | 'upd' = 'add'
     if(
       this.captionLog.length &&
-      this.captionLog[this.captionLog.length - 1].index === log.index &&
-      this.captionLog[this.captionLog.length - 1].time_s === log.time_s
+      this.lastLogIndex === log.index
     ) {
       this.captionLog.splice(this.captionLog.length - 1, 1, log)
       command = 'upd'
     }
     else {
       this.captionLog.push(log)
+      this.lastLogIndex = log.index
     }
+    this.captionLog[this.captionLog.length - 1].index = this.captionLog.length
     for(const window of BrowserWindow.getAllWindows()){
       this.sendCaptionLog(window, command)
     }

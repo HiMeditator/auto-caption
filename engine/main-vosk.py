@@ -49,6 +49,7 @@ def convert_audio_to_text(audio_type, chunk_rate, model_path):
                 continue
             if prev_content == '':
                 time_str = datetime.now().strftime('%H:%M:%S.%f')[:-3]
+            caption['command'] = 'caption'
             caption['index'] = cur_id
             caption['text'] = content
             caption['time_s'] = time_str

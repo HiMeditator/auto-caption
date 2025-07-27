@@ -32,7 +32,19 @@ Python 进程标准输出 (`sys.stdout`) 的内容一定为一行一行的字符
 }
 ```
 
-Python 端打印的提示信息。
+Python 端打印的提示信息，比起 `print`，该信息更希望 Electron 端的关注。
+
+### `usage`
+
+```js
+{
+  command: "usage",
+  content: string
+}
+```
+
+Gummy 字幕引擎结束时打印计费消耗信息。
+
 
 ### `caption`
 
@@ -42,7 +54,6 @@ Python 端打印的提示信息。
   index: number,
   time_s: string,
   time_t: string,
-  end: boolean,
   text: string,
   translation: string
 }

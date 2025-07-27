@@ -174,6 +174,12 @@ const columns = [
     dataIndex: 'index',
     key: 'index',
     width: 80,
+    sorter: (a: CaptionItem, b: CaptionItem) => {
+      if(a.index <= b.index) return -1
+      return 1
+    },
+    sortDirections: ['descend'],
+    defaultSortOrder: 'descend',
   },
   {
     title: 'time',
@@ -184,8 +190,7 @@ const columns = [
       if(a.time_s <= b.time_s) return -1
       return 1
     },
-    sortDirections: ['descend'],
-    defaultSortOrder: 'descend',
+    sortDirections: ['descend', 'ascend'],
   },
   {
     title: 'content',

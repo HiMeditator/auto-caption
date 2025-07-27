@@ -5,6 +5,7 @@ import path from 'path'
 import { controlWindow } from '../ControlWindow'
 import { allConfig } from './AllConfig'
 import { i18n } from '../i18n'
+import { Log } from './Log'
 
 export class CaptionEngine {
   appPath: string = ''
@@ -14,7 +15,7 @@ export class CaptionEngine {
 
   private getApp(): boolean {
     if (allConfig.controls.customized && allConfig.controls.customizedApp) {
-      console.log('[INFO] Using customized engine')
+      Log.info('Using customized engine')
       this.appPath = allConfig.controls.customizedApp
       this.command = allConfig.controls.customizedCommand.split(' ')
     }
@@ -25,9 +26,7 @@ export class CaptionEngine {
         return false
       }
       let gummyName = 'main-gummy'
-      if (process.platform === 'win32') {
-        gummyName += '.exe'
-      }
+      if (process.platform === 'win32') { gummyName += '.exe' }
       this.command = []
       if (is.dev) {
         this.appPath = path.join(
@@ -56,31 +55,33 @@ export class CaptionEngine {
     else if(allConfig.controls.engine === 'vosk'){
       allConfig.controls.customized = false
       let voskName = 'main-vosk'
-      if (process.platform === 'win32') {
-        voskName += '.exe'
-      }
+      if (process.platform === 'win32') { voskName += '.exe' }
+      this.command = []
       if (is.dev) {
         this.appPath = path.join(
-          app.getAppPath(),
-          'engine', 'dist', voskName
+          app.getAppPath(), 'engine',
+          'subenv', 'Scripts', 'python.exe'
         )
+        this.command.push(path.join(
+          app.getAppPath(), 'engine', 'main-vosk.py'
+        ))
       }
       else {
         this.appPath = path.join(
           process.resourcesPath, 'engine', voskName
         )
       }
-      this.command = []
       this.command.push('-a', allConfig.controls.audio ? '1' : '0')
       this.command.push('-m', `"${allConfig.controls.modelPath}"`)
     }
-    console.log('[INFO] Engine Path:', this.appPath)
-    console.log('[INFO] Engine Command:', this.command)
+    Log.info('Engine Path:', this.appPath)
+    Log.info('Engine Command:', this.command)
     return true
   }
 
   public start() {
     if (this.processStatus !== 'stopped') {
+      Log.warn('Caption engine status is not stopped, cannot start')
       return
     }
     if(!this.getApp()){ return }
@@ -90,12 +91,12 @@ export class CaptionEngine {
     }
     catch (e) {
       controlWindow.sendErrorMessage(i18n('engine.start.error') + e)
-      console.error('[ERROR] Error starting subprocess:', e)
+      Log.error('Error starting engine:', e)
       return
     }
 
     this.processStatus = 'running'
-    console.log('[INFO] Caption Engine Started, PID:', this.process.pid)
+    Log.info('Caption Engine Started, PID:', this.process.pid)
 
     allConfig.controls.engineEnabled = true
     if(controlWindow.window){
@@ -111,27 +112,23 @@ export class CaptionEngine {
       lines.forEach((line: string) => {
         if (line.trim()) {
           try {
-            const caption = JSON.parse(line);
-            if(caption.index === undefined) {
-              console.log('[INFO] Engine Bad Output:', caption);
-            }
-            else allConfig.updateCaptionLog(caption);
+            const data_obj = JSON.parse(line)
+            handleEngineData(data_obj)
           } catch (e) {
             controlWindow.sendErrorMessage(i18n('engine.output.parse.error') + e)
-            console.error('[ERROR] Error parsing JSON:', e);
+            Log.error('Error parsing JSON:', e)
           }
         }
       });
     });
 
-    this.process.stderr.on('data', (data) => {
+    this.process.stderr.on('data', (data: any) => {
       if(this.processStatus === 'stopping') return
       controlWindow.sendErrorMessage(i18n('engine.error') + data)
-      console.error(`[ERROR] Subprocess Error: ${data}`);
+      Log.error(`Engine Error: ${data}`);
     });
 
     this.process.on('close', (code: any) => {
-      console.log(`[INFO] Subprocess exited with code ${code}`);
       this.process = undefined;
       allConfig.controls.engineEnabled = false
       if(controlWindow.window){
@@ -139,14 +136,14 @@ export class CaptionEngine {
         controlWindow.window.webContents.send('control.engine.stopped')
       }
       this.processStatus = 'stopped'
-      console.log('[INFO] Caption engine process stopped')
+      Log.info(`Engine exited with code ${code}`)
     });
   }
 
   public stop() {
     if(this.processStatus !== 'running') return
     if (this.process.pid) {
-      console.log('[INFO] Trying to stop process, PID:', this.process.pid)
+      Log.info('Trying to stop process, PID:', this.process.pid)
       let cmd = `kill ${this.process.pid}`;
       if (process.platform === "win32") {
         cmd = `taskkill /pid ${this.process.pid} /t /f`
@@ -154,7 +151,7 @@ export class CaptionEngine {
       exec(cmd, (error) => {
         if (error) {
           controlWindow.sendErrorMessage(i18n('engine.shutdown.error') + error)
-          console.error(`[ERROR] Failed to kill process: ${error}`)
+          Log.error(`Failed to kill process: ${error}`)
         }
       })
     }
@@ -166,11 +163,26 @@ export class CaptionEngine {
         controlWindow.window.webContents.send('control.engine.stopped')
       }
       this.processStatus = 'stopped'
-      console.log('[INFO] Process PID undefined, caption engine process stopped')
+      Log.info('Process PID undefined, caption engine process stopped')
       return
     }
     this.processStatus = 'stopping'
-    console.log('[INFO] Caption engine process stopping')
+    Log.info('Caption engine process stopping')
+  }
+}
+
+function handleEngineData(data: any) {
+  if(data.command === 'caption') {
+    allConfig.updateCaptionLog(data);
+  }
+  else if(data.command === 'print') {
+    Log.info('Engine print:', data.content)
+  }
+  else if(data.command === 'info') {
+    Log.info('Engine info:', data.content)
+  }
+  else if(data.command === 'usage') {
+    Log.info('Caption engine usage: ', data.content)
   }
 }
 
