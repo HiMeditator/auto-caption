@@ -1,6 +1,6 @@
 import samplerate
 import numpy as np
-
+import numpy.core.multiarray
 
 def merge_chunk_channels(chunk: bytes, channels: int) -> bytes:
     """
@@ -13,6 +13,7 @@ def merge_chunk_channels(chunk: bytes, channels: int) -> bytes:
     Returns:
         单通道音频数据块
     """
+    if channels == 1: return chunk
     # (length * channels,)
     chunk_np = np.frombuffer(chunk, dtype=np.int16)
     # (length, channels)
@@ -37,13 +38,17 @@ def resample_chunk_mono(chunk: bytes, channels: int, orig_sr: int, target_sr: in
     Return:
         单通道音频数据块
     """
-    # (length * channels,)
-    chunk_np = np.frombuffer(chunk, dtype=np.int16)
-    # (length, channels)
-    chunk_np = chunk_np.reshape(-1, channels)
-    # (length,)
-    chunk_mono_f = np.mean(chunk_np.astype(np.float32), axis=1)
-    chunk_mono = chunk_mono_f.astype(np.int16)
+    if channels == 1:
+        chunk_mono = chunk
+    else:
+        # (length * channels,)
+        chunk_np = np.frombuffer(chunk, dtype=np.int16)
+        # (length, channels)
+        chunk_np = chunk_np.reshape(-1, channels)
+        # (length,)
+        chunk_mono_f = np.mean(chunk_np.astype(np.float32), axis=1)
+        chunk_mono = chunk_mono_f.astype(np.int16)
+
     ratio = target_sr / orig_sr
     chunk_mono_r = samplerate.resample(chunk_mono, ratio, converter_type=mode)
     chunk_mono_r = np.round(chunk_mono_r).astype(np.int16)

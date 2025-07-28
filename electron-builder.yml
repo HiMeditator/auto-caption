@@ -11,20 +11,15 @@ files:
   - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
   - '!engine/*'
-  - '!engine-test/*'
   - '!docs/*'
   - '!assets/*'
 extraResources:
   # For Windows
-  - from: ./engine/dist/main-gummy.exe
-    to: ./engine/main-gummy.exe
-  - from: ./engine/dist/main-vosk.exe
-    to: ./engine/main-vosk.exe
+  - from: ./engine/dist/main.exe
+    to: ./engine/main.exe
   # For macOS and Linux
-  # - from: ./engine/dist/main-gummy
-  #   to: ./engine/main-gummy
-  # - from: ./engine/dist/main-vosk
-  #   to: ./engine/main-vosk
+  # - from: ./engine/dist/main
+  #   to: ./engine/main
 win:
   executableName: auto-caption
   icon: build/icon.png

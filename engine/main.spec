@@ -9,7 +9,7 @@ else:
     vosk_path = str(Path('./subenv/lib/python3.12/site-packages/vosk').resolve())
 
 a = Analysis(
-    ['main-vosk.py'],
+    ['main.py'],
     pathex=[],
     binaries=[],
     datas=[(vosk_path, 'vosk')],
@@ -30,7 +30,7 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name='main-vosk',
+    name='main',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,

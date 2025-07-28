@@ -12,10 +12,10 @@ export class Log {
   }
 
   static warn(...msg: any[]){
-    console.log(`[WARN ${getTimeString()}]`, ...msg)
+    console.warn(`[WARN ${getTimeString()}]`, ...msg)
   }
 
   static error(...msg: any[]){
-    console.log(`[ERROR ${getTimeString()}]`, ...msg)
+    console.error(`[ERROR ${getTimeString()}]`, ...msg)
   }
 }

@@ -4,7 +4,7 @@
       <a-col :span="6">
         <a-statistic
           :title="$t('status.engine')"
-          :value="(customized && customizedApp)?$t('status.customized'):engine"
+          :value="customized?$t('status.customized'):engine"
         />
       </a-col>
       <a-popover :title="$t('status.engineStatus')">
@@ -130,7 +130,7 @@ const showAbout = ref(false)
 const captionLog = useCaptionLogStore()
 const { captionData } = storeToRefs(captionLog)
 const engineControl = useEngineControlStore()
-const { engineEnabled, engine, customized, customizedApp } = storeToRefs(engineControl)
+const { engineEnabled, engine, customized } = storeToRefs(engineControl)
 
 const pid = ref(0)
 const ppid = ref(0)

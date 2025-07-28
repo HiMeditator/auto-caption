@@ -82,7 +82,7 @@ export const useEngineControlStore = defineStore('engineControl', () => {
     notification.open({
       message: t('noti.started'),
       description:
-        ((customized.value && customizedApp.value) ? str1 : str0) +
+        (customized.value ? str1 : str0) +
         `${t('noti.pidInfo')}${args}`
     });
   })

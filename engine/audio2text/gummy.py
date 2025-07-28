@@ -62,7 +62,7 @@ class Callback(TranslationRecognizerCallback):
             stdout_obj(caption)
 
 
-class GummyTranslator:
+class GummyRecognizer:
     """
     使用 Gummy 引擎流式处理的音频数据，并在标准输出中输出与 Auto Caption 软件可读取的 JSON 字符串数据
 
@@ -70,6 +70,7 @@ class GummyTranslator:
         rate: 音频采样率
         source: 源语言代码字符串（zh, en, ja 等）
         target: 目标语言代码字符串（zh, en, ja 等）
+        api_key: 阿里云百炼平台 API KEY
     """
     def __init__(self, rate: int, source: str, target: str | None, api_key: str | None):
         if api_key:

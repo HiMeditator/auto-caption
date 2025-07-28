@@ -2,7 +2,8 @@ import json
 from datetime import datetime
 
 from vosk import Model, KaldiRecognizer, SetLogLevel
-from utils import stdout_obj
+from utils import stdout_cmd, stdout_obj
+
 
 class VoskRecognizer:
     """
@@ -11,7 +12,7 @@ class VoskRecognizer:
     初始化参数：
         model_path: Vosk 识别模型路径
     """
-    def __int__(self, model_path: str):
+    def __init__(self, model_path: str):
         SetLogLevel(-1)
         if model_path.startswith('"'):
             model_path = model_path[1:]
@@ -24,7 +25,11 @@ class VoskRecognizer:
 
         self.model = Model(self.model_path)
         self.recognizer = KaldiRecognizer(self.model, 16000)
-    
+
+    def start(self):
+        """启动 Vosk 引擎"""
+        stdout_cmd('info', 'Vosk recognizer started.')
+
     def send_audio_frame(self, data: bytes):
         """
         发送音频帧给 Vosk 引擎，引擎将自动识别并将识别结果输出到标准输出中
@@ -57,3 +62,7 @@ class VoskRecognizer:
             self.prev_content = content
         
         stdout_obj(caption)
+
+    def stop(self):
+        """停止 Vosk 引擎"""
+        stdout_cmd('info', 'Vosk recognizer closed.')
