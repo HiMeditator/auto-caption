@@ -1,5 +1,5 @@
 import argparse
-from utils import stdout_cmd
+from utils import stdout_cmd, stderr
 from utils import thread_data, start_server
 from utils import merge_chunk_channels, resample_chunk_mono
 from audio2text import InvalidParameter, GummyRecognizer
@@ -8,6 +8,7 @@ from sysaudio import AudioStream
 
 
 def main_gummy(s: str, t: str, a: int, c: int, k: str):
+    global thread_data
     stream = AudioStream(a, c)
     if t == 'none':
         engine = GummyRecognizer(stream.RATE, s, None, k)
@@ -17,6 +18,7 @@ def main_gummy(s: str, t: str, a: int, c: int, k: str):
     stream.open_stream()
     engine.start()
 
+    restart_count = 0
     while thread_data.status == "running":
         try:
             chunk = stream.read_chunk()
@@ -24,18 +26,22 @@ def main_gummy(s: str, t: str, a: int, c: int, k: str):
             chunk_mono = merge_chunk_channels(chunk, stream.CHANNELS)
             try:
                 engine.send_audio_frame(chunk_mono)
-            except InvalidParameter:
-                stdout_cmd('info', 'Gummy engine stopped, restart engine')
-                engine.start()
-                engine.send_audio_frame(chunk_mono)
+            except InvalidParameter as e:
+                restart_count += 1
+                if restart_count > 8:
+                    stderr(str(e))
+                    thread_data.status = "kill"
+                    break
+                else:
+                    stdout_cmd('info', f'Gummy engine stopped, trying to restart #{restart_count}')
         except KeyboardInterrupt:
             break
 
     stream.close_stream()
     engine.stop()
 
-
 def main_vosk(a: int, c: int, m: str):
+    global thread_data
     stream = AudioStream(a, c)
     engine = VoskRecognizer(m)
 
@@ -68,9 +74,8 @@ if __name__ == "__main__":
     parser.add_argument('-k', '--api_key', default='', help='API KEY for Gummy model')
     # vosk
     parser.add_argument('-m', '--model_path', default='', help='The path to the vosk model.')
-    # for test
-    args = parser.parse_args()
-    
+
+    args = parser.parse_args()    
     if int(args.port) == 0:
         thread_data.status = "running"
     else:
@@ -92,3 +97,6 @@ if __name__ == "__main__":
         )
     else:
         raise ValueError('Invalid caption engine specified.')
+    
+    if thread_data.status == "kill":
+        stdout_cmd('kill')

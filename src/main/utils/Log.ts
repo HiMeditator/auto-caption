@@ -3,7 +3,8 @@ function getTimeString() {
   const HH = String(now.getHours()).padStart(2, '0')
   const MM = String(now.getMinutes()).padStart(2, '0')
   const SS = String(now.getSeconds()).padStart(2, '0')
-  return `${HH}:${MM}:${SS}`
+  const MS = String(now.getMilliseconds()).padStart(3, '0')
+  return `${HH}:${MM}:${SS}.${MS}`
 }
 
 export class Log {

@@ -164,6 +164,7 @@ function applyChange(){
   engineControl.sendControlsChange()
 
   notification.open({
+    placement: 'topLeft',
     message: t('noti.engineChange'),
     description: t('noti.changeInfo')
   });

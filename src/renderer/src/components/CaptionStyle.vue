@@ -282,7 +282,8 @@ function applyStyle(){
 
   captionStyle.sendStylesChange();
 
-    notification.open({
+  notification.open({
+    placement: 'topLeft',
     message: t('noti.styleChange'),
     description: t('noti.styleInfo')
   });

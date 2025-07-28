@@ -6,7 +6,7 @@ from dashscope.audio.asr import (
 )
 import dashscope
 from datetime import datetime
-from utils import stdout_cmd, stdout_obj
+from utils import stdout_cmd, stdout_obj, stderr
 
 
 class Callback(TranslationRecognizerCallback):
@@ -96,4 +96,7 @@ class GummyRecognizer:
 
     def stop(self):
         """停止 Gummy 引擎"""
-        self.translator.stop()
+        try:
+            self.translator.stop()
+        except Exception:
+            return

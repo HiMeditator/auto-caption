@@ -64,6 +64,7 @@ export const useEngineControlStore = defineStore('engineControl', () => {
 
   function emptyModelPathErr() {
     notification.open({
+      placement: 'topLeft',
       message: t('noti.empty'),
       description: t('noti.emptyInfo')
     });
@@ -80,6 +81,7 @@ export const useEngineControlStore = defineStore('engineControl', () => {
       (translation.value ? `${t('noti.tLang')}${targetLang.value}` : '');
     const str1 = `${t('noti.custom')}${customizedApp.value}${t('noti.args')}${customizedCommand.value}`;
     notification.open({
+      placement: 'topLeft',
       message: t('noti.started'),
       description:
         (customized.value ? str1 : str0) +
@@ -89,6 +91,7 @@ export const useEngineControlStore = defineStore('engineControl', () => {
 
   window.electron.ipcRenderer.on('control.engine.stopped', () => {
     notification.open({
+      placement: 'topLeft',
       message: t('noti.stopped'),
       description: t('noti.stoppedInfo')
     });
@@ -99,7 +102,6 @@ export const useEngineControlStore = defineStore('engineControl', () => {
       message: t('noti.error'),
       description: message,
       duration: null,
-      placement: 'topLeft',
       icon: () => h(ExclamationCircleOutlined, { style: 'color: #ff4d4f' })
     });
   })

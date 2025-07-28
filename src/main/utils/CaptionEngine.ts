@@ -1,4 +1,4 @@
-import { spawn } from 'child_process'
+import { exec, spawn } from 'child_process'
 import { app } from 'electron'
 import { is } from '@electron-toolkit/utils'
 import path from 'path'
@@ -13,11 +13,11 @@ export class CaptionEngine {
   command: string[] = []
   process: any | undefined
   client: net.Socket | undefined
-  status: 'running' | 'stopping' | 'stopped' = 'stopped'
+  status: 'running' | 'starting' | 'stopping' | 'stopped' = 'stopped'
 
   private getApp(): boolean {
     if (allConfig.controls.customized) {
-      Log.info('Using customized engine')
+      Log.info('Using customized caption engine')
       this.appPath = allConfig.controls.customizedApp
       this.command = allConfig.controls.customizedCommand.split(' ')
     }
@@ -30,14 +30,14 @@ export class CaptionEngine {
       }
       this.command = []
       if (is.dev) {
-        // this.appPath = path.join(
-        //   app.getAppPath(), 'engine',
-        //   'subenv', 'Scripts', 'python.exe'
-        // )
-        // this.command.push(path.join(
-        //   app.getAppPath(), 'engine', 'main.py'
-        // ))
-        this.appPath = path.join(app.getAppPath(), 'engine', 'dist', 'main.exe')
+        this.appPath = path.join(
+          app.getAppPath(), 'engine',
+          'subenv', 'Scripts', 'python.exe'
+        )
+        this.command.push(path.join(
+          app.getAppPath(), 'engine', 'main.py'
+        ))
+        // this.appPath = path.join(app.getAppPath(), 'engine', 'dist', 'main.exe')
       }
       else {
         this.appPath = path.join(process.resourcesPath, 'engine', 'main.exe')
@@ -73,6 +73,14 @@ export class CaptionEngine {
       Log.info('Connected to caption engine server');
     });
     this.status = 'running'
+    allConfig.controls.engineEnabled = true
+    if(controlWindow.window){
+      allConfig.sendControls(controlWindow.window)
+      controlWindow.window.webContents.send(
+        'control.engine.started',
+        this.process.pid
+      )
+    }
   }
 
   public sendCommand(command: string, content: string = "") {
@@ -93,19 +101,11 @@ export class CaptionEngine {
     if(!this.getApp()){ return }
 
     this.process = spawn(this.appPath, this.command)
-    Log.info('Caption Engine Started, PID:', this.process.pid)
-
-    allConfig.controls.engineEnabled = true
-    if(controlWindow.window){
-      allConfig.sendControls(controlWindow.window)
-      controlWindow.window.webContents.send(
-        'control.engine.started',
-        this.process.pid
-      )
-    }
-
+    this.status = 'starting'
+    Log.info('Caption Engine Starting, PID:', this.process.pid)
+    
     this.process.stdout.on('data', (data: any) => {
-      const lines = data.toString().split('\n');
+      const lines = data.toString().split('\n')
       lines.forEach((line: string) => {
         if (line.trim()) {
           try {
@@ -120,13 +120,18 @@ export class CaptionEngine {
     });
 
     this.process.stderr.on('data', (data: any) => {
-      if(this.status === 'stopping') return
-      controlWindow.sendErrorMessage(i18n('engine.error') + data)
-      Log.error(`Engine Error: ${data}`);
+      const lines = data.toString().split('\n')
+      lines.forEach((line: string) => {
+        if(line.trim()){
+          controlWindow.sendErrorMessage(/*i18n('engine.error') +*/ line)
+          console.error(line)          
+        }
+      })
     });
 
     this.process.on('close', (code: any) => {
       this.process = undefined;
+      this.client = undefined
       allConfig.controls.engineEnabled = false
       if(controlWindow.window){
         allConfig.sendControls(controlWindow.window)
@@ -150,25 +155,52 @@ export class CaptionEngine {
     this.status = 'stopping'
     Log.info('Caption engine process stopping...')
   }
+
+  public kill(){
+    if(this.status !== 'running'){
+      Log.warn('Engine is not running, current status:', this.status)
+      return
+    }
+    if (this.process.pid) {
+      Log.warn('Trying to kill engine process, PID:', this.process.pid)
+      if(this.client){
+        this.client.destroy()
+        this.client = undefined
+      }
+      let cmd = `kill ${this.process.pid}`;
+      if (process.platform === "win32") {
+        cmd = `taskkill /pid ${this.process.pid} /t /f`
+      }
+      exec(cmd)
+    }
+    this.status = 'stopping'
+  }
 }
 
 function handleEngineData(data: any) {
-  if(data.command === 'ready'){
+  if(data.command === 'connect'){
     captionEngine.connect()
+  }
+  else if(data.command === 'kill') {
+    if(captionEngine.status !== 'stopped') {
+      Log.warn('Error occurred, trying to kill Gummy engine...')
+      captionEngine.kill()
+    }
   }
   else if(data.command === 'caption') {
     allConfig.updateCaptionLog(data);
   }
   else if(data.command === 'print') {
-    console.log(data.content)
-    // Log.info('Engine Print:', data.content)
+    Log.info('Engine Print:', data.content)
   }
   else if(data.command === 'info') {
     Log.info('Engine Info:', data.content)
   }
   else if(data.command === 'usage') {
-    console.error(data.content)
-    // Log.info('Gummy Engine Usage: ', data.content)
+    Log.info('Gummy Engine Usage: ', data.content)
+  }
+  else {
+    Log.warn('Unknown command:', data)
   }
 }
 

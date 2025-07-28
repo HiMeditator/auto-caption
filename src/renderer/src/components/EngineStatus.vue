@@ -61,12 +61,14 @@
     >{{ $t('status.openCaption') }}</a-button>
     <a-button
       class="control-button"
-      :disabled="engineEnabled"
+      :loading="pending && !engineEnabled"
+      :disabled="pending || engineEnabled"
       @click="startEngine"
     >{{ $t('status.startEngine') }}</a-button>
     <a-button
      danger class="control-button"
-     :disabled="!engineEnabled"
+     :loading="pending && engineEnabled"
+     :disabled="pending || !engineEnabled"
      @click="stopEngine"
     >{{ $t('status.stopEngine') }}</a-button>
   </div>
@@ -119,13 +121,14 @@
 
 <script setup lang="ts">
 import { EngineInfo } from '@renderer/types'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useCaptionLogStore } from '@renderer/stores/captionLog'
 import { useEngineControlStore } from '@renderer/stores/engineControl'
 import { GithubOutlined, InfoCircleOutlined } from '@ant-design/icons-vue';
 
 const showAbout = ref(false)
+const pending = ref(false)
 
 const captionLog = useCaptionLogStore()
 const { captionData } = storeToRefs(captionLog)
@@ -143,6 +146,7 @@ function openCaptionWindow() {
 }
 
 function startEngine() {
+  pending.value = true
   if(engineControl.engine === 'vosk' && engineControl.modelPath.trim() === '') {
     engineControl.emptyModelPathErr()
     return
@@ -151,6 +155,7 @@ function startEngine() {
 }
 
 function stopEngine() {
+  pending.value = true
   window.electron.ipcRenderer.send('control.engine.stop')
 }
 
@@ -164,6 +169,9 @@ function getEngineInfo() {
   })
 }
 
+watch(engineEnabled, () => {
+  pending.value = false
+})
 </script>
 
 <style scoped>

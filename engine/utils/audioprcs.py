@@ -1,6 +1,6 @@
 import samplerate
 import numpy as np
-import numpy.core.multiarray
+import numpy.core.multiarray # do not remove
 
 def merge_chunk_channels(chunk: bytes, channels: int) -> bytes:
     """
