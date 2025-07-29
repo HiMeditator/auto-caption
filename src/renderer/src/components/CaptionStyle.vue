@@ -76,12 +76,12 @@
     <div class="input-item">
       <span class="input-label">{{ $t('style.preview') }}</span>
       <a-switch v-model:checked="currentPreview" />
-      <span style="display:inline-block;width:20px;"></span>
+      <span style="display:inline-block;width:10px;"></span>
       <div style="display: inline-block;">
         <span class="switch-label">{{ $t('style.translation') }}</span>
         <a-switch v-model:checked="currentTransDisplay" />
       </div>
-      <span style="display:inline-block;width:20px;"></span>
+      <span style="display:inline-block;width:10px;"></span>
       <div style="display: inline-block;">
         <span class="switch-label">{{ $t('style.textShadow') }}</span>
         <a-switch v-model:checked="currentTextShadow" />
@@ -282,7 +282,8 @@ function applyStyle(){
 
   captionStyle.sendStylesChange();
 
-    notification.open({
+  notification.open({
+    placement: 'topLeft',
     message: t('noti.styleChange'),
     description: t('noti.styleInfo')
   });

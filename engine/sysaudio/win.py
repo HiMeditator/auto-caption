@@ -1,14 +1,15 @@
 """获取 Windows 系统音频输入/输出流"""
 
 import pyaudiowpatch as pyaudio
+from textwrap import dedent
 
 
-def getDefaultLoopbackDevice(mic: pyaudio.PyAudio, info = True)->dict:
+def get_default_loopback_device(mic: pyaudio.PyAudio, info = True)->dict:
     """
     获取默认的系统音频输出的回环设备
     Args:
-        mic (pyaudio.PyAudio): pyaudio对象
-        info (bool, optional): 是否打印设备信息
+        mic: pyaudio对象
+        info: 是否打印设备信息
 
     Returns:
         dict: 系统音频输出的回环设备
@@ -51,38 +52,40 @@ class AudioStream:
         self.audio_type = audio_type
         self.mic = pyaudio.PyAudio()
         if self.audio_type == 0:
-            self.device = getDefaultLoopbackDevice(self.mic, False)
+            self.device = get_default_loopback_device(self.mic, False)
         else:
             self.device = self.mic.get_default_input_device_info()
+        self.stop_signal = False
         self.stream = None
-        self.SAMP_WIDTH = pyaudio.get_sample_size(pyaudio.paInt16)
+        self.INDEX = self.device["index"]
         self.FORMAT = pyaudio.paInt16
+        self.SAMP_WIDTH = pyaudio.get_sample_size(self.FORMAT)
         self.CHANNELS = int(self.device["maxInputChannels"])
         self.RATE = int(self.device["defaultSampleRate"])
         self.CHUNK = self.RATE // chunk_rate
-        self.INDEX = self.device["index"]
 
-    def printInfo(self):
+    def get_info(self):
         dev_info = f"""
         采样设备：
             - 设备类型：{ "音频输出" if self.audio_type == 0 else "音频输入" }
-            - 序号：{self.device['index']}
-            - 名称：{self.device['name']}
+            - 设备序号：{self.device['index']}
+            - 设备名称：{self.device['name']}
             - 最大输入通道数：{self.device['maxInputChannels']}
             - 默认低输入延迟：{self.device['defaultLowInputLatency']}s
             - 默认高输入延迟：{self.device['defaultHighInputLatency']}s
             - 默认采样率：{self.device['defaultSampleRate']}Hz
             - 是否回环设备：{self.device['isLoopbackDevice']}
 
-        音频样本块大小：{self.CHUNK}
+        设备序号：{self.INDEX}
+        样本格式：{self.FORMAT}
         样本位宽：{self.SAMP_WIDTH}
-        采样格式：{self.FORMAT}
-        音频通道数：{self.CHANNELS}
-        音频采样率：{self.RATE}
+        样本通道数：{self.CHANNELS}
+        样本采样率：{self.RATE}
+        样本块大小：{self.CHUNK}
         """
-        print(dev_info)
+        return dedent(dev_info).strip()
 
-    def openStream(self):
+    def open_stream(self):
         """
         打开并返回系统音频输出流
         """
@@ -96,18 +99,28 @@ class AudioStream:
         )
         return self.stream
 
-    def read_chunk(self):
+    def read_chunk(self) -> bytes | None:
         """
         读取音频数据
         """
+        if self.stop_signal:
+            self.close_stream()
+            return None
         if not self.stream: return None
         return self.stream.read(self.CHUNK, exception_on_overflow=False)
 
-    def closeStream(self):
+    def close_stream_signal(self):
         """
-        关闭系统音频输出流
+        线程安全的关闭系统音频输入流，不一定会立即关闭
         """
-        if self.stream is None: return
-        self.stream.stop_stream()
-        self.stream.close()
-        self.stream = None
+        self.stop_signal = True
+
+    def close_stream(self):
+        """
+        关闭系统音频输入流
+        """
+        if self.stream is not None:
+            self.stream.stop_stream()
+            self.stream.close()
+            self.stream = None
+        self.stop_signal = False

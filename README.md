@@ -4,7 +4,7 @@
     <p>Auto Caption 是一个跨平台的实时字幕显示软件。</p>
     <p>
       <a href="https://github.com/HiMeditator/auto-caption/releases">
-        <img src="https://img.shields.io/badge/release-0.5.1-blue">
+        <img src="https://img.shields.io/badge/release-0.6.0-blue">
       </a>
       <a href="https://github.com/HiMeditator/auto-caption/issues">
         <img src="https://img.shields.io/github/issues/HiMeditator/auto-caption?color=orange">
@@ -18,7 +18,7 @@
         | <a href="./README_en.md">English</a>
         | <a href="./README_ja.md">日本語</a> |
     </p>
-    <p><i>v0.5.1 版本已经发布。<b>目前 Vosk 本地字幕引擎效果较差，且不含翻译</b>，更优秀的字幕引擎正在尝试开发中...</i></p>
+    <p><i>v0.6.0 版本已经发布，对字幕引擎代码进行了大重构，提升了代码的可扩展性。更多的字幕引擎正在尝试开发中...</i></p>
 </div>
 
 ![](./assets/media/main_zh.png)
@@ -33,7 +33,9 @@
 
 [字幕引擎说明文档](./docs/engine-manual/zh.md)
 
-[项目 API 文档](./docs/api-docs/electron-ipc.md)
+[项目 API 文档](./docs/api-docs/)
+
+[更新日志](./docs/CHANGELOG.md)
 
 ## 📖 基本使用
 
@@ -122,7 +124,7 @@ npm install
 
 ### 构建字幕引擎
 
-首先进入 `engine` 文件夹，执行如下指令创建虚拟环境：
+首先进入 `engine` 文件夹，执行如下指令创建虚拟环境（需要使用大于等于 Python 3.10 的 Python 运行环境，建议使用 Python 3.12）：
 
 ```bash
 # in ./engine folder
@@ -140,7 +142,7 @@ subenv/Scripts/activate
 source subenv/bin/activate
 ```
 
-然后安装依赖（这一步可能会报错，一般是因为构建失败，需要根据报错信息安装对应的工具包）：
+然后安装依赖（这一步在 macOS 和 Linux 可能会报错，一般是因为构建失败，需要根据报错信息进行处理）：
 
 ```bash
 # Windows
@@ -151,7 +153,7 @@ pip install -r requirements_darwin.txt
 pip install -r requirements_linux.txt
 ```
 
-如果在 Linux 系统上安装 samplerate 模块报错，可以尝试使用以下命令单独安装：
+如果在 Linux 系统上安装 `samplerate` 模块报错，可以尝试使用以下命令单独安装：
 
 ```bash
 pip install samplerate --only-binary=:all:
@@ -160,11 +162,10 @@ pip install samplerate --only-binary=:all:
 然后使用 `pyinstaller` 构建项目：
 
 ```bash
-pyinstaller ./main-gummy.spec
-pyinstaller ./main-vosk.spec
+pyinstaller ./main.spec
 ```
 
-注意 `main-vosk.spec` 文件中 `vosk` 库的路径可能不正确，需要根据实际状况配置。
+注意 `main.spec` 文件中 `vosk` 库的路径可能不正确，需要根据实际状况配置（与 Python 环境的版本相关）。
 
 ```
 # Windows
@@ -197,13 +198,9 @@ npm run build:linux
 ```yml
 extraResources:
   # For Windows
-  - from: ./engine/dist/main-gummy.exe
-    to: ./engine/main-gummy.exe
-  - from: ./engine/dist/main-vosk.exe
-    to: ./engine/main-vosk.exe
+  - from: ./engine/dist/main.exe
+    to: ./engine/main.exe
   # For macOS and Linux
-  # - from: ./engine/dist/main-gummy
-  #   to: ./engine/main-gummy
-  # - from: ./engine/dist/main-vosk
-  #   to: ./engine/main-vosk
+  # - from: ./engine/dist/main
+  #   to: ./engine/main
 ```

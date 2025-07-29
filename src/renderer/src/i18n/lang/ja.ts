@@ -22,6 +22,8 @@ export default {
     "stopped": "字幕エンジンが停止しました",
     "stoppedInfo": "字幕エンジンが停止しました。再起動するには「字幕エンジンを開始」ボタンをクリックしてください。",
     "error": "エラーが発生しました",
+    "engineError": "字幕エンジンにエラーが発生し、強制終了が要求されました。",
+    "socketError": "メインプログラムと字幕エンジンの Socket 接続に失敗しました",
     "engineChange": "字幕エンジンの設定が変更されました",
     "changeInfo": "字幕エンジンがすでに起動している場合、変更を有効にするには再起動が必要です。",
     "styleChange": "字幕のスタイルが変更されました",
@@ -94,6 +96,7 @@ export default {
     "engineStatus": "字幕エンジンの状態",
     "pid": "プロセス ID",
     "ppid": "親プロセス ID",
+    "port": "Socket ポート番号",
     "cpu": "CPU 使用率",
     "mem": "メモリ使用量",
     "elapsed": "稼働時間",
@@ -116,7 +119,7 @@ export default {
       "projLink": "プロジェクトリンク",
       "manual": "ユーザーマニュアル",
       "engineDoc": "字幕エンジンマニュアル",
-      "date": "2025 年 7 月 17 日"
+      "date": "2025 年 7 月 30 日"
     }
   },
   log: {

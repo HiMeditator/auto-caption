@@ -1,7 +1,7 @@
 {
   "name": "auto-caption",
   "productName": "Auto Caption",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "description": "A cross-platform subtitle display software.",
   "main": "./out/main/index.js",
   "author": "himeditator",
@@ -35,6 +35,7 @@
     "@electron-toolkit/eslint-config-ts": "^3.0.0",
     "@electron-toolkit/tsconfig": "^1.0.1",
     "@types/node": "^22.14.1",
+    "@types/pidusage": "^2.0.5",
     "@vitejs/plugin-vue": "^5.2.3",
     "electron": "^35.1.5",
     "electron-builder": "^25.1.8",

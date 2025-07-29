@@ -22,6 +22,8 @@ export default {
     "stopped": "字幕引擎停止",
     "stoppedInfo": "字幕引擎已经停止，可点击“启动字幕引擎”按钮重新启动",
     "error": "发生错误",
+    "engineError": "字幕引擎发生错误并请求强制退出",
+    "socketError": "主程序与字幕引擎的 Socket 连接未成功",
     "engineChange": "字幕引擎配置已更改",
     "changeInfo": "如果字幕引擎已经启动，需要重启字幕引擎修改才会生效",
     "styleChange": "字幕样式已修改",
@@ -94,6 +96,7 @@ export default {
     "engineStatus": "字幕引擎状态",
     "pid": "进程ID",
     "ppid": "父进程ID",
+    "port": "Socket 端口号",
     "cpu": "CPU使用率",
     "mem": "内存使用量",
     "elapsed": "运行时间",
@@ -116,7 +119,7 @@ export default {
       "projLink": "项目链接",
       "manual": "用户手册",
       "engineDoc": "字幕引擎手册",
-      "date": "2025 年 7 月 17 日"
+      "date": "2025 年 7 月 30 日"
     }
   },
   log: {

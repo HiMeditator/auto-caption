@@ -1,201 +1,201 @@
-# 字幕エンジンの説明文書
+# 字幕エンジン説明ドキュメント
 
-対応バージョン：v0.5.1
+対応バージョン：v0.6.0
 
 この文書は大規模モデルを使用して翻訳されていますので、内容に正確でない部分があるかもしれません。
 
 ![](../../assets/media/structure_ja.png)
 
-## 字幕エンジンの紹介
+## 字幕エンジン紹介
 
-所謂字幕エンジンは実際にはサブプログラムであり、システムの音声入力（録音）または出力（音声再生）のストリーミングデータをリアルタイムで取得し、音声からテキストへの変換モデルを使って対応する音声の字幕を生成します。生成された字幕はJSON形式の文字列データに変換され、標準出力を通じてメインプログラムに渡されます（メインプログラムが読み取った文字列が正しいJSONオブジェクトとして解釈されることが保証される必要があります）。メインプログラムは字幕データを読み取り、解釈して処理し、ウィンドウ上に表示します。
+字幕エンジンとは、システムのオーディオ入力（マイク）または出力（スピーカー）のストリーミングデータをリアルタイムで取得し、音声を文字に変換するモデルを呼び出して対応する字幕を生成するサブプログラムです。生成された字幕はJSON形式の文字列データに変換され、標準出力を介してメインプログラムに渡されます（メインプログラムが受け取る文字列が正しくJSONオブジェクトとして解釈できる必要があります）。メインプログラムは字幕データを読み取り、解釈して処理した後、ウィンドウに表示します。
 
-## 字幕エンジンが必要な機能
+**字幕エンジンプロセスとElectronメインプロセス間の通信は、[caption engine api-doc](../api-docs/caption-engine.md)に準拠しています。**
 
-### 音声の取得
+## 実行フロー
 
-まず、あなたの字幕エンジンはシステムの音声入力（録音）または出力（音声再生）のストリーミングデータを取得する必要があります。Pythonを使用して開発する場合、PyAudioライブラリを使ってマイクからの音声入力データを取得できます（全プラットフォーム共通）。また、WindowsプラットフォームではPyAudioWPatchライブラリを使ってシステムの音声出力を取得することもできます。
+メインプロセスと字幕エンジンの通信フロー：
 
-一般的に取得される音声ストリームデータは、比較的短い時間間隔の音声ブロックで構成されています。モデルに合わせて音声ブロックのサイズを調整する必要があります。例えば、アリババクラウドのGummyモデルでは、0.05秒の音声ブロックを使用した認識結果の方が0.2秒の音声ブロックよりも優れています。
+### エンジンの起動
 
-### 音声の処理
+- メインプロセス：`child_process.spawn()`を使用して字幕エンジンプロセスを起動
+- 字幕エンジンプロセス：TCP Socketサーバースレッドを作成し、作成後に標準出力にJSONオブジェクトを文字列化して出力。このオブジェクトには`command`フィールドが含まれ、値は`connect`
+- メインプロセス：字幕エンジンプロセスの標準出力を監視し、標準出力を行ごとに分割してJSONオブジェクトとして解析し、オブジェクトの`command`フィールドの値が`connect`かどうかを判断。`connect`の場合はTCP Socketサーバーに接続
 
-取得した音声ストリームは、テキストに変換する前に前処理が必要な場合があります。例えば、アリババクラウドのGummyモデルは単一チャンネルの音声ストリームしか認識できませんが、収集された音声ストリームは通常二重チャンネルであるため、二重チャンネルの音声ストリームを単一チャンネルに変換する必要があります。チャンネル数の変換はNumPyライブラリのメソッドを使って行うことができます。
+### 字幕認識
 
-あなたは私によって開発された音声の取得（`engine/sysaudio`）と音声の処理（`engine/audioprcs`）モジュールを直接使用することができます。
+- 字幕エンジンプロセス：メインスレッドでシステムオーディオ出力を監視し、オーディオデータブロックを字幕エンジンに送信して解析。字幕エンジンはオーディオデータブロックを解析し、標準出力を介して解析された字幕データオブジェクト文字列を送信
+- メインプロセス：字幕エンジンの標準出力を引き続き監視し、解析されたオブジェクトの`command`フィールドに基づいて異なる操作を実行
 
-### 音声からテキストへの変換
+### エンジンの停止
 
-適切な音声ストリームを得た後、それをテキストに変換することができます。通常、様々なモデルを使って音声ストリームをテキストに変換します。必要に応じてモデルを選択することができます。
+- メインプロセス：ユーザーがフロントエンドで字幕エンジンを停止する操作を実行すると、メインプロセスはSocket通信を介して字幕エンジンプロセスに`command`フィールドが`stop`のオブジェクト文字列を送信
+- 字幕エンジンプロセス：メインエンジンプロセスから送信された字幕データオブジェクト文字列を受信し、文字列をオブジェクトとして解析。オブジェクトの`command`フィールドが`stop`の場合、グローバル変数`thread_data.status`の値を`stop`に設定
+- 字幕エンジンプロセス：メインスレッドでシステムオーディオ出力をループ監視し、`thread_data.status`の値が`running`でない場合、ループを終了し、リソースを解放して実行を終了
+- メインプロセス：字幕エンジンプロセスの終了を検出した場合、対応する処理を実行し、フロントエンドにフィードバック
 
-ほぼ完全な字幕エンジンの実装例：
+## プロジェクトで実装済みの機能
+
+以下の機能はすでに実装されており、直接再利用できます。
+
+### 標準出力
+
+通常情報、コマンド、エラー情報を出力できます。
+
+サンプル：
 
 ```python
-import sys
-import argparse
-
-# システム音声の取得に関する設定
-if sys.platform == 'win32':
-    from sysaudio.win import AudioStream
-elif sys.platform == 'darwin':
-    from sysaudio.darwin import AudioStream
-elif sys.platform == 'linux':
-    from sysaudio.linux import AudioStream
-else:
-    raise NotImplementedError(f"Unsupported platform: {sys.platform}")
-
-# 音声処理関数のインポート
-from audioprcs import mergeChunkChannels
-# 音声からテキストへの変換モジュールのインポート
-from audio2text import InvalidParameter, GummyTranslator
-
-
-def convert_audio_to_text(s_lang, t_lang, audio_type, chunk_rate, api_key):
-    # 標準出力をラインバッファリングに設定
-    sys.stdout.reconfigure(line_buffering=True) # type: ignore
-
-    # 音声の取得と音声からテキストへの変換のインスタンスを作成
-    stream = AudioStream(audio_type, chunk_rate)
-    if t_lang == 'none':
-        gummy = GummyTranslator(stream.RATE, s_lang, None, api_key)
-    else:
-        gummy = GummyTranslator(stream.RATE, s_lang, t_lang, api_key)
-
-    # インスタンスを開始
-    stream.openStream()
-    gummy.start()
-
-    while True:
-        try:
-            # 音声ストリームデータを読み込む
-            chunk = stream.read_chunk()
-            chunk_mono = mergeChunkChannels(chunk, stream.CHANNELS)
-            try:
-                # モデルを使って翻訳を行う
-                gummy.send_audio_frame(chunk_mono)
-            except InvalidParameter:
-                gummy.start()
-                gummy.send_audio_frame(chunk_mono)
-        except KeyboardInterrupt:
-            stream.closeStream()
-            gummy.stop()
-            break
+from utils import stdout, stdout_cmd, stdout_obj, stderr
+stdout("Hello") # {"command": "print", "content": "Hello"}\n
+stdout_cmd("connect", "8080") # {"command": "connect", "content": "8080"}\n
+stdout_obj({"command": "print", "content": "Hello"})
+stderr("Error Info")
 ```
+
+### Socketサービスの作成
+
+このSocketサービスは指定されたポートを監視し、Electronメインプログラムから送信された内容を解析し、`thread_data.status`の値を変更する可能性があります。
+
+サンプル：
+
+```python
+from utils import start_server
+from utils import thread_data
+port = 8080
+start_server(port)
+while thread_data == 'running':
+    # 何か処理
+    pass
+```
+
+### オーディオ取得
+
+`AudioStream`クラスはオーディオデータを取得するために使用され、Windows、Linux、macOSでクロスプラットフォームで実装されています。このクラスの初期化には2つのパラメータが含まれます：
+
+- `audio_type`：取得するオーディオのタイプ。0はシステム出力オーディオ（スピーカー）、1はシステム入力オーディオ（マイク）
+- `chunk_rate`：オーディオデータの取得頻度。1秒あたりに取得するオーディオブロックの数
+
+このクラスには3つのメソッドがあります：
+
+- `open_stream()`：オーディオ取得を開始
+- `read_chunk() -> bytes`：1つのオーディオブロックを読み取り
+- `close_stream()`：オーディオ取得を閉じる
+
+サンプル：
+
+```python
+from sysaudio import AudioStream
+audio_type = 0
+chunk_rate = 20
+stream =  AudioStream(audio_type, chunk_rate)
+stream.open_stream()
+while True:
+    data = stream.read_chunk()
+    # データで何か処理
+    pass
+stream.close_stream()
+```
+
+### オーディオ処理
+
+取得したオーディオストリームは、文字に変換する前に前処理が必要な場合があります。一般的に、マルチチャンネルオーディオをシングルチャンネルオーディオに変換し、リサンプリングが必要な場合もあります。このプロジェクトでは、3つのオーディオ処理関数を提供しています：
+
+- `merge_chunk_channels(chunk: bytes, channels: int) -> bytes`：マルチチャンネルオーディオブロックをシングルチャンネルオーディオブロックに変換
+- `resample_chunk_mono(chunk: bytes, channels: int, orig_sr: int, target_sr: int, mode="sinc_best") -> bytes`：現在のマルチチャンネルオーディオデータブロックをシングルチャンネルオーディオデータブロックに変換し、リサンプリングを実行
+- `resample_mono_chunk(chunk: bytes, orig_sr: int, target_sr: int, mode="sinc_best") -> bytes`：現在のシングルチャンネルオーディオブロックをリサンプリング
+
+## 字幕エンジンで実装が必要な機能
+
+### オーディオから文字への変換
+
+適切なオーディオストリームを取得した後、オーディオストリームを文字に変換する必要があります。一般的に、さまざまなモデル（クラウドまたはローカル）を使用してオーディオストリームを文字に変換します。要件に応じて適切なモデルを選択する必要があります。
+
+この部分はクラスとしてカプセル化することをお勧めします。以下の3つのメソッドを実装する必要があります：
+
+- `start(self)`：モデルを起動
+- `send_audio_frame(self, data: bytes)`：現在のオーディオブロックデータを処理し、**生成された字幕データを標準出力を介してElectronメインプロセスに送信**
+- `stop(self)`：モデルを停止
+
+完全な字幕エンジンの実例：
+
+- [gummy.py](../../engine/audio2text/gummy.py)
+- [vosk.py](../../engine/audio2text/vosk.py)
 
 ### 字幕翻訳
 
-音声認識モデルによっては翻訳機能を提供していないため、別途翻訳モジュールを追加する必要があります。この部分にはクラウドベースの翻訳APIを使用することも、ローカルの翻訳モデルを使用することも可能です。
+一部の音声文字変換モデルは翻訳を提供していません。必要がある場合、翻訳モジュールを追加する必要があります。
 
-### データの伝送
+### 字幕データの送信
 
-現在の音声ストリームのテキストを得たら、それをメインプログラムに渡す必要があります。字幕エンジンプロセスは標準出力を通じて電子メール主プロセスに字幕データを渡します。
+現在のオーディオストリームのテキストを取得した後、そのテキストをメインプログラムに送信する必要があります。字幕エンジンプロセスは標準出力を介して字幕データをElectronメインプロセスに渡します。
 
-渡す内容はJSON文字列でなければなりません。JSONオブジェクトには以下のパラメータを含める必要があります：
+送信する内容はJSON文字列でなければなりません。JSONオブジェクトには以下のパラメータを含める必要があります：
 
 ```typescript
 export interface CaptionItem {
-  index: number, // 字幕番号
-  time_s: string, // 現在の字幕開始時間
-  time_t: string, // 現在の字幕終了時間
-  text: string, // 字幕内容
-  translation: string // 字幕翻訳
+  command: "caption",
+  index: number, // 字幕のシーケンス番号
+  time_s: string, // 現在の字幕の開始時間
+  time_t: string, // 現在の字幕の終了時間
+  text: string, // 字幕の内容
+  translation: string // 字幕の翻訳
 }
 ```
 
-**必ず、字幕JSONデータを出力するたびにバッファをフラッシュし、electron主プロセスが受け取る文字列が常にJSONオブジェクトとして解釈できるようにする必要があります。**
+**JSONデータを出力するたびにバッファをフラッシュし、electronメインプロセスが受信する文字列が常にJSONオブジェクトとして解釈できるようにする必要があります。**
 
-Python言語を使用する場合、以下の方法でデータをメインプログラムに渡すことができます：
+プロジェクトで既に実装されている`stdout_obj`関数を使用して送信することをお勧めします。
 
-```python
-# engine\main-gummy.py
-sys.stdout.reconfigure(line_buffering=True)
+### コマンドラインパラメータの指定
 
-# engine\audio2text\gummy.py
-...
-    def send_to_node(self, data):
-        """
-        Node.jsプロセスにデータを送信する
-        """
-        try:
-            json_data = json.dumps(data) + '\n'
-            sys.stdout.write(json_data)
-            sys.stdout.flush()
-        except Exception as e:
-            print(f"Error sending data to Node.js: {e}", file=sys.stderr)
-...
-```
-
-データ受信側のコード
-
-```typescript
-// src\main\utils\engine.ts
-...
-    this.process.stdout.on('data', (data) => {
-      const lines = data.toString().split('\n');
-      lines.forEach((line: string) => {
-        if (line.trim()) {
-          try {
-            const caption = JSON.parse(line);
-            addCaptionLog(caption);
-          } catch (e) {
-            controlWindow.sendErrorMessage('字幕エンジンの出力をJSONオブジェクトとして解析できません:' + e)
-            console.error('[ERROR] JSON解析エラー:', e);
-          }
-        }
-      });
-    });
-
-    this.process.stderr.on('data', (data) => {
-      controlWindow.sendErrorMessage('字幕エンジンエラー:' + data)
-      console.error(`[ERROR] サブプロセスエラー: ${data}`);
-    });
-...
-```
-
-## 字幕エンジンの使用方法
-
-### コマンドライン引数の指定
-
-カスタム字幕エンジンの設定はコマンドライン引数で指定します。主な必要なパラメータは以下の通りです：
+カスタム字幕エンジンの設定はコマンドラインパラメータで指定するため、字幕エンジンのパラメータを設定する必要があります。このプロジェクトで現在使用されているパラメータは以下のとおりです：
 
 ```python
 import argparse
-
-...
-
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='システムのオーディオストリームをテキストに変換')
+    parser = argparse.ArgumentParser(description='システムオーディオストリームをテキストに変換')
+    # 共通
+    parser.add_argument('-e', '--caption_engine', default='gummy', help='字幕エンジン: gummyまたはvosk')
+    parser.add_argument('-a', '--audio_type', default=0, help='オーディオストリームソース: 0は出力、1は入力')
+    parser.add_argument('-c', '--chunk_rate', default=20, help='1秒あたりに収集するオーディオストリームブロックの数')
+    parser.add_argument('-p', '--port', default=8080, help='サーバーを実行するポート、0はサーバーなし')
+    # gummy専用
     parser.add_argument('-s', '--source_language', default='en', help='ソース言語コード')
     parser.add_argument('-t', '--target_language', default='zh', help='ターゲット言語コード')
-    parser.add_argument('-a', '--audio_type', default=0, help='オーディオストリームソース: 0は出力音声、1は入力音声')
-    parser.add_argument('-c', '--chunk_rate', default=20, help='1秒間に収集するオーディオチャンク数')
-    parser.add_argument('-k', '--api_key', default='', help='GummyモデルのAPIキー')
-    args = parser.parse_args()
-    convert_audio_to_text(
-        args.source_language,
-        args.target_language,
-        int(args.audio_type),
-        int(args.chunk_rate),
-        args.api_key
-    )
+    parser.add_argument('-k', '--api_key', default='', help='GummyモデルのAPI KEY')
+    # vosk専用
+    parser.add_argument('-m', '--model_path', default='', help='voskモデルのパス')
 ```
 
-例：原文を日本語、翻訳を中国語に指定し、システム音声出力を取得、0.1秒のオーディオデータを収集する場合：
+たとえば、このプロジェクトの字幕エンジンでGummyモデルを使用し、原文を日本語、翻訳を中国語に指定し、システムオーディオ出力の字幕を取得し、毎回0.1秒のオーディオデータをキャプチャする場合、コマンドラインパラメータは以下のようになります：
 
 ```bash
-python main-gummy.py -s ja -t zh -a 0 -c 10 -k <your-api-key>
+python main.py -e gummy -s ja -t zh -a 0 -c 10 -k <dashscope-api-key>
 ```
+
+## その他
+
+### 通信規格
+
+[caption engine api-doc](../api-docs/caption-engine.md)
+
+### プログラムエントリ
+
+[main.py](../../engine/main.py)
+
+### 開発の推奨事項
+
+オーディオから文字への変換以外は、このプロジェクトのコードを直接再利用することをお勧めします。その場合、追加する必要がある内容は：
+
+- `engine/audio2text/`：新しいオーディオから文字への変換クラスを追加（ファイルレベル）
+- `engine/main.py`：新しいパラメータ設定とプロセス関数を追加（`main_gummy`関数と`main_vosk`関数を参照）
 
 ### パッケージ化
 
-開発とテスト完了後、`pyinstaller`を使用して実行可能ファイルにパッケージ化します。エラーが発生した場合、依存ライブラリの不足を確認してください。
+字幕エンジンの開発とテストが完了した後、字幕エンジンを実行可能ファイルにパッケージ化する必要があります。一般的に`pyinstaller`を使用してパッケージ化します。パッケージ化された字幕エンジンファイルの実行でエラーが発生した場合、依存ライブラリが不足している可能性があります。不足している依存ライブラリを確認してください。
 
 ### 実行
 
-利用可能な字幕エンジンが準備できたら、字幕ソフトウェアのウィンドウでエンジンのパスと実行パラメータを指定して起動します。
+使用可能な字幕エンジンを取得したら、字幕ソフトウェアウィンドウで字幕エンジンのパスと字幕エンジンの実行コマンド（パラメータ）を指定して字幕エンジンを起動できます。
 
 ![](../img/02_ja.png)
-
-## 参考コード
-
-本プロジェクトの`engine`フォルダにある`main-gummy.py`ファイルはデフォルトの字幕エンジンのエントリーコードです。`src\main\utils\engine.ts`はサーバー側で字幕エンジンのデータを取得・処理するコードです。必要に応じて字幕エンジンの実装詳細と完全な実行プロセスを理解するために参照してください。

@@ -4,7 +4,7 @@
     <p>Auto Caption is a cross-platform real-time caption display software.</p>
     <p>
       <a href="https://github.com/HiMeditator/auto-caption/releases">
-        <img src="https://img.shields.io/badge/release-0.5.1-blue">
+        <img src="https://img.shields.io/badge/release-0.6.0-blue">
       </a>
       <a href="https://github.com/HiMeditator/auto-caption/issues">
         <img src="https://img.shields.io/github/issues/HiMeditator/auto-caption?color=orange">
@@ -18,7 +18,7 @@
         | <b>English</b>
         | <a href="./README_ja.md">日本語</a> |
     </p>
-    <p><i>Version v0.5.1 has been released. <b>The current Vosk local caption engine performs poorly and does not include translation</b>. A better caption engine is under development...</i></p>
+    <p><i>Version 0.6.0 has been released, featuring a major refactor of the subtitle engine code to improve code extensibility. More subtitle engines are being developed...</i></p>
 </div>
 
 ![](./assets/media/main_en.png)
@@ -33,7 +33,9 @@
 
 [Caption Engine Documentation](./docs/engine-manual/en.md)
 
-[Project API Documentation (Chinese)](./docs/api-docs/electron-ipc.md)
+[Project API Documentation (Chinese)](./docs/api-docs/)
+
+[Changelog](./docs/CHANGELOG.md)
 
 ## 📖 Basic Usage
 
@@ -122,7 +124,7 @@ npm install
 
 ### Build Subtitle Engine
 
-First enter the `engine` folder and execute the following commands to create a virtual environment:
+First enter the `engine` folder and execute the following commands to create a virtual environment (requires Python 3.10 or higher, with Python 3.12 recommended):
 
 ```bash
 # in ./engine folder
@@ -140,7 +142,7 @@ subenv/Scripts/activate
 source subenv/bin/activate
 ```
 
-Then install dependencies (this step may fail, usually due to build failures - you'll need to install the corresponding tool packages based on the error messages):
+Then install dependencies (this step might result in errors on macOS and Linux, usually due to build failures, and you need to handle them based on the error messages):
 
 ```bash
 # Windows
@@ -160,11 +162,10 @@ pip install samplerate --only-binary=:all:
 Then use `pyinstaller` to build the project:
 
 ```bash
-pyinstaller ./main-gummy.spec
-pyinstaller ./main-vosk.spec
+pyinstaller ./main.spec
 ```
 
-Note that the path to the `vosk` library in `main-vosk.spec` might be incorrect and needs to be configured according to the actual situation.
+Note that the path to the `vosk` library in `main-vosk.spec` might be incorrect and needs to be configured according to the actual situation (related to the version of the Python environment).
 
 ```
 # Windows
@@ -197,13 +198,9 @@ Note: You need to modify the configuration content in the `electron-builder.yml`
 ```yml
 extraResources:
   # For Windows
-  - from: ./engine/dist/main-gummy.exe
-    to: ./engine/main-gummy.exe
-  - from: ./engine/dist/main-vosk.exe
-    to: ./engine/main-vosk.exe
+  - from: ./engine/dist/main.exe
+    to: ./engine/main.exe
   # For macOS and Linux
-  # - from: ./engine/dist/main-gummy
-  #   to: ./engine/main-gummy
-  # - from: ./engine/dist/main-vosk
-  #   to: ./engine/main-vosk
+  # - from: ./engine/dist/main
+  #   to: ./engine/main
 ```
