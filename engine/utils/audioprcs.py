@@ -39,15 +39,15 @@ def resample_chunk_mono(chunk: bytes, channels: int, orig_sr: int, target_sr: in
         单通道音频数据块
     """
     if channels == 1:
-        chunk_mono = chunk
+        chunk_mono = np.frombuffer(chunk, dtype=np.int16)
+        chunk_mono = chunk_mono.astype(np.float32)
     else:
         # (length * channels,)
         chunk_np = np.frombuffer(chunk, dtype=np.int16)
         # (length, channels)
         chunk_np = chunk_np.reshape(-1, channels)
         # (length,)
-        chunk_mono_f = np.mean(chunk_np.astype(np.float32), axis=1)
-        chunk_mono = chunk_mono_f.astype(np.int16)
+        chunk_mono = np.mean(chunk_np.astype(np.float32), axis=1)
 
     ratio = target_sr / orig_sr
     chunk_mono_r = samplerate.resample(chunk_mono, ratio, converter_type=mode)
@@ -69,6 +69,7 @@ def resample_mono_chunk(chunk: bytes, orig_sr: int, target_sr: int, mode="sinc_b
         单通道音频数据块
     """
     chunk_np = np.frombuffer(chunk, dtype=np.int16)
+    chunk_np = chunk_np.astype(np.float32)
     ratio = target_sr / orig_sr
     chunk_r =  samplerate.resample(chunk_np, ratio, converter_type=mode)
     chunk_r = np.round(chunk_r).astype(np.int16)

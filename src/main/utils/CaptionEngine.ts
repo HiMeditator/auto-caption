@@ -54,7 +54,12 @@ export class CaptionEngine {
         }
       }
       else {
-        this.appPath = path.join(process.resourcesPath, 'engine', 'main.exe')
+        if(process.platform === 'win32') {
+          this.appPath = path.join(process.resourcesPath, 'engine', 'main.exe')
+        }
+        else {
+          this.appPath = path.join(process.resourcesPath, 'engine', 'main')
+        }
       }
 
       this.command.push('-a', allConfig.controls.audio ? '1' : '0')

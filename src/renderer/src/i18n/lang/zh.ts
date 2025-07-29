@@ -119,7 +119,7 @@ export default {
       "projLink": "项目链接",
       "manual": "用户手册",
       "engineDoc": "字幕引擎手册",
-      "date": "2025 年 7 月 29 日"
+      "date": "2025 年 7 月 30 日"
     }
   },
   log: {
