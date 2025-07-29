@@ -36,7 +36,6 @@ const { leftBarWidth, antdTheme } = storeToRefs(generalSettingStore)
   background-color: var(--control-background);
 }
 
-
 .caption-control {
   height: 100vh;
   border-right: 1px solid var(--tag-color);

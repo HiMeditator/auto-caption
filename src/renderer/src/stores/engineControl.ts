@@ -29,6 +29,7 @@ export const useEngineControlStore = defineStore('engineControl', () => {
   const customizedCommand = ref<string>('')
 
   const changeSignal = ref<boolean>(false)
+  const errorSignal = ref<boolean>(false)
 
   function sendControlsChange() {
     const controls: Controls = {
@@ -47,7 +48,22 @@ export const useEngineControlStore = defineStore('engineControl', () => {
     window.electron.ipcRenderer.send('control.controls.change', controls)
   }
 
-  function setControls(controls: Controls) {
+  function setControls(controls: Controls, set = false) {
+    if(set && !engineEnabled.value && !controls.engineEnabled) {
+      errorSignal.value = true
+      notification.open({
+        message: t('noti.error'),
+        description: t("noti.engineError"),
+        duration: null,
+        icon: () => h(ExclamationCircleOutlined, { style: 'color: #ff4d4f' })
+      });
+      notification.open({
+        message: t('noti.error'),
+        description: t("noti.wsError"),
+        duration: null,
+        icon: () => h(ExclamationCircleOutlined, { style: 'color: #ff4d4f' })
+      });
+    }
     sourceLang.value = controls.sourceLang
     targetLang.value = controls.targetLang
     engine.value = controls.engine
@@ -71,7 +87,7 @@ export const useEngineControlStore = defineStore('engineControl', () => {
   }
 
   window.electron.ipcRenderer.on('control.controls.set', (_, controls: Controls) => {
-    setControls(controls)
+    setControls(controls, true)
   })
 
   window.electron.ipcRenderer.on('control.engine.started', (_, args) => {
@@ -125,5 +141,6 @@ export const useEngineControlStore = defineStore('engineControl', () => {
     sendControlsChange, // 发送最新控制消息到后端
     emptyModelPathErr,  // 模型路径为空时显示警告
     changeSignal,       // 配置改变信号
+    errorSignal,        // 错误信号
   }
 })

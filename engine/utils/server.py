@@ -26,8 +26,13 @@ def handle_client(client_socket):
 
 def start_server(port: int):
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.bind(('localhost', port))
-    server.listen(1)
+    try:
+        server.bind(('localhost', port))
+        server.listen(1)
+    except Exception as e:
+        stderr(str(e))
+        stdout_cmd('kill')
+        return
     stdout_cmd('connect')
 
     client, addr = server.accept()

@@ -18,6 +18,10 @@
               <div class="engine-status-title">ppid</div>
               <div>{{ ppid }}</div>
             </a-col>
+            <a-col :flex="1" :title="$t('status.port')" style="cursor:pointer;">
+              <div class="engine-status-title">port</div>
+              <div>{{ port }}</div>
+            </a-col>
             <a-col :flex="1" :title="$t('status.cpu')" style="cursor:pointer;">
               <div class="engine-status-title">cpu</div>
               <div>{{ cpu.toFixed(1) }}%</div>
@@ -79,7 +83,7 @@
       <p class="about-desc">{{ $t('status.about.desc') }}</p>
       <a-divider />
       <div class="about-info">
-        <p><b>{{ $t('status.about.version') }}</b><a-tag color="green">v0.5.1</a-tag></p>
+        <p><b>{{ $t('status.about.version') }}</b><a-tag color="green">v0.6.0</a-tag></p>
         <p>
           <b>{{ $t('status.about.author') }}</b>
           <a
@@ -133,10 +137,11 @@ const pending = ref(false)
 const captionLog = useCaptionLogStore()
 const { captionData } = storeToRefs(captionLog)
 const engineControl = useEngineControlStore()
-const { engineEnabled, engine, customized } = storeToRefs(engineControl)
+const { engineEnabled, engine, customized, errorSignal } = storeToRefs(engineControl)
 
 const pid = ref(0)
 const ppid = ref(0)
+const port = ref(0)
 const cpu = ref(0)
 const mem = ref(0)
 const elapsed = ref(0)
@@ -163,6 +168,7 @@ function getEngineInfo() {
   window.electron.ipcRenderer.invoke('control.engine.info').then((data: EngineInfo) => {
     pid.value = data.pid
     ppid.value = data.ppid
+    port.value = data.port
     cpu.value = data.cpu
     mem.value = data.mem
     elapsed.value = data.elapsed
@@ -171,6 +177,11 @@ function getEngineInfo() {
 
 watch(engineEnabled, () => {
   pending.value = false
+})
+
+watch(errorSignal, () => {
+  pending.value = false
+  errorSignal.value = false
 })
 </script>
 

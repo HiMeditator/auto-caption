@@ -67,7 +67,7 @@ if __name__ == "__main__":
     parser.add_argument('-e', '--caption_engine', default='gummy', help='Caption engine: gummy or vosk')
     parser.add_argument('-a', '--audio_type', default=0, help='Audio stream source: 0 for output, 1 for input')
     parser.add_argument('-c', '--chunk_rate', default=20, help='Number of audio stream chunks collected per second')
-    parser.add_argument('-p', '--port', default=7070, help='The port to run the server on, 0 for no server')
+    parser.add_argument('-p', '--port', default=8080, help='The port to run the server on, 0 for no server')
     # gummy
     parser.add_argument('-s', '--source_language', default='en', help='Source language code')
     parser.add_argument('-t', '--target_language', default='zh', help='Target language code')

@@ -13,6 +13,7 @@ export class CaptionEngine {
   command: string[] = []
   process: any | undefined
   client: net.Socket | undefined
+  port: number = 8080
   status: 'running' | 'starting' | 'stopping' | 'stopped' = 'stopped'
 
   private getApp(): boolean {
@@ -20,6 +21,8 @@ export class CaptionEngine {
       Log.info('Using customized caption engine')
       this.appPath = allConfig.controls.customizedApp
       this.command = allConfig.controls.customizedCommand.split(' ')
+      this.port = Math.floor(Math.random() * (65535 - 1024 + 1)) + 1024
+      this.command.push('-p', this.port.toString())
     }
     else {
       if(allConfig.controls.engine === 'gummy' && 
@@ -30,18 +33,33 @@ export class CaptionEngine {
       }
       this.command = []
       if (is.dev) {
-        this.appPath = path.join(
-          app.getAppPath(), 'engine',
-          'subenv', 'Scripts', 'python.exe'
-        )
-        this.command.push(path.join(
-          app.getAppPath(), 'engine', 'main.py'
-        ))
-        // this.appPath = path.join(app.getAppPath(), 'engine', 'dist', 'main.exe')
+        if(process.platform === "win32") {
+          this.appPath = path.join(
+            app.getAppPath(), 'engine',
+            'subenv', 'Scripts', 'python.exe'
+          )
+          this.command.push(path.join(
+            app.getAppPath(), 'engine', 'main.py'
+          ))
+          // this.appPath = path.join(app.getAppPath(), 'engine', 'dist', 'main.exe')
+        }
+        else {
+          this.appPath = path.join(
+            app.getAppPath(), 'engine',
+            'subenv', 'bin', 'python3'
+          )
+          this.command.push(path.join(
+            app.getAppPath(), 'engine', 'main.py'
+          ))
+        }
       }
       else {
         this.appPath = path.join(process.resourcesPath, 'engine', 'main.exe')
       }
+
+      this.command.push('-a', allConfig.controls.audio ? '1' : '0')
+      this.port = Math.floor(Math.random() * (65535 - 1024 + 1)) + 1024
+      this.command.push('-p', this.port.toString())
 
       if(allConfig.controls.engine === 'gummy') {
         this.command.push('-e', 'gummy')
@@ -50,14 +68,13 @@ export class CaptionEngine {
           '-t', allConfig.controls.translation ?
           allConfig.controls.targetLang : 'none'
         )
-        this.command.push('-a', allConfig.controls.audio ? '1' : '0')
         if(allConfig.controls.API_KEY) {
           this.command.push('-k', allConfig.controls.API_KEY)
         }
       }
       else if(allConfig.controls.engine === 'vosk'){
         this.command.push('-e', 'vosk')
-        this.command.push('-a', allConfig.controls.audio ? '1' : '0')
+        
         this.command.push('-m', `"${allConfig.controls.modelPath}"`)        
       }
     }
@@ -67,15 +84,15 @@ export class CaptionEngine {
   }
 
   public connect() {
+    Log.info('Connecting to caption engine server...')
     if(this.client) { Log.warn('Client already exists, ignoring...') }
-    Log.info('Connecting to caption engine server...');
-    this.client = net.createConnection({ port: 7070 }, () => {
+    this.client = net.createConnection({ port: this.port }, () => {
       Log.info('Connected to caption engine server');
     });
     this.status = 'running'
     allConfig.controls.engineEnabled = true
     if(controlWindow.window){
-      allConfig.sendControls(controlWindow.window)
+      allConfig.sendControls(controlWindow.window, false)
       controlWindow.window.webContents.send(
         'control.engine.started',
         this.process.pid
@@ -95,7 +112,7 @@ export class CaptionEngine {
 
   public start() {
     if (this.status !== 'stopped') {
-      Log.warn('Casption engine is not stopped, current status:', this.status)
+      Log.warn('Caption engine is not stopped, current status:', this.status)
       return
     }
     if(!this.getApp()){ return }
@@ -134,7 +151,7 @@ export class CaptionEngine {
       this.client = undefined
       allConfig.controls.engineEnabled = false
       if(controlWindow.window){
-        allConfig.sendControls(controlWindow.window)
+        allConfig.sendControls(controlWindow.window, false)
         controlWindow.window.webContents.send('control.engine.stopped')
       }
       this.status = 'stopped'
@@ -144,7 +161,7 @@ export class CaptionEngine {
 
   public stop() {
     if(this.status !== 'running'){
-      Log.warn('Engine is not running, current status:', this.status)
+      Log.warn('Trying to stop engine which is not running, current status:', this.status)
       return
     }
     this.sendCommand('stop')
@@ -158,15 +175,14 @@ export class CaptionEngine {
 
   public kill(){
     if(this.status !== 'running'){
-      Log.warn('Engine is not running, current status:', this.status)
-      return
+      Log.warn('Trying to kill engine which is not running, current status:', this.status)
+    }
+    Log.warn('Trying to kill engine process, PID:', this.process.pid)
+    if(this.client){
+      this.client.destroy()
+      this.client = undefined
     }
     if (this.process.pid) {
-      Log.warn('Trying to kill engine process, PID:', this.process.pid)
-      if(this.client){
-        this.client.destroy()
-        this.client = undefined
-      }
       let cmd = `kill ${this.process.pid}`;
       if (process.platform === "win32") {
         cmd = `taskkill /pid ${this.process.pid} /t /f`
@@ -183,7 +199,7 @@ function handleEngineData(data: any) {
   }
   else if(data.command === 'kill') {
     if(captionEngine.status !== 'stopped') {
-      Log.warn('Error occurred, trying to kill Gummy engine...')
+      Log.warn('Error occurred, trying to kill caption engine...')
       captionEngine.kill()
     }
   }
@@ -197,7 +213,7 @@ function handleEngineData(data: any) {
     Log.info('Engine Info:', data.content)
   }
   else if(data.command === 'usage') {
-    Log.info('Gummy Engine Usage: ', data.content)
+    Log.info('Engine Usage: ', data.content)
   }
   else {
     Log.warn('Unknown command:', data)

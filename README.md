@@ -122,7 +122,7 @@ npm install
 
 ### 构建字幕引擎
 
-首先进入 `engine` 文件夹，执行如下指令创建虚拟环境：
+首先进入 `engine` 文件夹，执行如下指令创建虚拟环境（需要使用大于等于 Python 3.10 的 Python 运行环境）：
 
 ```bash
 # in ./engine folder
@@ -160,11 +160,10 @@ pip install samplerate --only-binary=:all:
 然后使用 `pyinstaller` 构建项目：
 
 ```bash
-pyinstaller ./main-gummy.spec
-pyinstaller ./main-vosk.spec
+pyinstaller ./main.spec
 ```
 
-注意 `main-vosk.spec` 文件中 `vosk` 库的路径可能不正确，需要根据实际状况配置。
+注意 `main.spec` 文件中 `vosk` 库的路径可能不正确，需要根据实际状况配置。
 
 ```
 # Windows
@@ -197,13 +196,9 @@ npm run build:linux
 ```yml
 extraResources:
   # For Windows
-  - from: ./engine/dist/main-gummy.exe
-    to: ./engine/main-gummy.exe
-  - from: ./engine/dist/main-vosk.exe
-    to: ./engine/main-vosk.exe
+  - from: ./engine/dist/main.exe
+    to: ./engine/main.exe
   # For macOS and Linux
-  # - from: ./engine/dist/main-gummy
-  #   to: ./engine/main-gummy
-  # - from: ./engine/dist/main-vosk
-  #   to: ./engine/main-vosk
+  # - from: ./engine/dist/main
+  #   to: ./engine/main
 ```

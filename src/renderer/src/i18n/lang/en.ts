@@ -22,6 +22,8 @@ export default {
     "stopped": "Caption Engine Stopped",
     "stoppedInfo": "The caption engine has stopped. You can click the 'Start Caption Engine' button to restart it.",
     "error": "An error occurred",
+    "engineError": "The subtitle engine encountered an error and requested a forced exit.",
+    "wsError": "The WebSocket connection between the main program and the subtitle engine was not successfully established.",
     "engineChange": "Cpation Engine Configuration Changed",
     "changeInfo": "If the caption engine is already running, you need to restart it for the changes to take effect.",
     "styleChange": "Caption Style Changed",
@@ -95,6 +97,7 @@ export default {
     "pid": "Process ID",
     "ppid": "Parent Process ID",
     "cpu": "CPU Usage",
+    "port": "WebSocket Port Number",
     "mem": "Memory Usage",
     "elapsed": "Running Time",
     "customized": "Customized",
@@ -116,7 +119,7 @@ export default {
       "projLink": "Project Link",
       "manual": "User Manual",
       "engineDoc": "Caption Engine Manual",
-      "date": "July 17, 2025"
+      "date": "July 29, 2025"
     }
   },
   log: {

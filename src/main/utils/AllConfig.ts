@@ -121,9 +121,9 @@ class AllConfig {
     Log.info('Set Controls:', this.controls)
   }
 
-  public sendControls(window: BrowserWindow) {
+  public sendControls(window: BrowserWindow, info = true) {
     window.webContents.send('control.controls.set', this.controls)
-    Log.info(`Send Controls to #${window.id}:`, this.controls)
+    if(info) Log.info(`Send Controls to #${window.id}:`, this.controls)
   }
 
   public updateCaptionLog(log: CaptionItem) {

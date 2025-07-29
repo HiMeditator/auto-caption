@@ -58,6 +58,7 @@ export interface FullConfig {
 export interface EngineInfo {
   pid: number,
   ppid: number,
+  port:number,
   cpu: number,
   mem: number,
   elapsed: number
