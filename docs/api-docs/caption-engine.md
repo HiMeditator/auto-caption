@@ -6,7 +6,7 @@
 
 本项目的 Python 进程通过标准输出向 Electron 主进程发送数据。Python 进程标准输出 (`sys.stdout`) 的内容一定为一行一行的字符串。且每行字符串均可以解释为一个 JSON 对象。每个 JSON 对象一定有 `command` 参数。
 
-Electron 主进程通过 WebSocket 向 Python 进程发送数据。发送的数据均是转化为字符串的对象，对象格式一定为：
+Electron 主进程通过 TCP Socket 向 Python 进程发送数据。发送的数据均是转化为字符串的对象，对象格式一定为：
 
 ```js
 {
@@ -30,7 +30,7 @@ Electron 主进程通过 WebSocket 向 Python 进程发送数据。发送的数�
 }
 ```
 
-字幕引擎 WebSocket 服务已经准备好，命令 Electron 主进程连接字幕引擎 WebSocket 服务
+字幕引擎 TCP Socket 服务已经准备好，命令 Electron 主进程连接字幕引擎 Socket 服务
 
 ### `kill`
 
@@ -91,12 +91,19 @@ Python 端打印的提示信息，比起 `print`，该信息更希望 Electron �
 
 Gummy 字幕引擎结束时打印计费消耗信息。
 
-## WebSocket
+## TCP Socket
 
 > 数据传递方向：Electron 主进程 => 字幕引擎进程
 
 当 JSON 对象的 `command` 参数为下列值时，表示的对应的含义：
 
 ### `stop`
+
+```js
+{
+  command: "stop",
+  content: ""
+}
+```
 
 命令当前字幕引擎停止监听并结束任务。

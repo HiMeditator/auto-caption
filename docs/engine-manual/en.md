@@ -1,203 +1,199 @@
-# Caption Engine Documentation
+# Caption Engine Documentation  
 
-Corresponding Version: v0.5.1
+Corresponding Version: v0.6.0  
 
-**Note: Due to limited personal resources, the English and Japanese documentation files for this project (except for the README document) will no longer be maintained. The content of this document may not be consistent with the latest version of the project. If you are willing to help with translation, please submit relevant Pull Requests.**
+![](../../assets/media/structure_en.png)  
 
-![](../../assets/media/structure_en.png)
+## Introduction to the Caption Engine  
 
-## Introduction to the Caption Engine
+The so-called caption engine is essentially a subprogram that continuously captures real-time streaming data from the system's audio input (microphone) or output (speakers) and invokes an audio-to-text model to generate corresponding captions for the audio. The generated captions are converted into JSON-formatted string data and passed to the main program via standard output (ensuring the string can be correctly interpreted as a JSON object by the main program). The main program reads and interprets the caption data, processes it, and displays it in the window.  
 
-The so-called caption engine is actually a subprogram that captures real-time streaming data from the system's audio input (recording) or output (playing sound) and calls an audio-to-text model to generate captions for the corresponding audio. The generated captions are converted into a JSON-formatted string and passed to the main program through standard output (it must be ensured that the string read by the main program can be correctly interpreted as a JSON object). The main program reads and interprets the caption data, processes it, and then displays it on the window.
+**The communication standard between the caption engine process and the Electron main process is: [caption engine api-doc](../api-docs/caption-engine.md).**  
 
-## Functions Required by the Caption Engine
+## Workflow  
 
-### Audio Acquisition
+The communication flow between the main process and the caption engine:  
 
-First, your caption engine needs to capture streaming data from the system's audio input (recording) or output (playing sound). If using Python for development, you can use the PyAudio library to obtain microphone audio input data (cross-platform). Use the PyAudioWPatch library to get system audio output (Windows platform only).
+### Starting the Engine  
 
-Generally, the captured audio stream data consists of short audio chunks, and the size of these chunks should be adjusted according to the model. For example, Alibaba Cloud's Gummy model performs better with 0.05-second audio chunks compared to 0.2-second ones.
+- **Main Process**: Uses `child_process.spawn()` to launch the caption engine process.  
+- **Caption Engine Process**: Creates a TCP Socket server thread. After creation, it outputs a JSON object string via standard output, containing a `command` field with the value `connect`.  
+- **Main Process**: Monitors the standard output of the caption engine process, attempts to split it line by line, parses it into a JSON object, and checks if the `command` field value is `connect`. If so, it connects to the TCP Socket server.  
 
-### Audio Processing
+### Caption Recognition  
 
-The acquired audio stream may need preprocessing before being converted to text. For instance, Alibaba Cloud's Gummy model can only recognize single-channel audio streams, while the collected audio streams are typically dual-channel, thus requiring conversion from dual-channel to single-channel. Channel conversion can be achieved using methods in the NumPy library.
+- **Caption Engine Process**: The main thread monitors system audio output, sends audio data chunks to the caption engine for parsing, and outputs the parsed caption data object strings via standard output.  
+- **Main Process**: Continues to monitor the standard output of the caption engine and performs different operations based on the `command` field of the parsed object.  
 
-You can directly use the audio acquisition (`engine/sysaudio`) and audio processing (`engine/audioprcs`) modules I have developed.
+### Closing the Engine  
 
-### Audio to Text Conversion
+- **Main Process**: When the user closes the caption engine via the frontend, the main process sends a JSON object string with the `command` field set to `stop` to the caption engine process via Socket communication.  
+- **Caption Engine Process**: Receives the object string, parses it, and if the `command` field is `stop`, sets the global variable `thread_data.status` to `stop`.  
+- **Caption Engine Process**: The main thread's loop for monitoring system audio output ends when `thread_data.status` is not `running`, releases resources, and terminates.  
+- **Main Process**: Detects the termination of the caption engine process, performs corresponding cleanup, and provides feedback to the frontend.  
 
-After obtaining the appropriate audio stream, you can convert it into text. This is generally done using various models based on your requirements.
+## Implemented Features  
 
-A nearly complete implementation of a caption engine is as follows:
+The following features are already implemented and can be reused directly.  
 
-```python
-import sys
-import argparse
+### Standard Output  
 
-# Import system audio acquisition module
-if sys.platform == 'win32':
-    from sysaudio.win import AudioStream
-elif sys.platform == 'darwin':
-    from sysaudio.darwin import AudioStream
-elif sys.platform == 'linux':
-    from sysaudio.linux import AudioStream
-else:
-    raise NotImplementedError(f"Unsupported platform: {sys.platform}")
+Supports printing general information, commands, and error messages.  
 
-# Import audio processing functions
-from audioprcs import mergeChunkChannels
-# Import audio-to-text module
-from audio2text import InvalidParameter, GummyTranslator
+Example:  
 
+```python  
+from utils import stdout, stdout_cmd, stdout_obj, stderr  
+stdout("Hello") # {"command": "print", "content": "Hello"}\n  
+stdout_cmd("connect", "8080") # {"command": "connect", "content": "8080"}\n  
+stdout_obj({"command": "print", "content": "Hello"})  
+stderr("Error Info")  
+```  
 
-def convert_audio_to_text(s_lang, t_lang, audio_type, chunk_rate, api_key):
-    # Set standard output to line buffering
-    sys.stdout.reconfigure(line_buffering=True) # type: ignore
+### Creating a Socket Service  
 
-    # Create instances for audio acquisition and speech-to-text
-    stream = AudioStream(audio_type, chunk_rate)
-    if t_lang == 'none':
-        gummy = GummyTranslator(stream.RATE, s_lang, None, api_key)
-    else:
-        gummy = GummyTranslator(stream.RATE, s_lang, t_lang, api_key)
+This Socket service listens on a specified port, parses content sent by the Electron main program, and may modify the value of `thread_data.status`.  
 
-    # Start instances
-    stream.openStream()
-    gummy.start()
+Example:  
 
-    while True:
-        try:
-            # Read audio stream data
-            chunk = stream.read_chunk()
-            chunk_mono = mergeChunkChannels(chunk, stream.CHANNELS)
-            try:
-                # Call the model for translation
-                gummy.send_audio_frame(chunk_mono)
-            except InvalidParameter:
-                gummy.start()
-                gummy.send_audio_frame(chunk_mono)
-        except KeyboardInterrupt:
-            stream.closeStream()
-            gummy.stop()
-            break
-```
+```python  
+from utils import start_server  
+from utils import thread_data  
+port = 8080  
+start_server(port)  
+while thread_data == 'running':  
+    # do something  
+    pass  
+```  
 
-### Caption Translation
+### Audio Capture  
 
-Some speech-to-text models don't provide translation functionality, requiring an additional translation module. This part can use either cloud-based translation APIs or local translation models.
+The `AudioStream` class captures audio data and is cross-platform, supporting Windows, Linux, and macOS. Its initialization includes two parameters:  
 
-### Data Transmission
+- `audio_type`: The type of audio to capture. `0` for system output audio (speakers), `1` for system input audio (microphone).  
+- `chunk_rate`: The frequency of audio data capture, i.e., the number of audio chunks captured per second.  
 
-After obtaining the text of the current audio stream, it needs to be transmitted to the main program. The caption engine process passes the caption data to the Electron main process through standard output.
+The class includes three methods:  
 
-The content transmitted must be a JSON string, where the JSON object must contain the following parameters:
+- `open_stream()`: Starts audio capture.  
+- `read_chunk() -> bytes`: Reads an audio chunk.  
+- `close_stream()`: Stops audio capture.  
 
-```typescript
-export interface CaptionItem {
-  index: number, // Caption sequence number
-  time_s: string, // Caption start time
-  time_t: string, // Caption end time
-  text: string, // Caption content
-  translation: string // Caption translation
-}
-```
+Example:  
 
-**It is essential to ensure that each time we output caption JSON data, the buffer is flushed, ensuring that the string received by the Electron main process can always be interpreted as a JSON object.**
+```python  
+from sysaudio import AudioStream  
+audio_type = 0  
+chunk_rate = 20  
+stream = AudioStream(audio_type, chunk_rate)  
+stream.open_stream()  
+while True:  
+    data = stream.read_chunk()  
+    # do something with data  
+    pass  
+stream.close_stream()  
+```  
 
-If using Python, you can refer to the following method to pass data to the main program:
+### Audio Processing  
 
-```python
-# engine\main-gummy.py
-sys.stdout.reconfigure(line_buffering=True)
+The captured audio stream may require preprocessing before conversion to text. Typically, multi-channel audio needs to be converted to mono, and resampling may be necessary. This project provides three audio processing functions:  
 
-# engine\audio2text\gummy.py
-...
-    def send_to_node(self, data):
-        """
-        Send data to the Node.js process
-        """
-        try:
-            json_data = json.dumps(data) + '\n'
-            sys.stdout.write(json_data)
-            sys.stdout.flush()
-        except Exception as e:
-            print(f"Error sending data to Node.js: {e}", file=sys.stderr)
-...
-```
+- `merge_chunk_channels(chunk: bytes, channels: int) -> bytes`: Converts a multi-channel audio chunk to mono.  
+- `resample_chunk_mono(chunk: bytes, channels: int, orig_sr: int, target_sr: int, mode="sinc_best") -> bytes`: Converts a multi-channel audio chunk to mono and resamples it.  
+- `resample_mono_chunk(chunk: bytes, orig_sr: int, target_sr: int, mode="sinc_best") -> bytes`: Resamples a mono audio chunk.  
 
-Data receiver code is as follows:
+## Features to Be Implemented in the Caption Engine  
 
+### Audio-to-Text Conversion  
 
-```typescript
-// src\main\utils\engine.ts
-...
-    this.process.stdout.on('data', (data) => {
-      const lines = data.toString().split('\n');
-      lines.forEach((line: string) => {
-        if (line.trim()) {
-          try {
-            const caption = JSON.parse(line);
-            addCaptionLog(caption);
-          } catch (e) {
-            controlWindow.sendErrorMessage('Unable to parse the output from the caption engine as a JSON object: ' + e)
-            console.error('[ERROR] Error parsing JSON:', e);
-          }
-        }
-      });
-    });
+After obtaining a suitable audio stream, it needs to be converted to text. Typically, various models (cloud-based or local) are used for this purpose. Choose the appropriate model based on requirements.  
 
-    this.process.stderr.on('data', (data) => {
-      controlWindow.sendErrorMessage('Caption engine error: ' + data)
-      console.error(`[ERROR] Subprocess Error: ${data}`);
-    });
-...
-```
+This part is recommended to be encapsulated as a class with three methods:  
 
-## Usage of Caption Engine
+- `start(self)`: Starts the model.  
+- `send_audio_frame(self, data: bytes)`: Processes the current audio chunk data. **The generated caption data is sent to the Electron main process via standard output.**  
+- `stop(self)`: Stops the model.  
 
-### Command Line Parameter Specification
+Complete caption engine examples:  
 
-The custom caption engine settings are specified via command line parameters. Common required parameters are as follows:
+- [gummy.py](../../engine/audio2text/gummy.py)  
+- [vosk.py](../../engine/audio2text/vosk.py)  
 
-```python
-import argparse
+### Caption Translation  
 
-...
+Some speech-to-text models do not provide translation. If needed, a translation module must be added.  
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Convert system audio stream to text')
-    parser.add_argument('-s', '--source_language', default='en', help='Source language code')
-    parser.add_argument('-t', '--target_language', default='zh', help='Target language code')
-    parser.add_argument('-a', '--audio_type', default=0, help='Audio stream source: 0 for output audio stream, 1 for input audio stream')
-    parser.add_argument('-c', '--chunk_rate', default=20, help='The number of audio stream chunks collected per second.')
-    parser.add_argument('-k', '--api_key', default='', help='API KEY for Gummy model')
-    args = parser.parse_args()
-    convert_audio_to_text(
-        args.source_language,
-        args.target_language,
-        int(args.audio_type),
-        int(args.chunk_rate),
-        args.api_key
-    )
-```
+### Sending Caption Data  
 
-For example, to specify Japanese as source language, Chinese as target language, capture system audio output, and collect 0.1s audio chunks, use the following command:
+After obtaining the text for the current audio stream, it must be sent to the main program. The caption engine process passes caption data to the Electron main process via standard output.  
 
-```bash
-python main-gummy.py -s ja -t zh -a 0 -c 10 -k <your-api-key>
-```
+The content must be a JSON string, with the JSON object including the following parameters:  
 
-### Packaging
+```typescript  
+export interface CaptionItem {  
+  command: "caption",  
+  index: number, // Caption sequence number  
+  time_s: string, // Start time of the current caption  
+  time_t: string, // End time of the current caption  
+  text: string, // Caption content  
+  translation: string // Caption translation  
+}  
+```  
 
-After development and testing, package the caption engine into an executable file using `pyinstaller`. If errors occur, check for missing dependencies.
+**Note: Ensure the buffer is flushed after each JSON output to guarantee the Electron main process receives a string that can be parsed as a JSON object.**  
 
-### Execution
+It is recommended to use the project's `stdout_obj` function for sending.  
 
-With a working caption engine, specify its path and runtime parameters in the caption software window to launch it.
+### Command-Line Parameter Specification  
 
-![](../img/02_en.png)
+Custom caption engine settings are provided via command-line arguments. The current project uses the following parameters:  
 
+```python  
+import argparse  
+if __name__ == "__main__":  
+    parser = argparse.ArgumentParser(description='Convert system audio stream to text')  
+    # Common parameters  
+    parser.add_argument('-e', '--caption_engine', default='gummy', help='Caption engine: gummy or vosk')  
+    parser.add_argument('-a', '--audio_type', default=0, help='Audio stream source: 0 for output, 1 for input')  
+    parser.add_argument('-c', '--chunk_rate', default=20, help='Number of audio stream chunks collected per second')  
+    parser.add_argument('-p', '--port', default=8080, help='The port to run the server on, 0 for no server')  
+    # Gummy-specific parameters  
+    parser.add_argument('-s', '--source_language', default='en', help='Source language code')  
+    parser.add_argument('-t', '--target_language', default='zh', help='Target language code')  
+    parser.add_argument('-k', '--api_key', default='', help='API KEY for Gummy model')  
+    # Vosk-specific parameters  
+    parser.add_argument('-m', '--model_path', default='', help='The path to the vosk model.')  
+```  
 
-## Reference Code
+For example, to use the Gummy model with Japanese as the source language, Chinese as the target language, and system audio output captions with 0.1s audio chunks, the command-line arguments would be:  
 
-The `main-gummy.py` file under the `engine` folder in this project serves as the entry point for the default caption engine. The `src\main\utils\engine.ts` file contains the server-side code for acquiring and processing data from the caption engine. You can read and understand the implementation details and the complete execution process of the caption engine as needed.
+```bash  
+python main.py -e gummy -s ja -t zh -a 0 -c 10 -k <dashscope-api-key>  
+```  
+
+## Additional Notes  
+
+### Communication Standards  
+
+[caption engine api-doc](../api-docs/caption-engine.md)  
+
+### Program Entry  
+
+[main.py](../../engine/main.py)  
+
+### Development Recommendations  
+
+Apart from audio-to-text conversion, it is recommended to reuse the existing code. In this case, the following additions are needed:  
+
+- `engine/audio2text/`: Add a new audio-to-text class (file-level).  
+- `engine/main.py`: Add new parameter settings and workflow functions (refer to `main_gummy` and `main_vosk` functions).  
+
+### Packaging  
+
+After development and testing, the caption engine must be packaged into an executable. Typically, `pyinstaller` is used. If the packaged executable reports errors, check for missing dependencies.  
+
+### Execution  
+
+With a functional caption engine, it can be launched in the caption software window by specifying the engine's path and runtime arguments.  
+
+![](../img/02_en.png)  

@@ -41,14 +41,44 @@
     <div class="input-item">
       <span class="input-label">{{ $t('engine.enableTranslation') }}</span>
       <a-switch v-model:checked="currentTranslation" />
-      <span style="display:inline-block;width:20px;"></span>
+      <span style="display:inline-block;width:10px;"></span>
+      <div style="display: inline-block;">
+        <span class="switch-label">{{ $t('engine.customEngine') }}</span>
+        <a-switch v-model:checked="currentCustomized" />
+      </div>
+      <span style="display:inline-block;width:10px;"></span>
       <div style="display: inline-block;">
         <span class="switch-label">{{ $t('engine.showMore') }}</span>
         <a-switch v-model:checked="showMore" />
       </div>
     </div>
 
-    <a-card size="small" :title="$t('engine.showMore')" v-show="showMore">
+    <a-card size="small" :title="$t('engine.custom.title')" v-show="currentCustomized">
+      <template #extra>
+        <a-popover>
+          <template #content>
+            <p class="customize-note">{{ $t('engine.custom.note') }}</p>
+          </template>
+          <a><InfoCircleOutlined />{{ $t('engine.custom.attention') }}</a>
+        </a-popover>
+      </template>
+      <div class="input-item">
+        <span class="input-label">{{ $t('engine.custom.app') }}</span>
+        <a-input
+          class="input-area"
+          v-model:value="currentCustomizedApp"
+        ></a-input>
+      </div>
+      <div class="input-item">
+        <span class="input-label">{{ $t('engine.custom.command') }}</span>
+        <a-input
+          class="input-area"
+          v-model:value="currentCustomizedCommand"
+        ></a-input>
+      </div>
+    </a-card>
+
+    <a-card size="small" :title="$t('engine.showMore')" v-show="showMore" style="margin-top:10px;">
       <div class="input-item">
         <a-popover>
           <template #content>
@@ -78,36 +108,6 @@
           style="width:calc(100% - 140px);"
           v-model:value="currentModelPath"
         />
-      </div>
-      <div class="input-item">
-        <span style="margin-right:5px;">{{ $t('engine.customEngine') }}</span>
-        <a-switch v-model:checked="currentCustomized" />
-      </div>
-      <div v-show="currentCustomized">
-        <a-card size="small" :title="$t('engine.custom.title')">
-          <template #extra>
-            <a-popover>
-              <template #content>
-                <p class="customize-note">{{ $t('engine.custom.note') }}</p>
-              </template>
-              <a><InfoCircleOutlined />{{ $t('engine.custom.attention') }}</a>
-            </a-popover>
-          </template>
-          <div class="input-item">
-            <span class="input-label">{{ $t('engine.custom.app') }}</span>
-            <a-input
-              class="input-area"
-              v-model:value="currentCustomizedApp"
-            ></a-input>
-          </div>
-          <div class="input-item">
-            <span class="input-label">{{ $t('engine.custom.command') }}</span>
-            <a-input
-              class="input-area"
-              v-model:value="currentCustomizedCommand"
-            ></a-input>
-          </div>
-        </a-card>
       </div>
     </a-card>
   </a-card>

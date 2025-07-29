@@ -59,7 +59,7 @@ export const useEngineControlStore = defineStore('engineControl', () => {
       });
       notification.open({
         message: t('noti.error'),
-        description: t("noti.wsError"),
+        description: t("noti.socketError"),
         duration: null,
         icon: () => h(ExclamationCircleOutlined, { style: 'color: #ff4d4f' })
       });

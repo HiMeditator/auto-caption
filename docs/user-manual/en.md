@@ -1,6 +1,6 @@
 # Auto Caption User Manual
 
-Corresponding Version: v0.5.1
+Corresponding Version: v0.6.0
 
 **Note: Due to limited personal resources, the English and Japanese documentation files for this project (except for the README document) will no longer be maintained. The content of this document may not be consistent with the latest version of the project. If you are willing to help with translation, please submit relevant Pull Requests.**
 

@@ -1,97 +1,138 @@
 # 字幕引擎说明文档
 
-对应版本：v0.5.1
+对应版本：v0.6.0
 
 ![](../../assets/media/structure_zh.png)
 
 ## 字幕引擎介绍
 
-所谓的字幕引擎实际上是一个子程序，它会实时获取系统音频输入（录音）或输出（播放声音）的流式数据，并调用音频转文字的模型生成对应音频的字幕。生成的字幕转换为 JSON 格式的字符串数据，并通过标准输出传递给主程序（需要保证主程序读取到的字符串可以被正确解释为 JSON 对象）。主程序读取并解释字幕数据，处理后显示在窗口上。
+所谓的字幕引擎实际上是一个子程序，它会实时获取系统音频输入（麦克风）或输出（扬声器）的流式数据，并调用音频转文字的模型生成对应音频的字幕。生成的字幕转换为 JSON 格式的字符串数据，并通过标准输出传递给主程序（需要保证主程序读取到的字符串可以被正确解释为 JSON 对象）。主程序读取并解释字幕数据，处理后显示在窗口上。
 
-## 字幕引擎需要实现的功能
+**字幕引擎进程和 Electron 主进程之间的通信遵循的标准为：[caption engine api-doc](../api-docs/caption-engine.md)。**
+
+## 运行流程
+
+主进程和字幕引擎通信的流程：
+
+### 启动引擎
+
+- 主进程：使用 `child_process.spawn()` 启动字幕引擎进程
+- 字幕引擎进程：创建 TCP Socket 服务器线程，创建后在标准输出中输出转化为字符串的 JSON 对象，该对象中包含 `command` 字段，值为 `connect`
+- 主进程：监听字幕引擎进程的标准输出，尝试将标准输出按行分割，解析为 JSON 对象，并判断对象的 `command` 字段值是否为 `connect`，如果是则连接 TCP Socket 服务器
+
+### 字幕识别
+
+- 字幕引擎进程：在主线程监听系统音频输出，并将音频数据块发送给字幕引擎解析，字幕引擎解析音频数据块，通过标准输出发送解析的字幕数据对象字符串
+- 主进程：继续监听字幕引擎的标准输出，并根据解析的对象的 `command` 字段采取不同的操作
+
+### 关闭引擎
+
+- 主进程：当用户在前端操作关闭字幕引擎时，主进程通过 Socket 通信给字幕引擎进程发送 `command` 字段为 `stop` 的对象字符串
+- 字幕引擎进程：接收主引擎进程发送的字幕数据对象字符串，将字符串解析为对象，如果对象的 `command` 字段为 `stop`，则将全局变量 `thread_data.status` 的值设置为 `stop`
+- 字幕引擎进程：主线程循环监听系统音频输出，当 `thread_data.status` 的值不为 `running` 时，则结束循环，释放资源，结束运行
+- 主进程：如果检测到字幕引擎进程结束，进行相应处理，并向前端反馈
+
+
+## 项目已经实现的功能
+
+以下功能已经实现，可以直接复用。
+
+### 标准输出
+
+可以输出普通信息、命令和错误信息。
+
+样例：
+
+```python
+from utils import stdout, stdout_cmd, stdout_obj, stderr
+stdout("Hello") # {"command": "print", "content": "Hello"}\n
+stdout_cmd("connect", "8080") # {"command": "connect", "content": "8080"}\n
+stdout_obj({"command": "print", "content": "Hello"})
+stderr("Error Info")
+```
+
+### 创建 Socket 服务
+
+该 Socket 服务会监听指定端口，会解析 Electron 主程序发送的内容，并可能改变 `thread_data.status` 的值。
+
+样例：
+
+```python
+from utils import start_server
+from utils import thread_data
+port = 8080
+start_server(port)
+while thread_data == 'running':
+    # do something
+    pass
+```
 
 ### 音频获取
 
-首先，你的字幕引擎需要获取系统音频输入（录音）或输出（播放声音）的流式数据。如果使用 Python 开发，可以使用 PyAudio 库获取麦克风音频输入数据（全平台通用）。使用 PyAudioWPatch 库获取系统音频输出（仅适用于 Windows 平台）。
+`AudioStream` 类用于获取音频数据，实现是跨平台的，支持 Windows、Linux 和 macOS。该类初始化包含两个参数：
 
-一般获取的音频流数据实际上是一个一个的时间比较短的音频块，需要根据模型调整音频块的大小。比如阿里云的 Gummy 模型使用 0.05 秒大小的音频块识别效果优于使用 0.2 秒大小的音频块。
+- `audio_type`: 获取音频类型，0 表示系统输出音频（扬声器），1 表示系统输入音频（麦克风）
+- `chunk_rate`: 音频数据获取频率，每秒音频获取的音频块的数量
+
+该类包含三个方法：
+
+- `open_stream()`: 开启音频获取
+- `read_chunk() -> bytes`: 读取一个音频块
+- `close_stream()`: 关闭音频获取
+
+样例：
+
+```python
+from sysaudio import AudioStream
+audio_type = 0
+chunk_rate = 20
+stream =  AudioStream(audio_type, chunk_rate)
+stream.open_stream()
+while True:
+    data = stream.read_chunk()
+    # do something with data
+    pass
+stream.close_stream()
+```
 
 ### 音频处理
 
-获取到的音频流在转文字之前可能需要进行预处理。比如阿里云的 Gummy 模型只能识别单通道的音频流，而收集的音频流一般是双通道的，因此要将双通道音频流转换为单通道。通道数的转换可以使用 NumPy 库中的方法实现。
+获取到的音频流在转文字之前可能需要进行预处理。一般需要将多通道音频转换为单通道音频，还可能需要进行重采样。本项目提供了三个音频处理函数：
 
-你可以直接使用我开发好的音频获取（`engine/sysaudio`）和音频处理（`engine/audioprcs`）模块。
+- `merge_chunk_channels(chunk: bytes, channels: int) -> bytes`： 将多通道音频块转换为单通道音频块
+- `resample_chunk_mono(chunk: bytes, channels: int, orig_sr: int, target_sr: int, mode="sinc_best") -> bytes`：将当前多通道音频数据块转换成单通道音频数据块，然后进行重采样
+- `resample_mono_chunk(chunk: bytes, orig_sr: int, target_sr: int, mode="sinc_best") -> bytes`：将当前单通道音频块进行重采样
+
+## 字幕引擎需要实现的功能
 
 ### 音频转文字
 
-在得到了合适的音频流后，就可以将音频流转换为文字了。一般使用各种模型来实现音频流转文字。可根据需求自行选择模型。
+在得到了合适的音频流后，需要将音频流转换为文字了。一般使用各种模型（云端或本地）来实现音频流转文字。需要根据需求选择合适的模型。
 
-一个接近完整的字幕引擎实例如下：
+这部分建议封装为一个类，需要实现三个方法：
 
-```python
-import sys
-import argparse
+- `start(self)`：启动模型
+- `send_audio_frame(self, data: bytes)`：处理当前音频块数据，**生成的字幕数据通过标准输出发送给 Electron 主进程**
+- `stop(self)`：停止模型
 
-# 引入系统音频获取类
-if sys.platform == 'win32':
-    from sysaudio.win import AudioStream
-elif sys.platform == 'darwin':
-    from sysaudio.darwin import AudioStream
-elif sys.platform == 'linux':
-    from sysaudio.linux import AudioStream
-else:
-    raise NotImplementedError(f"Unsupported platform: {sys.platform}")
+完整的字幕引擎实例如下：
 
-# 引入音频处理函数
-from audioprcs import mergeChunkChannels
-# 引入音频转文本模块
-from audio2text import InvalidParameter, GummyTranslator
-
-
-def convert_audio_to_text(s_lang, t_lang, audio_type, chunk_rate, api_key):
-    # 设置标准输出为行缓冲
-    sys.stdout.reconfigure(line_buffering=True) # type: ignore
-
-    # 创建音频获取和语音转文字实例
-    stream = AudioStream(audio_type, chunk_rate)
-    if t_lang == 'none':
-        gummy = GummyTranslator(stream.RATE, s_lang, None, api_key)
-    else:
-        gummy = GummyTranslator(stream.RATE, s_lang, t_lang, api_key)
-
-    # 启动实例
-    stream.openStream()
-    gummy.start()
-
-    while True:
-        try:
-            # 读取音频流数据
-            chunk = stream.read_chunk()
-            chunk_mono = mergeChunkChannels(chunk, stream.CHANNELS)
-            try:
-                # 调用模型进行翻译
-                gummy.send_audio_frame(chunk_mono)
-            except InvalidParameter:
-                gummy.start()
-                gummy.send_audio_frame(chunk_mono)
-        except KeyboardInterrupt:
-            stream.closeStream()
-            gummy.stop()
-            break
-```
+- [gummy.py](../../engine/audio2text/gummy.py)
+- [vosk.py](../../engine/audio2text/vosk.py)
 
 ### 字幕翻译
 
-有的语音转文字模型并不提供翻译，需要再添加一个翻译模块。这部分可以使用云端翻译 API 也可以使用本地翻译模型。
+有的语音转文字模型并不提供翻译，如果有需求，需要再添加一个翻译模块。
 
-### 数据传递
+### 字幕数据发送
 
-在获取到当前音频流的文字后，需要将文字传递给主程序。字幕引擎进程通过标准输出将字幕数据传递给 electron 主进程。
+在获取到当前音频流的文字后，需要将文字发送给主程序。字幕引擎进程通过标准输出将字幕数据传递给 Electron 主进程。
 
 传递的内容必须是 JSON 字符串，其中 JSON 对象需要包含的参数如下：
 
 ```typescript
 export interface CaptionItem {
+  command: "caption",
   index: number, // 字幕序号
   time_s: string, // 当前字幕开始时间
   time_t: string, // 当前字幕结束时间
@@ -102,88 +143,51 @@ export interface CaptionItem {
 
 **注意必须确保每输出一次字幕 JSON 数据就得刷新缓冲区，确保 electron 主进程每次接收到的字符串都可以被解释为 JSON 对象。**
 
-如果使用 python 语言，可以参考以下方式将数据传递给主程序：
-
-```python
-# engine\main-gummy.py
-sys.stdout.reconfigure(line_buffering=True)
-
-# engine\audio2text\gummy.py
-...
-    def send_to_node(self, data):
-        """
-        将数据发送到 Node.js 进程
-        """
-        try:
-            json_data = json.dumps(data) + '\n'
-            sys.stdout.write(json_data)
-            sys.stdout.flush()
-        except Exception as e:
-            print(f"Error sending data to Node.js: {e}", file=sys.stderr)
-...
-```
-
-数据接收端代码如下：
-
-
-```typescript
-// src\main\utils\engine.ts
-...
-    this.process.stdout.on('data', (data) => {
-      const lines = data.toString().split('\n');
-      lines.forEach((line: string) => {
-        if (line.trim()) {
-          try {
-            const caption = JSON.parse(line);
-            addCaptionLog(caption);
-          } catch (e) {
-            controlWindow.sendErrorMessage('字幕引擎输出内容无法解析为 JSON 对象：' + e)
-            console.error('[ERROR] Error parsing JSON:', e);
-          }
-        }
-      });
-    });
-
-    this.process.stderr.on('data', (data) => {
-      controlWindow.sendErrorMessage('字幕引擎错误：' + data)
-      console.error(`[ERROR] Subprocess Error: ${data}`);
-    });
-...
-```
-
-## 字幕引擎的使用
+建议使用项目已经实现的 `stdout_obj` 函数来发送。
 
 ### 命令行参数的指定
 
-自定义字幕引擎的设置提供命令行参数指定，因此需要设置好字幕引擎的参数，常见的需要的参数如下：
+自定义字幕引擎的设置提供命令行参数指定，因此需要设置好字幕引擎的参数，本项目目前用到的参数如下：
 
 ```python
 import argparse
-
-...
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Convert system audio stream to text')
+    # both
+    parser.add_argument('-e', '--caption_engine', default='gummy', help='Caption engine: gummy or vosk')
+    parser.add_argument('-a', '--audio_type', default=0, help='Audio stream source: 0 for output, 1 for input')
+    parser.add_argument('-c', '--chunk_rate', default=20, help='Number of audio stream chunks collected per second')
+    parser.add_argument('-p', '--port', default=8080, help='The port to run the server on, 0 for no server')
+    # gummy only
     parser.add_argument('-s', '--source_language', default='en', help='Source language code')
     parser.add_argument('-t', '--target_language', default='zh', help='Target language code')
-    parser.add_argument('-a', '--audio_type', default=0, help='Audio stream source: 0 for output audio stream, 1 for input audio stream')
-    parser.add_argument('-c', '--chunk_rate', default=20, help='The number of audio stream chunks collected per second.')
     parser.add_argument('-k', '--api_key', default='', help='API KEY for Gummy model')
-    args = parser.parse_args()
-    convert_audio_to_text(
-        args.source_language,
-        args.target_language,
-        int(args.audio_type),
-        int(args.chunk_rate),
-        args.api_key
-    )
+    # vosk only
+    parser.add_argument('-m', '--model_path', default='', help='The path to the vosk model.')
 ```
 
-比如对应上面的字幕引擎，我想指定原文为日语，翻译为中文，获取系统音频输出的字幕，每次截取 0.1s 的音频数据，那么命令行参数如下：
+比如对于本项目的字幕引擎，我想使用 Gummy 模型，指定原文为日语，翻译为中文，获取系统音频输出的字幕，每次截取 0.1s 的音频数据，那么命令行参数如下：
 
 ```bash
-python main-gummy.py -s ja -t zh -a 0 -c 10 -k <your-api-key>
+python main.py -e gummy -s ja -t zh -a 0 -c 10 -k <dashscope-api-key>
 ```
+
+## 其他
+
+### 通信规范
+
+[caption engine api-doc](../api-docs/caption-engine.md)
+
+### 程序入口
+
+[main.py](../../engine/main.py)
+
+### 开发建议
+
+除音频转文字外，其他建议直接复用本项目代码。如果这样，那么需要添加的内容为：
+
+- `engine/audio2text/`：添加新的音频转文字类（文件级别）
+- `engine/main.py`：添加新参数设置、流程函数（参考 `main_gummy` 函数和 `main_vosk` 函数）
 
 ### 打包
 
@@ -194,8 +198,3 @@ python main-gummy.py -s ja -t zh -a 0 -c 10 -k <your-api-key>
 有了可以使用的字幕引擎，就可以在字幕软件窗口中通过指定字幕引擎的路径和字幕引擎的运行指令（参数）来启动字幕引擎了。
 
 ![](../img/02_zh.png)
-
-
-## 参考代码
-
-本项目 `engine` 文件夹下的 `main-gummy.py` 文件为默认字幕引擎的入口代码。`src\main\utils\engine.ts` 为服务端获取字幕引擎数据和进行处理的代码。可以根据需要阅读了解字幕引擎的实现细节和完整运行过程。

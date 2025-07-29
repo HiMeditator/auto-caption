@@ -4,7 +4,7 @@
     <p>Auto Caption はクロスプラットフォームのリアルタイム字幕表示ソフトウェアです。</p>
     <p>
       <a href="https://github.com/HiMeditator/auto-caption/releases">
-        <img src="https://img.shields.io/badge/release-0.5.1-blue">
+        <img src="https://img.shields.io/badge/release-0.6.0-blue">
       </a>
       <a href="https://github.com/HiMeditator/auto-caption/issues">
         <img src="https://img.shields.io/github/issues/HiMeditator/auto-caption?color=orange">
@@ -18,7 +18,7 @@
         | <a href="./README_en.md">English</a>
         | <b>日本語</b> |
     </p>
-    <p><i>バージョン v0.5.1 がリリースされました。<b>現在の Vosk ローカル字幕エンジンは性能が低く、翻訳機能も含まれていません</b>。より優れた字幕エンジンを開発中です...</i></p>
+    <p><i>v0.6.0 バージョンがリリースされ、字幕エンジンコードが大規模にリファクタリングされ、コードの拡張性が向上しました。より多くの字幕エンジンの開発が試みられています...</i></p>
 </div>
 
 ![](./assets/media/main_ja.png)
@@ -33,7 +33,9 @@
 
 [字幕エンジン説明ドキュメント](./docs/engine-manual/ja.md)
 
-[プロジェクト API ドキュメント（中国語）](./docs/api-docs/electron-ipc.md)
+[プロジェクト API ドキュメント（中国語）](./docs/api-docs/)
+
+[更新履歴](./docs/CHANGELOG.md)
 
 ## 📖 基本使い方
 
@@ -122,7 +124,7 @@ npm install
 
 ### 字幕エンジンの構築
 
-まず `engine` フォルダに入り、以下のコマンドを実行して仮想環境を作成します：
+まず `engine` フォルダに入り、以下のコマンドを実行して仮想環境を作成します（Python 3.10 以上が必要で、Python 3.12 が推奨されます）：
 
 ```bash
 # ./engine フォルダ内
@@ -140,7 +142,7 @@ subenv/Scripts/activate
 source subenv/bin/activate
 ```
 
-次に依存関係をインストールします（このステップは失敗する可能性があります、通常はビルド失敗が原因です - エラーメッセージに基づいて対応するツールパッケージをインストールする必要があります）：
+次に依存関係をインストールします（このステップでは macOS と Linux でエラーが発生する可能性があります。通常はビルド失敗によるもので、エラーメッセージに基づいて対処する必要があります）：
 
 ```bash
 # Windows
@@ -151,7 +153,7 @@ pip install -r requirements_darwin.txt
 pip install -r requirements_linux.txt
 ```
 
-Linuxシステムで`samplerate`モジュールのインストールに問題が発生した場合、以下のコマンドで個別にインストールを試すことができます：
+Linux システムで `samplerate` モジュールのインストールに問題が発生した場合、以下のコマンドで個別にインストールを試すことができます：
 
 ```bash
 pip install samplerate --only-binary=:all:
@@ -160,16 +162,15 @@ pip install samplerate --only-binary=:all:
 その後、`pyinstaller` を使用してプロジェクトをビルドします：
 
 ```bash
-pyinstaller ./main-gummy.spec
-pyinstaller ./main-vosk.spec
+pyinstaller ./main.spec
 ```
 
-`main-vosk.spec` ファイル内の `vosk` ライブラリのパスが正しくない可能性があるため、実際の状況に応じて設定する必要があります。
+`main-vosk.spec` ファイル内の `vosk` ライブラリのパスが正しくない可能性があるため、実際の状況（Python 環境のバージョンに関連）に応じて設定する必要があります。
 
 ```
 # Windows
 vosk_path = str(Path('./subenv/Lib/site-packages/vosk').resolve())
-# LinuxまたはmacOS
+# Linux または macOS
 vosk_path = str(Path('./subenv/lib/python3.x/site-packages/vosk').resolve())
 ```
 
@@ -196,14 +197,10 @@ npm run build:linux
 
 ```yml
 extraResources:
-  # Windows用
-  - from: ./engine/dist/main-gummy.exe
-    to: ./engine/main-gummy.exe
-  - from: ./engine/dist/main-vosk.exe
-    to: ./engine/main-vosk.exe
-  # macOSとLinux用
-  # - from: ./engine/dist/main-gummy
-  #   to: ./engine/main-gummy
-  # - from: ./engine/dist/main-vosk
-  #   to: ./engine/main-vosk
+  # Windows 用
+  - from: ./engine/dist/main.exe
+    to: ./engine/main.exe
+  # macOS と Linux 用
+  # - from: ./engine/dist/main
+  #   to: ./engine/main
 ```
