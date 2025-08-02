@@ -3,6 +3,7 @@ import path from 'path'
 import { is } from '@electron-toolkit/utils'
 import icon from '../../build/icon.png?asset'
 import { controlWindow } from './ControlWindow'
+import { allConfig } from './utils/AllConfig'
 
 class CaptionWindow {
   window: BrowserWindow | undefined;
@@ -10,7 +11,7 @@ class CaptionWindow {
   public createWindow(): void {
     this.window = new BrowserWindow({
       icon: icon,
-      width: 900,
+      width: allConfig.captionWindowWidth,
       height: 100,
       minWidth: 480,
       show: false,
@@ -28,6 +29,12 @@ class CaptionWindow {
 
     this.window.on('ready-to-show', () => {
       this.window?.show()
+    })
+
+    this.window.on('close', () => {
+      if(this.window) {
+        allConfig.captionWindowWidth = this.window?.getBounds().width;
+      }
     })
 
     this.window.on('closed', () => {

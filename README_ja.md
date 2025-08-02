@@ -3,12 +3,8 @@
     <h1 align="center">auto-caption</h1>
     <p>Auto Caption はクロスプラットフォームのリアルタイム字幕表示ソフトウェアです。</p>
     <p>
-      <a href="https://github.com/HiMeditator/auto-caption/releases">
-        <img src="https://img.shields.io/badge/release-0.6.0-blue">
-      </a>
-      <a href="https://github.com/HiMeditator/auto-caption/issues">
-        <img src="https://img.shields.io/github/issues/HiMeditator/auto-caption?color=orange">
-      </a>
+      <a href="https://github.com/HiMeditator/auto-caption/releases"><img src="https://img.shields.io/badge/release-0.6.0-blue"></a>
+      <a href="https://github.com/HiMeditator/auto-caption/issues"><img src="https://img.shields.io/github/issues/HiMeditator/auto-caption?color=orange"></a>
       <img src="https://img.shields.io/github/languages/top/HiMeditator/auto-caption?color=royalblue">
       <img src="https://img.shields.io/github/repo-size/HiMeditator/auto-caption?color=green">
       <img src="https://img.shields.io/github/stars/HiMeditator/auto-caption?style=social">
@@ -77,7 +73,7 @@ Vosk ローカル字幕エンジンを使用するには、まず [Vosk Models](
 
 ## ⚙️ 字幕エンジン説明
 
-現在ソフトウェアには2つの字幕エンジンが組み込まれており、1つの新しいエンジンを計画中です。詳細は以下の通りです。
+現在、ソフトウェアには2つの字幕エンジンが搭載されており、新しいエンジンが計画されています。それらの詳細情報は以下の通りです。
 
 ### Gummy 字幕エンジン（クラウド）
 
@@ -108,9 +104,14 @@ $$
 
 [vosk-api](https://github.com/alphacep/vosk-api) をベースに開発されています。現在は音声に対応する原文の生成のみをサポートしており、翻訳コンテンツはサポートしていません。
 
-### FunASR字幕エンジン（ローカル）
+### 新規計画字幕エンジン
 
-可能であれば、[FunASR](https://github.com/modelscope/FunASR) をベースに開発予定です。まだ調査と実現可能性の検証を行っていません。
+以下は候補モデルであり、モデルの性能と統合の容易さに基づいて選択されます。
+
+- [faster-whisper](https://github.com/SYSTRAN/faster-whisper)
+- [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx)
+- [SenseVoice](https://github.com/FunAudioLLM/SenseVoice)
+- [FunASR](https://github.com/modelscope/FunASR)
 
 ## 🚀 プロジェクト実行
 

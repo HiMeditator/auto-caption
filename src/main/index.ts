@@ -25,7 +25,7 @@ app.whenReady().then(() => {
 })
 
 app.on('will-quit', async () => {
-  captionEngine.stop()
+  captionEngine.kill()
   allConfig.writeConfig()
 });
 

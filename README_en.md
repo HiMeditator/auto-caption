@@ -3,12 +3,8 @@
     <h1 align="center">auto-caption</h1>
     <p>Auto Caption is a cross-platform real-time caption display software.</p>
     <p>
-      <a href="https://github.com/HiMeditator/auto-caption/releases">
-        <img src="https://img.shields.io/badge/release-0.6.0-blue">
-      </a>
-      <a href="https://github.com/HiMeditator/auto-caption/issues">
-        <img src="https://img.shields.io/github/issues/HiMeditator/auto-caption?color=orange">
-      </a>
+      <a href="https://github.com/HiMeditator/auto-caption/releases"><img src="https://img.shields.io/badge/release-0.6.0-blue"></a>
+      <a href="https://github.com/HiMeditator/auto-caption/issues"><img src="https://img.shields.io/github/issues/HiMeditator/auto-caption?color=orange"></a>
       <img src="https://img.shields.io/github/languages/top/HiMeditator/auto-caption?color=royalblue">
       <img src="https://img.shields.io/github/repo-size/HiMeditator/auto-caption?color=green">
       <img src="https://img.shields.io/github/stars/HiMeditator/auto-caption?style=social">
@@ -77,7 +73,7 @@ To use the Vosk local caption engine, first download your required model from [V
 
 ## ⚙️ Built-in Subtitle Engines
 
-Currently, the software comes with 2 subtitle engines, with 1 new engine planned. Details are as follows.
+Currently, the software comes with 2 subtitle engines, with new engines under development. Their detailed information is as follows.
 
 ### Gummy Subtitle Engine (Cloud)
 
@@ -108,9 +104,14 @@ The engine only uploads data when receiving audio streams, so the actual upload 
 
 Developed based on [vosk-api](https://github.com/alphacep/vosk-api). Currently only supports generating original text from audio, does not support translation content.
 
-### FunASR Subtitle Engine (Local)
+### Planned New Subtitle Engines
 
-If feasible, will be developed based on [FunASR](https://github.com/modelscope/FunASR). Not yet researched or verified for feasibility.
+The following are candidate models that will be selected based on model performance and ease of integration.
+
+- [faster-whisper](https://github.com/SYSTRAN/faster-whisper)
+- [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx)
+- [SenseVoice](https://github.com/FunAudioLLM/SenseVoice)
+- [FunASR](https://github.com/modelscope/FunASR)
 
 ## 🚀 Project Setup
 

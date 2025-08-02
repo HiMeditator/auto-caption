@@ -44,11 +44,14 @@ const defaultControls: Controls = {
 
 
 class AllConfig {
+  captionWindowWidth: number = 900;
+
   uiLanguage: UILanguage = 'zh';
   leftBarWidth: number = 8;
   uiTheme: UITheme = 'system';
   styles: Styles = {...defaultStyles};
   controls: Controls = {...defaultControls};
+  
   lastLogIndex: number = -1;
   captionLog: CaptionItem[] = [];
 
@@ -58,6 +61,7 @@ class AllConfig {
     const configPath = path.join(app.getPath('userData'), 'config.json')
     if(fs.existsSync(configPath)){
       const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'))
+      if(config.captionWindowWidth) this.captionWindowWidth = config.captionWindowWidth
       if(config.uiLanguage) this.uiLanguage = config.uiLanguage
       if(config.uiTheme) this.uiTheme = config.uiTheme
       if(config.leftBarWidth) this.leftBarWidth = config.leftBarWidth
@@ -69,6 +73,7 @@ class AllConfig {
 
   public writeConfig() {
     const config = {
+      captionWindowWidth: this.captionWindowWidth,
       uiLanguage: this.uiLanguage,
       uiTheme: this.uiTheme,
       leftBarWidth: this.leftBarWidth,

@@ -15,6 +15,7 @@ export class CaptionEngine {
   client: net.Socket | undefined
   port: number = 8080
   status: 'running' | 'starting' | 'stopping' | 'stopped' = 'stopped'
+  timerID: NodeJS.Timeout | undefined
 
   private getApp(): boolean {
     if (allConfig.controls.customized) {
@@ -160,6 +161,7 @@ export class CaptionEngine {
         controlWindow.window.webContents.send('control.engine.stopped')
       }
       this.status = 'stopped'
+      clearInterval(this.timerID)
       Log.info(`Engine exited with code ${code}`)
     });
   }
@@ -176,9 +178,15 @@ export class CaptionEngine {
     }
     this.status = 'stopping'
     Log.info('Caption engine process stopping...')
+    this.timerID = setTimeout(() => {
+      if(this.status !== 'stopping') return
+      Log.warn('Engine process still not stopped, trying to kill...')
+      this.kill()
+    }, 4000);
   }
 
   public kill(){
+    if(!this.process || !this.process.pid) return
     if(this.status !== 'running'){
       Log.warn('Trying to kill engine which is not running, current status:', this.status)
     }

@@ -3,12 +3,8 @@
     <h1 align="center">auto-caption</h1>
     <p>Auto Caption 是一个跨平台的实时字幕显示软件。</p>
     <p>
-      <a href="https://github.com/HiMeditator/auto-caption/releases">
-        <img src="https://img.shields.io/badge/release-0.6.0-blue">
-      </a>
-      <a href="https://github.com/HiMeditator/auto-caption/issues">
-        <img src="https://img.shields.io/github/issues/HiMeditator/auto-caption?color=orange">
-      </a>
+      <a href="https://github.com/HiMeditator/auto-caption/releases"><img src="https://img.shields.io/badge/release-0.6.0-blue"></a>
+      <a href="https://github.com/HiMeditator/auto-caption/issues"><img src="https://img.shields.io/github/issues/HiMeditator/auto-caption?color=orange"></a>
       <img src="https://img.shields.io/github/languages/top/HiMeditator/auto-caption?color=royalblue">
       <img src="https://img.shields.io/github/repo-size/HiMeditator/auto-caption?color=green">
       <img src="https://img.shields.io/github/stars/HiMeditator/auto-caption?style=social">
@@ -77,7 +73,7 @@ macOS 平台和 Linux 平台获取系统音频输出需要进行额外设置，�
 
 ## ⚙️ 自带字幕引擎说明
 
-目前软件自带 2 个字幕引擎，正在规划 1 个新的引擎。它们的详细信息如下。
+目前软件自带 2 个字幕引擎，正在规划新的引擎。它们的详细信息如下。
 
 ### Gummy 字幕引擎（云端）
 
@@ -108,9 +104,14 @@ $$
 
 基于 [vosk-api](https://github.com/alphacep/vosk-api) 开发。目前只支持生成音频对应的原文，不支持生成翻译内容。
 
-### FunASR 字幕引擎（本地）
+### 新规划字幕引擎
 
-如果可行，将基于 [FunASR](https://github.com/modelscope/FunASR) 进行开发。还未进行调研和可行性验证。
+以下为备选模型，将根据模型效果和集成难易程度选择。
+
+- [faster-whisper](https://github.com/SYSTRAN/faster-whisper)
+- [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx)
+- [SenseVoice](https://github.com/FunAudioLLM/SenseVoice)
+- [FunASR](https://github.com/modelscope/FunASR)
 
 ## 🚀 项目运行
 
