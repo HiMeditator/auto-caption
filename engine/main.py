@@ -40,6 +40,7 @@ def main_gummy(s: str, t: str, a: int, c: int, k: str):
     stream.close_stream()
     engine.stop()
 
+
 def main_vosk(a: int, c: int, m: str):
     global thread_data
     stream = AudioStream(a, c)
