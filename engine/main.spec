@@ -4,9 +4,9 @@ from pathlib import Path
 import sys
 
 if sys.platform == 'win32':
-    vosk_path = str(Path('./subenv/Lib/site-packages/vosk').resolve())
+    vosk_path = str(Path('./.venv/Lib/site-packages/vosk').resolve())
 else:
-    vosk_path = str(Path('./subenv/lib/python3.12/site-packages/vosk').resolve())
+    vosk_path = str(Path('./.venv/lib/python3.12/site-packages/vosk').resolve())
 
 a = Analysis(
     ['main.py'],

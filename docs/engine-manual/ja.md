@@ -157,7 +157,7 @@ if __name__ == "__main__":
     # 共通
     parser.add_argument('-e', '--caption_engine', default='gummy', help='字幕エンジン: gummyまたはvosk')
     parser.add_argument('-a', '--audio_type', default=0, help='オーディオストリームソース: 0は出力、1は入力')
-    parser.add_argument('-c', '--chunk_rate', default=20, help='1秒あたりに収集するオーディオストリームブロックの数')
+    parser.add_argument('-c', '--chunk_rate', default=10, help='1秒あたりに収集するオーディオストリームブロックの数')
     parser.add_argument('-p', '--port', default=8080, help='サーバーを実行するポート、0はサーバーなし')
     # gummy専用
     parser.add_argument('-s', '--source_language', default='en', help='ソース言語コード')

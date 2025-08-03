@@ -6,7 +6,7 @@ out
 *.log*
 __pycache__
 .venv
-subenv
+test.py
 engine/build
 engine/models
 engine/notebook

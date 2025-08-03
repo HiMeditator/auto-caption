@@ -37,7 +37,7 @@ export class CaptionEngine {
         if(process.platform === "win32") {
           this.appPath = path.join(
             app.getAppPath(), 'engine',
-            'subenv', 'Scripts', 'python.exe'
+            '.venv', 'Scripts', 'python.exe'
           )
           this.command.push(path.join(
             app.getAppPath(), 'engine', 'main.py'
@@ -47,7 +47,7 @@ export class CaptionEngine {
         else {
           this.appPath = path.join(
             app.getAppPath(), 'engine',
-            'subenv', 'bin', 'python3'
+            '.venv', 'bin', 'python3'
           )
           this.command.push(path.join(
             app.getAppPath(), 'engine', 'main.py'

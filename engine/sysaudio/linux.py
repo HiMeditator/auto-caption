@@ -41,9 +41,9 @@ class AudioStream:
 
     初始化参数：
         audio_type: 0-系统音频输出流（不支持，不会生效），1-系统音频输入流（默认）
-        chunk_rate: 每秒采集音频块的数量，默认为20
+        chunk_rate: 每秒采集音频块的数量，默认为10
     """
-    def __init__(self, audio_type=1,  chunk_rate=20):
+    def __init__(self, audio_type=1,  chunk_rate=10):
         self.audio_type = audio_type
 
         if self.audio_type == 0:
@@ -57,6 +57,12 @@ class AudioStream:
         self.CHANNELS = 2
         self.RATE = 48000
         self.CHUNK = self.RATE // chunk_rate
+
+    def reset_chunk_size(self, chunk_size: int):
+        """
+        重新设置音频块大小
+        """
+        self.CHUNK = chunk_size
 
     def get_info(self):
         dev_info = f"""

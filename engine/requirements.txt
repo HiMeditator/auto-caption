@@ -1,0 +1,7 @@
+dashscope
+numpy
+samplerate
+vosk
+pyinstaller
+pyaudio; sys_platform == 'darwin'
+pyaudiowpatch; sys_platform == 'win32'

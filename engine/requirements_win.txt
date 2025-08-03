@@ -1,6 +1,0 @@
-dashscope
-numpy
-samplerate
-PyAudioWPatch
-vosk
-pyinstaller

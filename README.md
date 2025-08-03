@@ -129,29 +129,24 @@ npm install
 
 ```bash
 # in ./engine folder
-python -m venv subenv
+python -m venv .venv
 # or
-python3 -m venv subenv
+python3 -m venv .venv
 ```
 
 然后激活虚拟环境：
 
 ```bash
 # Windows
-subenv/Scripts/activate
+.venv/Scripts/activate
 # Linux or macOS
-source subenv/bin/activate
+source .venv/bin/activate
 ```
 
 然后安装依赖（这一步在 macOS 和 Linux 可能会报错，一般是因为构建失败，需要根据报错信息进行处理）：
 
 ```bash
-# Windows
-pip install -r requirements_win.txt
-# macOS
-pip install -r requirements_darwin.txt
-# Linux
-pip install -r requirements_linux.txt
+pip install -r requirements.txt
 ```
 
 如果在 Linux 系统上安装 `samplerate` 模块报错，可以尝试使用以下命令单独安装：
@@ -170,12 +165,12 @@ pyinstaller ./main.spec
 
 ```
 # Windows
-vosk_path = str(Path('./subenv/Lib/site-packages/vosk').resolve())
+vosk_path = str(Path('./.venv/Lib/site-packages/vosk').resolve())
 # Linux or macOS
-vosk_path = str(Path('./subenv/lib/python3.x/site-packages/vosk').resolve())
+vosk_path = str(Path('./.venv/lib/python3.x/site-packages/vosk').resolve())
 ```
 
-此时项目构建完成，在进入 `engine/dist` 文件夹可见对应的可执行文件。即可进行后续操作。
+此时项目构建完成，进入 `engine/dist` 文件夹可见对应的可执行文件。即可进行后续操作。
 
 ### 运行项目
 

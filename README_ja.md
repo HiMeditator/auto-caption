@@ -129,29 +129,24 @@ npm install
 
 ```bash
 # ./engine フォルダ内
-python -m venv subenv
+python -m venv .venv
 # または
-python3 -m venv subenv
+python3 -m venv .venv
 ```
 
 次に仮想環境をアクティブにします：
 
 ```bash
 # Windows
-subenv/Scripts/activate
+.venv/Scripts/activate
 # Linux または macOS
-source subenv/bin/activate
+source .venv/bin/activate
 ```
 
 次に依存関係をインストールします（このステップでは macOS と Linux でエラーが発生する可能性があります。通常はビルド失敗によるもので、エラーメッセージに基づいて対処する必要があります）：
 
 ```bash
-# Windows
-pip install -r requirements_win.txt
-# macOS
-pip install -r requirements_darwin.txt
-# Linux
-pip install -r requirements_linux.txt
+pip install -r requirements.txt
 ```
 
 Linux システムで `samplerate` モジュールのインストールに問題が発生した場合、以下のコマンドで個別にインストールを試すことができます：
@@ -170,9 +165,9 @@ pyinstaller ./main.spec
 
 ```
 # Windows
-vosk_path = str(Path('./subenv/Lib/site-packages/vosk').resolve())
+vosk_path = str(Path('./.venv/Lib/site-packages/vosk').resolve())
 # Linux または macOS
-vosk_path = str(Path('./subenv/lib/python3.x/site-packages/vosk').resolve())
+vosk_path = str(Path('./.venv/lib/python3.x/site-packages/vosk').resolve())
 ```
 
 これでプロジェクトのビルドが完了し、`engine/dist` フォルダ内に対応する実行可能ファイルが確認できます。その後、次の操作に進むことができます。

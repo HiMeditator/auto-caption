@@ -129,29 +129,24 @@ First enter the `engine` folder and execute the following commands to create a v
 
 ```bash
 # in ./engine folder
-python -m venv subenv
+python -m venv .venv
 # or
-python3 -m venv subenv
+python3 -m venv .venv
 ```
 
 Then activate the virtual environment:
 
 ```bash
 # Windows
-subenv/Scripts/activate
+.venv/Scripts/activate
 # Linux or macOS
-source subenv/bin/activate
+source .venv/bin/activate
 ```
 
 Then install dependencies (this step might result in errors on macOS and Linux, usually due to build failures, and you need to handle them based on the error messages):
 
 ```bash
-# Windows
-pip install -r requirements_win.txt
-# macOS
-pip install -r requirements_darwin.txt
-# Linux
-pip install -r requirements_linux.txt
+pip install -r requirements.txt
 ```
 
 If you encounter errors when installing the `samplerate` module on Linux systems, you can try installing it separately with this command:
@@ -170,9 +165,9 @@ Note that the path to the `vosk` library in `main-vosk.spec` might be incorrect 
 
 ```
 # Windows
-vosk_path = str(Path('./subenv/Lib/site-packages/vosk').resolve())
+vosk_path = str(Path('./.venv/Lib/site-packages/vosk').resolve())
 # Linux or macOS
-vosk_path = str(Path('./subenv/lib/python3.x/site-packages/vosk').resolve())
+vosk_path = str(Path('./.venv/lib/python3.x/site-packages/vosk').resolve())
 ```
 
 After the build completes, you can find the executable file in the `engine/dist` folder. Then proceed with subsequent operations.
