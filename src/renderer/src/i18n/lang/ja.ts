@@ -37,7 +37,8 @@ export default {
     "theme": "テーマ",
     "light": "明るい",
     "dark": "暗い",
-    "system": "システム"
+    "system": "システム",
+    "color": "カラー"
   },
   engine: {
     "title": "字幕エンジン設定",
@@ -142,6 +143,8 @@ export default {
     "both": "すべて",
     "source": "原文",
     "translation": "翻訳",
+    "copyNum": "コピー数",
+    "all": "すべて",
     "copySuccess": "字幕がクリップボードにコピーされました",
     "clear": "ログをクリア"
   }

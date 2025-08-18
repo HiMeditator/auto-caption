@@ -29,10 +29,22 @@
       </div>
 
       <div class="input-item">
+        <span class="input-label">{{ $t('general.color') }}</span>
+        <a-radio-group v-model:value="uiColor">
+          <template v-for="color in colorList" :key="color">
+            <a-radio-button :value="color"
+              :style="{
+                backgroundColor: color
+              }"
+            >&nbsp;</a-radio-button>
+          </template>
+        </a-radio-group>
+      </div>
+
+      <div class="input-item">
         <span class="input-label">{{ $t('general.barWidth') }}</span>
-        <a-input
-          type="range" class="span-input"
-          min="6" max="12" v-model:value="leftBarWidth"
+        <a-slider class="span-input"
+          :min="6" :max="12" v-model:value="leftBarWidth"
         />
         <div class="input-item-value">{{ (leftBarWidth * 100 / 24).toFixed(0) }}%</div>
       </div>
@@ -45,15 +57,26 @@ import { storeToRefs } from 'pinia'
 import { useGeneralSettingStore } from '@renderer/stores/generalSetting'
 import { InfoCircleOutlined } from '@ant-design/icons-vue';
 
+const colorList = [
+  '#1677ff',
+  '#00b96b',
+  '#fa8c16',
+  '#722ed1',
+  '#eb2f96',
+  '#000000'
+]
+
 const generalSettingStore = useGeneralSettingStore()
-const { uiLanguage, uiTheme, leftBarWidth } = storeToRefs(generalSettingStore)
+const { uiLanguage, uiTheme, uiColor, leftBarWidth } = storeToRefs(generalSettingStore)
 </script>
 
 <style scoped>
 @import url(../assets/input.css);
 
 .span-input {
+  display: inline-block;
   width: 100px;
+  margin: 0;
 }
 
 .general-note {

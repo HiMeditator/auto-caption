@@ -49,6 +49,7 @@ export interface FullConfig {
   platform: string,
   uiLanguage: UILanguage,
   uiTheme: UITheme,
+  uiColor: string,
   leftBarWidth: number,
   styles: Styles,
   controls: Controls,

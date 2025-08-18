@@ -55,8 +55,8 @@
           <div class="input-item">
             <span class="input-label">{{ $t('log.exportFormat') }}</span>
             <a-radio-group v-model:value="exportFormat">
-              <a-radio-button value="srt">.srt</a-radio-button>
-              <a-radio-button value="json">.json</a-radio-button>
+              <a-radio-button value="srt"><code>.srt</code></a-radio-button>
+              <a-radio-button value="json"><code>.json</code></a-radio-button>
             </a-radio-group>
           </div>
           <div class="input-item">
@@ -88,6 +88,15 @@
               <a-radio-button value="both">{{ $t('log.both') }}</a-radio-button>
               <a-radio-button value="source">{{ $t('log.source') }}</a-radio-button>
               <a-radio-button value="target">{{ $t('log.translation') }}</a-radio-button>
+            </a-radio-group>
+          </div>
+          <div class="input-item">
+            <span class="input-label">{{ $t('log.copyNum') }}</span>
+            <a-radio-group v-model:value="copyNum">
+              <a-radio-button :value="0"><code>[:]</code></a-radio-button>
+              <a-radio-button :value="1"><code>[-1:]</code></a-radio-button>
+              <a-radio-button :value="2"><code>[-2:]</code></a-radio-button>
+              <a-radio-button :value="3"><code>[-3:]</code></a-radio-button>
             </a-radio-group>
           </div>
         </template>
@@ -147,6 +156,7 @@ const exportFormat = ref('srt')
 const showIndex = ref(true)
 const copyTime = ref(true)
 const contentOption = ref('both')
+const copyNum = ref(0)
 
 const baseHH = ref<number>(0)
 const baseMM = ref<number>(0)
@@ -255,7 +265,12 @@ function getExportData() {
 
 function copyCaptions() {
   let content = ''
-  for(let i = 0; i < captionData.value.length; i++){
+  let start = 0
+  if(copyNum.value > 0) {
+    start = captionData.value.length - copyNum.value
+    if(start < 0) start = 0
+  }
+  for(let i = start; i < captionData.value.length; i++){
     const item = captionData.value[i]
     if(showIndex.value) content += `${i+1}\n`
     if(copyTime.value) content += `${item.time_s} --> ${item.time_t}\n`.replace(/\./g, ',')

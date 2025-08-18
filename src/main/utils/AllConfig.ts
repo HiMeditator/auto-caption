@@ -49,6 +49,7 @@ class AllConfig {
   uiLanguage: UILanguage = 'zh';
   leftBarWidth: number = 8;
   uiTheme: UITheme = 'system';
+  uiColor: string = '#1677ff';
   styles: Styles = {...defaultStyles};
   controls: Controls = {...defaultControls};
   
@@ -64,6 +65,7 @@ class AllConfig {
       if(config.captionWindowWidth) this.captionWindowWidth = config.captionWindowWidth
       if(config.uiLanguage) this.uiLanguage = config.uiLanguage
       if(config.uiTheme) this.uiTheme = config.uiTheme
+      if(config.uiColor) this.uiColor = config.uiColor
       if(config.leftBarWidth) this.leftBarWidth = config.leftBarWidth
       if(config.styles) this.setStyles(config.styles)
       if(config.controls) this.setControls(config.controls)
@@ -76,6 +78,7 @@ class AllConfig {
       captionWindowWidth: this.captionWindowWidth,
       uiLanguage: this.uiLanguage,
       uiTheme: this.uiTheme,
+      uiColor: this.uiColor,
       leftBarWidth: this.leftBarWidth,
       controls: this.controls,
       styles: this.styles
@@ -90,6 +93,7 @@ class AllConfig {
       platform: process.platform,
       uiLanguage: this.uiLanguage,
       uiTheme: this.uiTheme,
+      uiColor: this.uiColor,
       leftBarWidth: this.leftBarWidth,
       styles: this.styles,
       controls: this.controls,
@@ -123,7 +127,9 @@ class AllConfig {
       }
     }
     this.controls.engineEnabled = engineEnabled
-    Log.info('Set Controls:', this.controls)
+    let _controls = {...this.controls}
+    _controls.API_KEY = _controls.API_KEY.replace(/./g, '*')
+    Log.info('Set Controls:', _controls)
   }
 
   public sendControls(window: BrowserWindow, info = true) {

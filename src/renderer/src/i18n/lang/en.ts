@@ -37,7 +37,8 @@ export default {
     "theme": "Theme",
     "light": "light",
     "dark": "dark",
-    "system": "system"
+    "system": "system",
+    "color": "Color"
   },
   engine: {
     "title": "Caption Engine Settings",
@@ -142,6 +143,8 @@ export default {
     "both": "Both",
     "source": "Original",
     "translation": "Translation",
+    "copyNum": "Copy Count",
+    "all": "All",
     "copySuccess": "Subtitle copied to clipboard",
     "clear": "Clear Log"
   }

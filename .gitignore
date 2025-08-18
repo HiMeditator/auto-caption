@@ -10,3 +10,5 @@ test.py
 engine/build
 engine/models
 engine/notebook
+.repomap
+.virtualme

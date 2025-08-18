@@ -109,6 +109,10 @@ class ControlWindow {
       allConfig.uiTheme = args
     })
 
+    ipcMain.on('control.uiColor.change', (_, args) => {
+      allConfig.uiColor = args
+    })
+
     ipcMain.on('control.leftBarWidth.change', (_, args) => {
       allConfig.leftBarWidth = args
     })

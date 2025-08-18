@@ -14,6 +14,7 @@ onMounted(() => {
   window.electron.ipcRenderer.invoke('both.window.mounted').then((data: FullConfig) => {
     useGeneralSettingStore().uiLanguage = data.uiLanguage
     useGeneralSettingStore().uiTheme = data.uiTheme
+    useGeneralSettingStore().uiColor = data.uiColor
     useGeneralSettingStore().leftBarWidth = data.leftBarWidth
     useCaptionStyleStore().setStyles(data.styles)
     useEngineControlStore().platform = data.platform

@@ -3,16 +3,17 @@ import { defineStore } from 'pinia'
 import { i18n } from '../i18n'
 import type { UILanguage, UITheme } from '../types'
 
-import { engines, audioTypes, antDesignTheme, breakOptions  } from '../i18n'
+import { engines, audioTypes, breakOptions, setThemeColor, getTheme } from '../i18n'
 import { useEngineControlStore } from './engineControl'
 import { useCaptionStyleStore } from './captionStyle'
 
 export const useGeneralSettingStore = defineStore('generalSetting', () => {
   const uiLanguage = ref<UILanguage>('zh')
   const uiTheme = ref<UITheme>('system')
+  const uiColor = ref<string>('#1677ff')
   const leftBarWidth = ref<number>(8)
 
-  const antdTheme = ref<Object>(antDesignTheme['light'])
+  const antdTheme = ref<Object>(getTheme())
 
   window.electron.ipcRenderer.invoke('control.nativeTheme.get').then((theme) => {
     if(theme === 'light') setLightTheme()
@@ -39,6 +40,12 @@ export const useGeneralSettingStore = defineStore('generalSetting', () => {
     else if(newValue === 'dark') setDarkTheme()
   })
 
+  watch(uiColor, (newValue) => {
+    setThemeColor(newValue)
+    antdTheme.value = getTheme()
+    window.electron.ipcRenderer.send('control.uiColor.change', newValue)
+  })
+
   watch(leftBarWidth, (newValue) => {
     window.electron.ipcRenderer.send('control.leftBarWidth.change', newValue)
   })
@@ -53,7 +60,7 @@ export const useGeneralSettingStore = defineStore('generalSetting', () => {
   })
 
   function setLightTheme(){
-    antdTheme.value = antDesignTheme.light
+    antdTheme.value = getTheme(true)
     const root = document.documentElement
     root.style.setProperty('--control-background', '#fff')
     root.style.setProperty('--tag-color', 'rgba(0, 0, 0, 0.45)')
@@ -61,7 +68,7 @@ export const useGeneralSettingStore = defineStore('generalSetting', () => {
   }
 
   function setDarkTheme(){
-    antdTheme.value = antDesignTheme.dark
+    antdTheme.value = getTheme(false)
     const root = document.documentElement
     root.style.setProperty('--control-background', '#000')
     root.style.setProperty('--tag-color', 'rgba(255, 255, 255, 0.45)')
@@ -71,6 +78,7 @@ export const useGeneralSettingStore = defineStore('generalSetting', () => {
   return {
     uiLanguage,
     uiTheme,
+    uiColor,
     leftBarWidth,
     antdTheme
   }

@@ -34,20 +34,18 @@
     </div>
     <div class="input-item">
       <span class="input-label">{{ $t('style.fontSize') }}</span>
-      <a-input
+      <a-slider
         class="input-area"
-        type="range"
-        min="0" max="72"
+        :min="0" :max="72"
         v-model:value="currentFontSize"
       />
       <div class="input-item-value">{{ currentFontSize }}px</div>
     </div>
     <div class="input-item">
       <span class="input-label">{{ $t('style.fontWeight') }}</span>
-      <a-input
+      <a-slider
         class="input-area"
-        type="range"
-        min="1" max="9"
+        :min="1" :max="9"
         v-model:value="currentFontWeight"
       />
       <div class="input-item-value">{{ currentFontWeight*100 }}</div>
@@ -63,11 +61,10 @@
     </div>
     <div class="input-item">
       <span class="input-label">{{ $t('style.opacity') }}</span>
-      <a-input
+      <a-slider
         class="input-area"
-        type="range"
-        min="0"
-        max="100"
+        :min="0"
+        :max="100"
         v-model:value="currentOpacity"
       />
       <div class="input-item-value">{{ currentOpacity }}%</div>
@@ -111,20 +108,18 @@
         </div>
         <div class="input-item">
           <span class="input-label">{{ $t('style.fontSize') }}</span>
-          <a-input
+          <a-slider
             class="input-area"
-            type="range"
-            min="0" max="72"
+            :min="0" :max="72"
             v-model:value="currentTransFontSize"
           />
           <div class="input-item-value">{{ currentTransFontSize }}px</div>
         </div>
         <div class="input-item">
           <span class="input-label">{{ $t('style.fontWeight') }}</span>
-          <a-input
+          <a-slider
             class="input-area"
-            type="range"
-            min="1" max="9"
+            :min="1" :max="9"
             v-model:value="currentTransFontWeight"
           />
           <div class="input-item-value">{{ currentTransFontWeight*100 }}</div>
@@ -136,30 +131,27 @@
       <a-card size="small" :title="$t('style.shadow.title')">
         <div class="input-item">
           <span class="input-label">{{ $t('style.shadow.offsetX') }}</span>
-          <a-input
+          <a-slider
             class="input-area"
-            type="range"
-            min="-10" max="10"
+            :min="-10" :max="10"
             v-model:value="currentOffsetX"
           />
           <div class="input-item-value">{{ currentOffsetX }}px</div>
         </div>
         <div class="input-item">
           <span class="input-label">{{ $t('style.shadow.offsetY') }}</span>
-          <a-input
+          <a-slider
             class="input-area"
-            type="range"
-            min="-10" max="10"
+            :min="-10" :max="10"
             v-model:value="currentOffsetY"
           />
           <div class="input-item-value">{{ currentOffsetY }}px</div>
         </div>
         <div class="input-item">
           <span class="input-label">{{ $t('style.shadow.blur') }}</span>
-          <a-input
+          <a-slider
             class="input-area"
-            type="range"
-            min="0" max="12"
+            :min="0" :max="12"
             v-model:value="currentBlur"
           />
           <div class="input-item-value">{{ currentBlur }}px</div>
@@ -315,7 +307,7 @@ function resetStyle() {
 }
 
 watch(changeSignal, (val) => {
-  if(val == true) {
+  if(val === true) {
     backStyle();
     captionStyle.changeSignal = false;
   }

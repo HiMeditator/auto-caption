@@ -37,7 +37,8 @@ export default {
     "theme": "主题",
     "light": "浅色",
     "dark": "深色",
-    "system": "系统"
+    "system": "系统",
+    "color": "颜色"
   },
   engine: {
     "title": "字幕引擎设置",
@@ -142,6 +143,8 @@ export default {
     "both": "全部",
     "source": "原文",
     "translation": "翻译",
+    "copyNum": "复制数量",
+    "all": "全部",
     "copySuccess": "字幕已复制到剪贴板",
     "clear": "清空记录"
   }

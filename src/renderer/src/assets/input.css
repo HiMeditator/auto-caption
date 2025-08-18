@@ -17,6 +17,7 @@
 }
 
 .input-area {
+  display: inline-block;
   width: calc(100% - 100px);
   min-width: 100px;
 }
