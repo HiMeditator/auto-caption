@@ -4,6 +4,9 @@ import json
 def stdout(text: str):
     stdout_cmd("print", text)
 
+def stdout_err(text: str):
+    stdout_cmd("error", text)
+
 def stdout_cmd(command: str, content = ""):
     msg = { "command": command, "content": content }
     sys.stdout.write(json.dumps(msg) + "\n")

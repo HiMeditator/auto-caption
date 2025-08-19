@@ -3,7 +3,7 @@
     <h1 align="center">auto-caption</h1>
     <p>Auto Caption はクロスプラットフォームのリアルタイム字幕表示ソフトウェアです。</p>
     <p>
-      <a href="https://github.com/HiMeditator/auto-caption/releases"><img src="https://img.shields.io/badge/release-0.6.0-blue"></a>
+      <a href="https://github.com/HiMeditator/auto-caption/releases"><img src="https://img.shields.io/badge/release-0.7.0-blue"></a>
       <a href="https://github.com/HiMeditator/auto-caption/issues"><img src="https://img.shields.io/github/issues/HiMeditator/auto-caption?color=orange"></a>
       <img src="https://img.shields.io/github/languages/top/HiMeditator/auto-caption?color=royalblue">
       <img src="https://img.shields.io/github/repo-size/HiMeditator/auto-caption?color=green">
@@ -14,7 +14,7 @@
         | <a href="./README_en.md">English</a>
         | <b>日本語</b> |
     </p>
-    <p><i>v0.6.0 バージョンがリリースされ、字幕エンジンコードが大規模にリファクタリングされ、コードの拡張性が向上しました。より多くの字幕エンジンの開発が試みられています...</i></p>
+    <p><i>バージョン 0.7.0 がリリースされ、ソフトウェアインターフェースが最適化され、ログ記録表示機能が追加されました。ローカルの字幕エンジンは現在開発中であり、Pythonコードの形式でリリースされる予定です...</i></p>
 </div>
 
 ![](./assets/media/main_ja.png)
@@ -33,9 +33,18 @@
 
 [更新履歴](./docs/CHANGELOG.md)
 
+## ✨ 特徴
+
+- 音声出力またはマイク入力からの字幕生成
+- クロスプラットフォーム（Windows、macOS、Linux）、多言語インターフェース（中国語、英語、日本語）対応
+- 豊富な字幕スタイル設定（フォント、フォントサイズ、フォント太さ、フォント色、背景色など）
+- 柔軟な字幕エンジン選択（阿里雲 Gummy クラウドモデル、ローカル Vosk モデル、独自開発モデル）
+- 多言語認識と翻訳（下記「⚙️ 字幕エンジン説明」参照）
+- 字幕記録表示とエクスポート（`.srt` および `.json` 形式のエクスポートに対応）
+
 ## 📖 基本使い方
 
-このソフトウェアはWindows、macOS、Linuxプラットフォームに対応しています。テスト済みのプラットフォーム情報は以下の通りです：
+このソフトウェアは Windows、macOS、Linux プラットフォームに対応しています。テスト済みのプラットフォーム情報は以下の通りです：
 
 | OS バージョン | アーキテクチャ | システムオーディオ入力 | システムオーディオ出力 |
 | ------------------ | ------------ | ------------------ | ------------------- |
@@ -45,7 +54,7 @@
 | Kali Linux 2022.3  | x64          | ✅                 | ✅                   |
 | Kylin Server V10 SP3 | x64 | ✅ | ✅ |
 
-macOSおよびLinuxプラットフォームでシステムオーディオ出力を取得するには追加設定が必要です。詳細は[Auto Captionユーザーマニュアル](./docs/user-manual/ja.md)をご覧ください。
+macOS および Linux プラットフォームでシステムオーディオ出力を取得するには追加設定が必要です。詳細は[Auto Captionユーザーマニュアル](./docs/user-manual/ja.md)をご覧ください。
 
 > 阿里雲の国際版サービスでは Gummy モデルを提供していないため、現在中国以外のユーザーは Gummy 字幕エンジンを使用できません。
 
@@ -61,15 +70,6 @@ Vosk ローカル字幕エンジンを使用するには、まず [Vosk Models](
 ![](./assets/media/vosk_ja.png)
 
 **上記の字幕エンジンがご要望を満たさず、かつ Python の知識をお持ちの場合、独自の字幕エンジンを開発することも可能です。詳細な説明は[字幕エンジン説明書](./docs/engine-manual/ja.md)をご参照ください。**
-
-## ✨ 特徴
-
-- クロスプラットフォーム、多言語 UI サポート
-- 豊富な字幕スタイル設定
-- 柔軟な字幕エンジン選択
-- 多言語認識と翻訳
-- 字幕記録の表示とエクスポート
-- オーディオ出力またはマイク入力からの字幕生成
 
 ## ⚙️ 字幕エンジン説明
 

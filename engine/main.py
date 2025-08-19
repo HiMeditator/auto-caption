@@ -1,5 +1,5 @@
 import argparse
-from utils import stdout_cmd, stderr
+from utils import stdout_cmd, stdout_err
 from utils import thread_data, start_server
 from utils import merge_chunk_channels, resample_chunk_mono
 from audio2text import InvalidParameter, GummyRecognizer
@@ -17,6 +17,7 @@ def main_gummy(s: str, t: str, a: int, c: int, k: str):
 
     stream.open_stream()
     engine.start()
+    chunk_mono = bytes()
 
     restart_count = 0
     while thread_data.status == "running":
@@ -28,15 +29,17 @@ def main_gummy(s: str, t: str, a: int, c: int, k: str):
                 engine.send_audio_frame(chunk_mono)
             except InvalidParameter as e:
                 restart_count += 1
-                if restart_count > 8:
-                    stderr(str(e))
+                if restart_count > 5:
+                    stdout_err(str(e))
                     thread_data.status = "kill"
+                    stdout_cmd('kill')
                     break
                 else:
-                    stdout_cmd('info', f'Gummy engine stopped, trying to restart #{restart_count}')
+                    stdout_cmd('info', f'Gummy engine stopped, restart attempt: {restart_count}...')
         except KeyboardInterrupt:
             break
 
+    engine.send_audio_frame(chunk_mono)
     stream.close_stream()
     engine.stop()
 

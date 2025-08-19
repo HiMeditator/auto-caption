@@ -3,7 +3,7 @@
     <h1 align="center">auto-caption</h1>
     <p>Auto Caption is a cross-platform real-time caption display software.</p>
     <p>
-      <a href="https://github.com/HiMeditator/auto-caption/releases"><img src="https://img.shields.io/badge/release-0.6.0-blue"></a>
+      <a href="https://github.com/HiMeditator/auto-caption/releases"><img src="https://img.shields.io/badge/release-0.7.0-blue"></a>
       <a href="https://github.com/HiMeditator/auto-caption/issues"><img src="https://img.shields.io/github/issues/HiMeditator/auto-caption?color=orange"></a>
       <img src="https://img.shields.io/github/languages/top/HiMeditator/auto-caption?color=royalblue">
       <img src="https://img.shields.io/github/repo-size/HiMeditator/auto-caption?color=green">
@@ -14,7 +14,7 @@
         | <b>English</b>
         | <a href="./README_ja.md">日本語</a> |
     </p>
-    <p><i>Version 0.6.0 has been released, featuring a major refactor of the subtitle engine code to improve code extensibility. More subtitle engines are being developed...</i></p>
+    <p><i>Version 0.7.0 has been released, imporving the software interface and adding software log display. The local caption engine is under development and is expected to be released in the form of Python code...</i></p>
 </div>
 
 ![](./assets/media/main_en.png)
@@ -32,6 +32,15 @@
 [Project API Documentation (Chinese)](./docs/api-docs/)
 
 [Changelog](./docs/CHANGELOG.md)
+
+## ✨ Features
+
+- Generate captions from audio output or microphone input
+- Cross-platform (Windows, macOS, Linux) and multi-language interface (Chinese, English, Japanese) support
+- Rich caption style settings (font, font size, font weight, font color, background color, etc.)
+- Flexible caption engine selection (Alibaba Cloud Gummy cloud model, local Vosk model, self-developed model)
+- Multi-language recognition and translation (see below "⚙️ Built-in Subtitle Engines")
+- Subtitle record display and export (supports exporting `.srt` and `.json` formats)
 
 ## 📖 Basic Usage
 
@@ -61,15 +70,6 @@ To use the Vosk local caption engine, first download your required model from [V
 ![](./assets/media/vosk_en.png)
 
 **If you find the above caption engines don't meet your needs and you know Python, you may consider developing your own caption engine. For detailed instructions, please refer to the [Caption Engine Documentation](./docs/engine-manual/en.md).**
-
-## ✨ Features
-
-- Cross-platform, multi-language UI support
-- Rich caption style settings
-- Flexible caption engine selection
-- Multi-language recognition and translation
-- Caption recording display and export
-- Generate captions for audio output or microphone input
 
 ## ⚙️ Built-in Subtitle Engines
 

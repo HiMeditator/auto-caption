@@ -80,6 +80,17 @@ Python 端监听到的音频流转换为的字幕数据。
 
 Python 端打印的提示信息，比起 `print`，该信息更希望 Electron 端的关注。
 
+### `error`
+
+```js
+{
+  command: "error",
+  content: string
+}
+```
+
+Python 端打印的错误信息，该错误信息需要在前端弹窗显示。
+
 ### `usage`
 
 ```js

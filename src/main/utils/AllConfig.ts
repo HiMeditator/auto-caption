@@ -61,6 +61,7 @@ class AllConfig {
   public readConfig() {
     const configPath = path.join(app.getPath('userData'), 'config.json')
     if(fs.existsSync(configPath)){
+      Log.info('Read Config from:', configPath)
       const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'))
       if(config.captionWindowWidth) this.captionWindowWidth = config.captionWindowWidth
       if(config.uiLanguage) this.uiLanguage = config.uiLanguage
@@ -69,7 +70,6 @@ class AllConfig {
       if(config.leftBarWidth) this.leftBarWidth = config.leftBarWidth
       if(config.styles) this.setStyles(config.styles)
       if(config.controls) this.setControls(config.controls)
-      Log.info('Read Config from:', configPath)
     }
   }
 

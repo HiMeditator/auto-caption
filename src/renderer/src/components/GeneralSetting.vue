@@ -54,21 +54,46 @@
 </template>
 
 <script setup lang="ts">
+import { ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useGeneralSettingStore } from '@renderer/stores/generalSetting'
 import { InfoCircleOutlined, CheckOutlined } from '@ant-design/icons-vue'
 
-const colorList = [
+const generalSettingStore = useGeneralSettingStore()
+const { uiLanguage, realTheme, uiTheme, uiColor, leftBarWidth } = storeToRefs(generalSettingStore)
+
+const colorListLight = [
   '#1677ff',
   '#00b96b',
   '#fa8c16',
-  '#722ed1',
+  '#9254de',
   '#eb2f96',
   '#000000'
 ]
 
-const generalSettingStore = useGeneralSettingStore()
-const { uiLanguage, uiTheme, uiColor, leftBarWidth } = storeToRefs(generalSettingStore)
+const colorListDark = [
+  '#1677ff',
+  '#00b96b',
+  '#fa8c16',
+  '#9254de',
+  '#eb2f96',
+  '#b9d7ea'
+]
+
+const colorList = ref(colorListLight)
+
+watch(realTheme, (val) => {
+  if(val === 'dark') {
+    colorList.value = colorListDark
+  } else {
+    colorList.value = colorListLight
+  }
+  console.log(val)
+})
+
+watch(uiTheme, (val) => {
+  console.log(val)
+})
 </script>
 
 <style scoped>

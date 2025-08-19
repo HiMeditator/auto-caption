@@ -7,17 +7,31 @@ import { engines, audioTypes, breakOptions, setThemeColor, getTheme } from '../i
 import { useEngineControlStore } from './engineControl'
 import { useCaptionStyleStore } from './captionStyle'
 
+type RealTheme = 'light' | 'dark'
+
 export const useGeneralSettingStore = defineStore('generalSetting', () => {
   const uiLanguage = ref<UILanguage>('zh')
+  const realTheme = ref<RealTheme>('light')
   const uiTheme = ref<UITheme>('system')
   const uiColor = ref<string>('#1677ff')
   const leftBarWidth = ref<number>(8)
 
   const antdTheme = ref<Object>(getTheme())
 
+  function handleThemeChange(newTheme: RealTheme) {
+    realTheme.value = newTheme
+    if(newTheme === 'dark' && uiColor.value === '#000000') {
+      uiColor.value = '#b9d7ea'
+    }
+    if(newTheme === 'light' && uiColor.value === '#b9d7ea') {
+      uiColor.value = '#000000'
+    }
+  }
+
   window.electron.ipcRenderer.invoke('control.nativeTheme.get').then((theme) => {
     if(theme === 'light') setLightTheme()
     else if(theme === 'dark') setDarkTheme()
+    handleThemeChange(theme)
   })
 
   watch(uiLanguage, (newValue) => {
@@ -31,13 +45,20 @@ export const useGeneralSettingStore = defineStore('generalSetting', () => {
   watch(uiTheme, (newValue) => {
     window.electron.ipcRenderer.send('control.uiTheme.change', newValue)
     if(newValue === 'system'){
-      window.electron.ipcRenderer.invoke('control.nativeTheme.get').then((theme) => {
+      window.electron.ipcRenderer.invoke('control.nativeTheme.get').then((theme: RealTheme) => {
         if(theme === 'light') setLightTheme()
         else if(theme === 'dark') setDarkTheme()
+        handleThemeChange(theme)
       })
     }
-    else if(newValue === 'light') setLightTheme()
-    else if(newValue === 'dark') setDarkTheme()
+    else if(newValue === 'light'){
+      setLightTheme()
+      handleThemeChange('light')
+    }
+    else if(newValue === 'dark') {
+      setDarkTheme()
+      handleThemeChange('dark')
+    }
   })
 
   watch(uiColor, (newValue) => {
@@ -50,13 +71,18 @@ export const useGeneralSettingStore = defineStore('generalSetting', () => {
     window.electron.ipcRenderer.send('control.leftBarWidth.change', newValue)
   })
 
+  watch(realTheme, (newValue) => { 
+    console.log('realTheme', newValue)
+  })
+
   window.electron.ipcRenderer.on('control.uiLanguage.set', (_, args: UILanguage) => {
     uiLanguage.value = args
   })
 
-  window.electron.ipcRenderer.on('control.nativeTheme.change', (_, args) => {
+  window.electron.ipcRenderer.on('control.nativeTheme.change', (_, args: RealTheme) => {
     if(args === 'light') setLightTheme()
     else if(args === 'dark') setDarkTheme()
+    handleThemeChange(args)
   })
 
   function setLightTheme(){
@@ -77,6 +103,7 @@ export const useGeneralSettingStore = defineStore('generalSetting', () => {
 
   return {
     uiLanguage,
+    realTheme,
     uiTheme,
     uiColor,
     leftBarWidth,

@@ -122,14 +122,19 @@
       </template>
       <template v-if="column.key === 'time'">
         <div class="time-cell">
-          <div class="time-start">{{ record.time_s }}</div>
-          <div class="time-end">{{ record.time_t }}</div>
+          <code class="time-start"
+            :style="`color: ${uiColor}`"
+          >{{ record.time_s }}</code>
+          <code class="time-end">{{ record.time_t }}</code>
         </div>
       </template>
       <template v-if="column.key === 'content'">
         <div class="caption-content">
           <div class="caption-text">{{ record.text }}</div>
-          <div class="caption-translation">{{ record.translation }}</div>
+          <div
+            class="caption-translation"
+            :style="`border-left: 3px solid ${uiColor};`"
+          >{{ record.translation }}</div>
         </div>
       </template>
     </template>
@@ -140,6 +145,7 @@
 import { ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useCaptionLogStore } from '@renderer/stores/captionLog'
+import { useGeneralSettingStore } from '@renderer/stores/generalSetting'
 import { message } from 'ant-design-vue'
 import { useI18n } from 'vue-i18n'
 import * as tc from '../utils/timeCalc'
@@ -149,6 +155,9 @@ const { t } = useI18n()
 
 const captionLog = useCaptionLogStore()
 const { captionData } = storeToRefs(captionLog)
+
+const generalSetting = useGeneralSettingStore()
+const { uiColor } = storeToRefs(generalSetting)
 
 const exportFormat = ref('srt')
 const showIndex = ref(true)
@@ -326,10 +335,13 @@ function clearCaptions() {
 }
 
 .time-start {
-  color: #1677ff;
+  display: block;
+  font-weight: bold;
 }
 
 .time-end {
+  display: block;
+  font-weight: bold;
   color: #ff4d4f;
 }
 
@@ -345,6 +357,5 @@ function clearCaptions() {
 .caption-translation {
   font-size: 14px;
   padding-left: 16px;
-  border-left: 3px solid #1890ff;
 }
 </style>

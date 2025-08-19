@@ -15,11 +15,14 @@
     style="margin-top: 10px;"
   >
     <template #bodyCell="{ column, record }">
-      <template v-if="column.key === 'type'">
-        <span :class="record.type">{{ record.type }}</span>
-      </template>
       <template v-if="column.key === 'index'">
         {{ record.index }}
+      </template>
+      <template v-if="column.key === 'type'">
+        <code :class="record.type">{{ record.type }}</code>
+      </template>
+      <template v-if="column.key === 'time'">
+        <code>{{ record.time }}</code>
       </template>
       <template v-if="column.key === 'content'">
         <code>{{ record.text }}</code>
@@ -79,7 +82,7 @@ const columns = [
     title: 'time',
     dataIndex: 'time',
     key: 'time',
-    width: 120,
+    width: 135,
     sortDirections: ['descend'],
   },
   {
