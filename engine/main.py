@@ -76,7 +76,7 @@ if __name__ == "__main__":
     # vosk only
     parser.add_argument('-m', '--model_path', default='', help='The path to the vosk model.')
 
-    args = parser.parse_args()    
+    args = parser.parse_args()
     if int(args.port) == 0:
         thread_data.status = "running"
     else:

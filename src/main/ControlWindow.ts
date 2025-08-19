@@ -7,8 +7,10 @@ import icon from '../../build/icon.png?asset'
 import { captionWindow } from './CaptionWindow'
 import { allConfig } from './utils/AllConfig'
 import { captionEngine } from './utils/CaptionEngine'
+import { Log } from './utils/Log'
 
 class ControlWindow {
+  mounted: boolean = false;
   window: BrowserWindow | undefined;
 
   public createWindow(): void {
@@ -34,6 +36,7 @@ class ControlWindow {
     })
 
     this.window.on('closed', () => {
+      this.mounted = false
       this.window = undefined
       allConfig.writeConfig()
     })
@@ -63,7 +66,8 @@ class ControlWindow {
     })
 
     ipcMain.handle('both.window.mounted', () => {
-      return allConfig.getFullConfig()
+      this.mounted = true
+      return allConfig.getFullConfig(Log.getAndClearLogQueue())
     })
 
     ipcMain.handle('control.nativeTheme.get', () => {

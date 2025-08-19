@@ -6,6 +6,7 @@
 import { onMounted } from 'vue'
 import { FullConfig } from './types'
 import { useCaptionLogStore } from './stores/captionLog'
+import { useSoftwareLogStore } from './stores/softwareLog'
 import { useCaptionStyleStore } from './stores/captionStyle'
 import { useEngineControlStore } from './stores/engineControl'
 import { useGeneralSettingStore } from './stores/generalSetting'
@@ -20,6 +21,7 @@ onMounted(() => {
     useEngineControlStore().platform = data.platform
     useEngineControlStore().setControls(data.controls)
     useCaptionLogStore().captionData = data.captionLog
+    useSoftwareLogStore().softwareLogs = data.softwareLog
   })
 })
 </script>

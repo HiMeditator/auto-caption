@@ -85,12 +85,16 @@ export class CaptionEngine {
       }
     }
     Log.info('Engine Path:', this.appPath)
-    Log.info('Engine Command:', this.command)
+    if(this.command.length > 2 && this.command.at(-2) === '-k') {
+      const _command = [...this.command]
+      _command[_command.length -1] = _command[_command.length -1].replace(/./g, '*')
+      Log.info('Engine Command:', _command)
+    }
+    else Log.info('Engine Command:', this.command)
     return true
   }
 
   public connect() {
-    Log.info('Connecting to caption engine server...')
     if(this.client) { Log.warn('Client already exists, ignoring...') }
     this.client = net.createConnection({ port: this.port }, () => {
       Log.info('Connected to caption engine server');
@@ -177,7 +181,6 @@ export class CaptionEngine {
       this.client = undefined
     }
     this.status = 'stopping'
-    Log.info('Caption engine process stopping...')
     this.timerID = setTimeout(() => {
       if(this.status !== 'stopping') return
       Log.warn('Engine process still not stopped, trying to kill...')
@@ -226,7 +229,7 @@ function handleEngineData(data: any) {
     Log.info('Engine Info:', data.content)
   }
   else if(data.command === 'usage') {
-    Log.info('Engine Usage: ', data.content)
+    Log.info('Engine Token Usage: ', data.content)
   }
   else {
     Log.warn('Unknown command:', data)

@@ -1,7 +1,7 @@
 <template>
   <div class="caption-stat">
     <a-row>
-      <a-col :span="6">
+      <a-col :span="5">
         <a-statistic
           :title="$t('status.engine')"
           :value="customized?$t('status.customized'):engine"
@@ -36,7 +36,7 @@
             </a-col>
           </a-row>
         </template>
-        <a-col :span="6" @mouseenter="getEngineInfo" style="cursor: pointer;">
+        <a-col :span="5" @mouseenter="getEngineInfo" style="cursor: pointer;">
           <a-statistic
             :title="$t('status.status')"
             :value="engineEnabled?$t('status.started'):$t('status.stopped')"
@@ -47,10 +47,13 @@
           </a-statistic>
         </a-col>
       </a-popover>
-      <a-col :span="6">
+      <a-col :span="5">
         <a-statistic :title="$t('status.logNumber')" :value="captionData.length" />
       </a-col>
-      <a-col :span="6">
+      <a-col :span="5">
+        <a-statistic :title="$t('status.logNumber2')" :value="softwareLogs.length" />
+      </a-col>
+      <a-col :span="4">
         <div class="about-tag">{{ $t('status.aboutProj') }}</div>
           <GithubOutlined class="proj-info" @click="showAbout = true"/>
       </a-col>
@@ -128,14 +131,17 @@ import { EngineInfo } from '@renderer/types'
 import { ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useCaptionLogStore } from '@renderer/stores/captionLog'
+import { useSoftwareLogStore } from '@renderer/stores/softwareLog'
 import { useEngineControlStore } from '@renderer/stores/engineControl'
-import { GithubOutlined, InfoCircleOutlined } from '@ant-design/icons-vue';
+import { GithubOutlined, InfoCircleOutlined } from '@ant-design/icons-vue'
 
 const showAbout = ref(false)
 const pending = ref(false)
 
 const captionLog = useCaptionLogStore()
 const { captionData } = storeToRefs(captionLog)
+const softwareLog = useSoftwareLogStore()
+const { softwareLogs } = storeToRefs(softwareLog)
 const engineControl = useEngineControlStore()
 const { engineEnabled, engine, customized, errorSignal } = storeToRefs(engineControl)
 

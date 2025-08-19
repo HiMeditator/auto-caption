@@ -106,6 +106,7 @@ export default {
     "started": "Started",
     "stopped": "Not Started",
     "logNumber": "Caption Count",
+    "logNumber2": "Log Count",
     "aboutProj": "About Project",
     "openCaption": "Open Caption Window",
     "startEngine": "Start Caption Engine",
@@ -146,6 +147,7 @@ export default {
     "copyNum": "Copy Count",
     "all": "All",
     "copySuccess": "Subtitle copied to clipboard",
-    "clear": "Clear Log"
+    "clear": "Clear Log",
+    "title2": "Software Log"
   }
 }

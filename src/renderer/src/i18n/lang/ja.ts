@@ -106,6 +106,7 @@ export default {
     "started": "開始済み",
     "stopped": "未開始",
     "logNumber": "字幕数",
+    "logNumber2": "ログ数",
     "aboutProj": "プロジェクト情報",
     "openCaption": "字幕ウィンドウを開く",
     "startEngine": "字幕エンジンを開始",
@@ -124,7 +125,7 @@ export default {
     }
   },
   log: {
-    "title": "字幕ログ",
+    "title": "字幕記録",
     "changeTime": "時間を変更",
     "baseTime": "最初の字幕開始時間",
     "hour": "時",
@@ -132,7 +133,7 @@ export default {
     "sec": "秒",
     "ms": "ミリ秒",
     "export": "エクスポート",
-    "copy": "ログをコピー",
+    "copy": "記録をコピー",
     "exportOptions": "エクスポートオプション",
     "exportFormat": "形式",
     "exportContent": "内容",
@@ -146,6 +147,7 @@ export default {
     "copyNum": "コピー数",
     "all": "すべて",
     "copySuccess": "字幕がクリップボードにコピーされました",
-    "clear": "ログをクリア"
+    "clear": "記録をクリア",
+    "title2": "ログ記録"
   }
 }

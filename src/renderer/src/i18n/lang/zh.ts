@@ -106,6 +106,7 @@ export default {
     "started": "已启动",
     "stopped": "未启动",
     "logNumber": "字幕数量",
+    "logNumber2": "日志数量",
     "aboutProj": "项目关于",
     "openCaption": "打开字幕窗口",
     "startEngine": "启动字幕引擎",
@@ -146,6 +147,7 @@ export default {
     "copyNum": "复制数量",
     "all": "全部",
     "copySuccess": "字幕已复制到剪贴板",
-    "clear": "清空记录"
+    "clear": "清空记录",
+    "title2": "日志记录"
   }
 }

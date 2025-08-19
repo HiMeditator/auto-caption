@@ -1,141 +1,139 @@
 <template>
-  <div class="caption-list">
-    <div>
-      <a-app class="caption-title">
-        <span style="margin-right: 30px;">{{ $t('log.title') }}</span>
-      </a-app>
-      <a-popover :title="$t('log.baseTime')">
-        <template #content>
-          <div class="base-time">
-            <div class="base-time-container">
-              <a-input
-                type="number" min="0"
-                v-model:value="baseHH"
-              ></a-input>
-              <span class="base-time-label">{{ $t('log.hour') }}</span>
-            </div>
-          </div><span style="margin: 0 4px;">:</span>
-          <div class="base-time">
-            <div class="base-time-container">
-              <a-input
-                type="number" min="0" max="59"
-                v-model:value="baseMM"
-              ></a-input>
-              <span class="base-time-label">{{ $t('log.min') }}</span>
-            </div>
-          </div><span style="margin: 0 4px;">:</span>
-          <div class="base-time">
-            <div class="base-time-container">
-              <a-input
-                type="number" min="0" max="59"
-                v-model:value="baseSS"
-              ></a-input>
-              <span class="base-time-label">{{ $t('log.sec') }}</span>
-            </div>
-          </div><span style="margin: 0 4px;">.</span>
-          <div class="base-time">
-            <div class="base-time-container">
-              <a-input
-                type="number" min="0" max="999"
-                v-model:value="baseMS"
-              ></a-input>
-              <span class="base-time-label">{{ $t('log.ms') }}</span>
-            </div>
-          </div>
-        </template>
-        <a-button
-          type="primary"
-          style="margin-right: 20px;"
-          @click="changeBaseTime"
-          :disabled="captionData.length === 0"
-        >{{ $t('log.changeTime') }}</a-button>
-      </a-popover>
-      <a-popover :title="$t('log.exportOptions')">
-        <template #content>
-          <div class="input-item">
-            <span class="input-label">{{ $t('log.exportFormat') }}</span>
-            <a-radio-group v-model:value="exportFormat">
-              <a-radio-button value="srt"><code>.srt</code></a-radio-button>
-              <a-radio-button value="json"><code>.json</code></a-radio-button>
-            </a-radio-group>
-          </div>
-          <div class="input-item">
-            <span class="input-label">{{ $t('log.exportContent') }}</span>
-            <a-radio-group v-model:value="contentOption">
-              <a-radio-button value="both">{{ $t('log.both') }}</a-radio-button>
-              <a-radio-button value="source">{{ $t('log.source') }}</a-radio-button>
-              <a-radio-button value="target">{{ $t('log.translation') }}</a-radio-button>
-            </a-radio-group>
-          </div>
-        </template>
-        <a-button
-          style="margin-right: 20px;"
-          @click="exportCaptions"
-          :disabled="captionData.length === 0"
-        >{{ $t('log.export') }}</a-button>
-      </a-popover>
-      <a-popover :title="$t('log.copyOptions')">
-        <template #content>
-          <div class="input-item">
-            <span class="input-label">{{ $t('log.addIndex') }}</span>
-            <a-switch v-model:checked="showIndex" />
-            <span class="input-label">{{ $t('log.copyTime') }}</span>
-            <a-switch v-model:checked="copyTime" />
-          </div>
-          <div class="input-item">
-            <span class="input-label">{{ $t('log.copyContent') }}</span>
-            <a-radio-group v-model:value="contentOption">
-              <a-radio-button value="both">{{ $t('log.both') }}</a-radio-button>
-              <a-radio-button value="source">{{ $t('log.source') }}</a-radio-button>
-              <a-radio-button value="target">{{ $t('log.translation') }}</a-radio-button>
-            </a-radio-group>
-          </div>
-          <div class="input-item">
-            <span class="input-label">{{ $t('log.copyNum') }}</span>
-            <a-radio-group v-model:value="copyNum">
-              <a-radio-button :value="0"><code>[:]</code></a-radio-button>
-              <a-radio-button :value="1"><code>[-1:]</code></a-radio-button>
-              <a-radio-button :value="2"><code>[-2:]</code></a-radio-button>
-              <a-radio-button :value="3"><code>[-3:]</code></a-radio-button>
-            </a-radio-group>
-          </div>
-        </template>
-        <a-button
-          style="margin-right: 20px;"
-          @click="copyCaptions"
-        >{{ $t('log.copy') }}</a-button>
-      </a-popover>
-      <a-button
-        danger
-        @click="clearCaptions"
-      >{{ $t('log.clear') }}</a-button>
+  <div>
+    <div class="caption-title">
+      <span style="margin-right: 30px;">{{ $t('log.title') }}</span>
     </div>
-
-    <a-table
-      :columns="columns"
-      :data-source="captionData"
-      v-model:pagination="pagination"
-      style="margin-top: 10px;"
-    >
-      <template #bodyCell="{ column, record }">
-        <template v-if="column.key === 'index'">
-          {{ record.index }}
-        </template>
-        <template v-if="column.key === 'time'">
-          <div class="time-cell">
-            <div class="time-start">{{ record.time_s }}</div>
-            <div class="time-end">{{ record.time_t }}</div>
+    <a-popover :title="$t('log.baseTime')">
+      <template #content>
+        <div class="base-time">
+          <div class="base-time-container">
+            <a-input
+              type="number" min="0"
+              v-model:value="baseHH"
+            ></a-input>
+            <span class="base-time-label">{{ $t('log.hour') }}</span>
           </div>
-        </template>
-        <template v-if="column.key === 'content'">
-          <div class="caption-content">
-            <div class="caption-text">{{ record.text }}</div>
-            <div class="caption-translation">{{ record.translation }}</div>
+        </div><span style="margin: 0 4px;">:</span>
+        <div class="base-time">
+          <div class="base-time-container">
+            <a-input
+              type="number" min="0" max="59"
+              v-model:value="baseMM"
+            ></a-input>
+            <span class="base-time-label">{{ $t('log.min') }}</span>
           </div>
-        </template>
+        </div><span style="margin: 0 4px;">:</span>
+        <div class="base-time">
+          <div class="base-time-container">
+            <a-input
+              type="number" min="0" max="59"
+              v-model:value="baseSS"
+            ></a-input>
+            <span class="base-time-label">{{ $t('log.sec') }}</span>
+          </div>
+        </div><span style="margin: 0 4px;">.</span>
+        <div class="base-time">
+          <div class="base-time-container">
+            <a-input
+              type="number" min="0" max="999"
+              v-model:value="baseMS"
+            ></a-input>
+            <span class="base-time-label">{{ $t('log.ms') }}</span>
+          </div>
+        </div>
       </template>
-    </a-table>
+      <a-button
+        type="primary"
+        style="margin-right: 20px;"
+        @click="changeBaseTime"
+        :disabled="captionData.length === 0"
+      >{{ $t('log.changeTime') }}</a-button>
+    </a-popover>
+    <a-popover :title="$t('log.exportOptions')">
+      <template #content>
+        <div class="input-item">
+          <span class="input-label">{{ $t('log.exportFormat') }}</span>
+          <a-radio-group v-model:value="exportFormat">
+            <a-radio-button value="srt"><code>.srt</code></a-radio-button>
+            <a-radio-button value="json"><code>.json</code></a-radio-button>
+          </a-radio-group>
+        </div>
+        <div class="input-item">
+          <span class="input-label">{{ $t('log.exportContent') }}</span>
+          <a-radio-group v-model:value="contentOption">
+            <a-radio-button value="both">{{ $t('log.both') }}</a-radio-button>
+            <a-radio-button value="source">{{ $t('log.source') }}</a-radio-button>
+            <a-radio-button value="target">{{ $t('log.translation') }}</a-radio-button>
+          </a-radio-group>
+        </div>
+      </template>
+      <a-button
+        style="margin-right: 20px;"
+        @click="exportCaptions"
+        :disabled="captionData.length === 0"
+      >{{ $t('log.export') }}</a-button>
+    </a-popover>
+    <a-popover :title="$t('log.copyOptions')">
+      <template #content>
+        <div class="input-item">
+          <span class="input-label">{{ $t('log.addIndex') }}</span>
+          <a-switch v-model:checked="showIndex" />
+          <span class="input-label">{{ $t('log.copyTime') }}</span>
+          <a-switch v-model:checked="copyTime" />
+        </div>
+        <div class="input-item">
+          <span class="input-label">{{ $t('log.copyContent') }}</span>
+          <a-radio-group v-model:value="contentOption">
+            <a-radio-button value="both">{{ $t('log.both') }}</a-radio-button>
+            <a-radio-button value="source">{{ $t('log.source') }}</a-radio-button>
+            <a-radio-button value="target">{{ $t('log.translation') }}</a-radio-button>
+          </a-radio-group>
+        </div>
+        <div class="input-item">
+          <span class="input-label">{{ $t('log.copyNum') }}</span>
+          <a-radio-group v-model:value="copyNum">
+            <a-radio-button :value="0"><code>[:]</code></a-radio-button>
+            <a-radio-button :value="1"><code>[-1:]</code></a-radio-button>
+            <a-radio-button :value="2"><code>[-2:]</code></a-radio-button>
+            <a-radio-button :value="3"><code>[-3:]</code></a-radio-button>
+          </a-radio-group>
+        </div>
+      </template>
+      <a-button
+        style="margin-right: 20px;"
+        @click="copyCaptions"
+      >{{ $t('log.copy') }}</a-button>
+    </a-popover>
+    <a-button
+      danger
+      @click="clearCaptions"
+    >{{ $t('log.clear') }}</a-button>
   </div>
+
+  <a-table
+    :columns="columns"
+    :data-source="captionData"
+    v-model:pagination="pagination"
+    style="margin-top: 10px;"
+  >
+    <template #bodyCell="{ column, record }">
+      <template v-if="column.key === 'index'">
+        {{ record.index }}
+      </template>
+      <template v-if="column.key === 'time'">
+        <div class="time-cell">
+          <div class="time-start">{{ record.time_s }}</div>
+          <div class="time-end">{{ record.time_t }}</div>
+        </div>
+      </template>
+      <template v-if="column.key === 'content'">
+        <div class="caption-content">
+          <div class="caption-text">{{ record.text }}</div>
+          <div class="caption-translation">{{ record.translation }}</div>
+        </div>
+      </template>
+    </template>
+  </a-table>
 </template>
 
 <script setup lang="ts">
@@ -195,7 +193,7 @@ const columns = [
     title: 'time',
     dataIndex: 'time',
     key: 'time',
-    width: 160,
+    width: 150,
     sorter: (a: CaptionItem, b: CaptionItem) => {
       if(a.time_s <= b.time_s) return -1
       return 1
@@ -300,7 +298,7 @@ function clearCaptions() {
   display: inline-block;
   font-size: 24px;
   font-weight: bold;
-  margin-bottom: 10px;
+  margin: 10px 0;
 }
 
 .base-time {

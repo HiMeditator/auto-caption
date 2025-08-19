@@ -33,10 +33,11 @@
         <a-radio-group v-model:value="uiColor">
           <template v-for="color in colorList" :key="color">
             <a-radio-button :value="color"
-              :style="{
-                backgroundColor: color
-              }"
-            >&nbsp;</a-radio-button>
+              :style="{backgroundColor: color}"
+            >
+              <CheckOutlined style="color: white;" v-if="color === uiColor" />
+              <span v-else>&nbsp;</span>
+            </a-radio-button>
           </template>
         </a-radio-group>
       </div>
@@ -55,7 +56,7 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
 import { useGeneralSettingStore } from '@renderer/stores/generalSetting'
-import { InfoCircleOutlined } from '@ant-design/icons-vue';
+import { InfoCircleOutlined, CheckOutlined } from '@ant-design/icons-vue'
 
 const colorList = [
   '#1677ff',

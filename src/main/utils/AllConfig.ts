@@ -1,6 +1,6 @@
 import {
   UILanguage, UITheme, Styles, Controls,
-  CaptionItem, FullConfig
+  CaptionItem, FullConfig, SoftwareLogItem
 } from '../types'
 import { Log } from './Log'
 import { app, BrowserWindow } from 'electron'
@@ -88,7 +88,7 @@ class AllConfig {
     Log.info('Write Config to:', configPath)
   }
 
-  public getFullConfig(): FullConfig {
+  public getFullConfig(softwareLog: SoftwareLogItem[]): FullConfig {
     return {
       platform: process.platform,
       uiLanguage: this.uiLanguage,
@@ -97,7 +97,8 @@ class AllConfig {
       leftBarWidth: this.leftBarWidth,
       styles: this.styles,
       controls: this.controls,
-      captionLog: this.captionLog
+      captionLog: this.captionLog,
+      softwareLog: softwareLog
     }
   }
 

@@ -45,6 +45,13 @@ export interface CaptionItem {
   translation: string
 }
 
+export interface SoftwareLogItem {
+  type: "INFO" | "WARN" | "ERROR",
+  index: number,
+  time: string,
+  text: string
+}
+
 export interface FullConfig {
   platform: string,
   uiLanguage: UILanguage,
@@ -53,7 +60,8 @@ export interface FullConfig {
   leftBarWidth: number,
   styles: Styles,
   controls: Controls,
-  captionLog: CaptionItem[]
+  captionLog: CaptionItem[],
+  softwareLog: SoftwareLogItem[]
 }
 
 export interface EngineInfo {
