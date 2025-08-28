@@ -1,6 +1,7 @@
 import socket
 import threading
 import json
+# import time
 from utils import thread_data, stdout_cmd, stderr
 
 
@@ -33,6 +34,7 @@ def start_server(port: int):
         stderr(str(e))
         stdout_cmd('kill')
         return
+    # time.sleep(20)
     stdout_cmd('connect')
 
     client, addr = server.accept()

@@ -56,6 +56,7 @@ export default {
     "apikey": "API KEY",
     "modelPath": "模型路径",
     "startTimeout": "启动超时",
+    "seconds": "秒",
     "apikeyInfo": "Gummy 字幕引擎需要的 API KEY，需要在阿里云百炼平台获取。详细信息见项目用户手册。",
     "modelPathInfo": "Vosk 字幕引擎需要的模型的文件夹路径，需要提前下载需要的模型到本地。信息详情见项目用户手册。",
     "startTimeoutInfo": "字幕引擎启动超时时间，超过此时间将自动强制停止。建议设置为 10-120 秒之间。",

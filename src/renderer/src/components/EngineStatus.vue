@@ -84,7 +84,7 @@
         danger
         class="control-button"
         type="primary"
-        :loading="true"
+        :icon="h(LoadingOutlined)"
       >{{ $t('status.forceKillStarting') }}</a-button>
     </a-popconfirm>
     <a-button
@@ -143,12 +143,12 @@
 
 <script setup lang="ts">
 import { EngineInfo } from '@renderer/types'
-import { ref, watch } from 'vue'
+import { ref, watch, h } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useCaptionLogStore } from '@renderer/stores/captionLog'
 import { useSoftwareLogStore } from '@renderer/stores/softwareLog'
 import { useEngineControlStore } from '@renderer/stores/engineControl'
-import { GithubOutlined, InfoCircleOutlined } from '@ant-design/icons-vue'
+import { GithubOutlined, InfoCircleOutlined, LoadingOutlined } from '@ant-design/icons-vue'
 
 const showAbout = ref(false)
 const pending = ref(false)

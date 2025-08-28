@@ -114,7 +114,10 @@
           <template #content>
             <p class="label-hover-info">{{ $t('engine.startTimeoutInfo') }}</p>
           </template>
-          <span class="input-label info-label">{{ $t('engine.startTimeout') }}</span>
+          <span
+            class="input-label info-label"
+            style="vertical-align: middle;"
+          >{{ $t('engine.startTimeout') }}</span>
         </a-popover>
         <a-input-number
           class="input-area"
@@ -122,7 +125,7 @@
           :min="10"
           :max="120"
           :step="5"
-          addon-after="秒"
+          :addon-after="$t('engine.seconds')"
         />
       </div>
     </a-card>
