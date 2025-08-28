@@ -27,7 +27,8 @@ export default {
     "engineChange": "字幕引擎配置已更改",
     "changeInfo": "如果字幕引擎已经启动，需要重启字幕引擎修改才会生效",
     "styleChange": "字幕样式已修改",
-    "styleInfo": "字幕样式修改已经保存并生效"
+    "styleInfo": "字幕样式修改已经保存并生效",
+    "engineStartTimeout": "字幕引擎启动超时，已自动强制停止"
   },
   general: {
     "title": "通用设置",
@@ -54,8 +55,11 @@ export default {
     "showMore": "更多设置",
     "apikey": "API KEY",
     "modelPath": "模型路径",
+    "startTimeout": "启动超时",
+    "seconds": "秒",
     "apikeyInfo": "Gummy 字幕引擎需要的 API KEY，需要在阿里云百炼平台获取。详细信息见项目用户手册。",
     "modelPathInfo": "Vosk 字幕引擎需要的模型的文件夹路径，需要提前下载需要的模型到本地。信息详情见项目用户手册。",
+    "startTimeoutInfo": "字幕引擎启动超时时间，超过此时间将自动强制停止。建议设置为 10-120 秒之间。",
     "customEngine": "自定义引擎",
     custom: {
       "title": "自定义字幕引擎",
@@ -112,6 +116,11 @@ export default {
     "startEngine": "启动字幕引擎",
     "restartEngine": "重启字幕引擎",
     "stopEngine": "关闭字幕引擎",
+    "forceKill": "强行停止",
+    "forceKillStarting": "正在启动引擎... (强行停止)",
+    "forceKillConfirm": "确定要强行停止字幕引擎吗？这将立即终止进程。",
+    "confirm": "确定",
+    "cancel": "取消",
     about: {
       "title": "关于本项目",
       "proj": "Auto Caption 项目",

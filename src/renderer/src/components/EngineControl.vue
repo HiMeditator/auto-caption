@@ -109,6 +109,25 @@
           v-model:value="currentModelPath"
         />
       </div>
+      <div class="input-item">
+        <a-popover>
+          <template #content>
+            <p class="label-hover-info">{{ $t('engine.startTimeoutInfo') }}</p>
+          </template>
+          <span
+            class="input-label info-label"
+            style="vertical-align: middle;"
+          >{{ $t('engine.startTimeout') }}</span>
+        </a-popover>
+        <a-input-number
+          class="input-area"
+          v-model:value="currentStartTimeoutSeconds"
+          :min="10"
+          :max="120"
+          :step="5"
+          :addon-after="$t('engine.seconds')"
+        />
+      </div>
     </a-card>
   </a-card>
   <div style="height: 20px;"></div>
@@ -139,6 +158,7 @@ const currentModelPath = ref<string>('')
 const currentCustomized = ref<boolean>(false)
 const currentCustomizedApp = ref('')
 const currentCustomizedCommand = ref('')
+const currentStartTimeoutSeconds = ref<number>(30)
 
 const langList = computed(() => {
   for(let item of captionEngine.value){
@@ -160,6 +180,7 @@ function applyChange(){
   engineControl.customized = currentCustomized.value
   engineControl.customizedApp = currentCustomizedApp.value
   engineControl.customizedCommand = currentCustomizedCommand.value
+  engineControl.startTimeoutSeconds = currentStartTimeoutSeconds.value
 
   engineControl.sendControlsChange()
 
@@ -181,6 +202,7 @@ function cancelChange(){
   currentCustomized.value = engineControl.customized
   currentCustomizedApp.value = engineControl.customizedApp
   currentCustomizedCommand.value = engineControl.customizedCommand
+  currentStartTimeoutSeconds.value = engineControl.startTimeoutSeconds
 }
 
 function selectFolderPath() {

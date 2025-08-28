@@ -13,7 +13,8 @@ export interface Controls {
   modelPath: string,
   customized: boolean,
   customizedApp: string,
-  customizedCommand: string
+  customizedCommand: string,
+  startTimeoutSeconds: number
 }
 
 export interface Styles {

@@ -4,5 +4,6 @@ export default {
   "engine.start.error": "字幕エンジンの起動に失敗しました: ",
   "engine.output.parse.error": "字幕エンジンの出力を JSON オブジェクトとして解析できませんでした: ",
   "engine.error": "字幕エンジンエラー: ",
-  "engine.shutdown.error": "字幕エンジンプロセスの終了に失敗しました: "
+  "engine.shutdown.error": "字幕エンジンプロセスの終了に失敗しました: ",
+  "engine.start.timeout": "字幕エンジンの起動がタイムアウトしました。自動的に強制停止しました"
 }

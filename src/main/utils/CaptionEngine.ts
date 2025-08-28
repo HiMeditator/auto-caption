@@ -14,8 +14,9 @@ export class CaptionEngine {
   process: any | undefined
   client: net.Socket | undefined
   port: number = 8080
-  status: 'running' | 'starting' | 'stopping' | 'stopped' = 'stopped'
+  status: 'running' | 'starting' | 'stopping' | 'stopped' | 'starting-timeout' = 'stopped'
   timerID: NodeJS.Timeout | undefined
+  startTimeoutID: NodeJS.Timeout | undefined
 
   private getApp(): boolean {
     if (allConfig.controls.customized) {
@@ -96,6 +97,11 @@ export class CaptionEngine {
 
   public connect() {
     if(this.client) { Log.warn('Client already exists, ignoring...') }
+    // 清除启动超时计时器
+    if (this.startTimeoutID) {
+      clearTimeout(this.startTimeoutID)
+      this.startTimeoutID = undefined
+    }
     this.client = net.createConnection({ port: this.port }, () => {
       Log.info('Connected to caption engine server');
     });
@@ -130,6 +136,17 @@ export class CaptionEngine {
     this.process = spawn(this.appPath, this.command)
     this.status = 'starting'
     Log.info('Caption Engine Starting, PID:', this.process.pid)
+
+    // 设置启动超时机制
+    const timeoutMs = allConfig.controls.startTimeoutSeconds * 1000
+    this.startTimeoutID = setTimeout(() => {
+      if (this.status === 'starting') {
+        Log.warn(`Engine start timeout after ${allConfig.controls.startTimeoutSeconds} seconds, forcing kill...`)
+        this.status = 'starting-timeout'
+        controlWindow.sendErrorMessage(i18n('engine.start.timeout'))
+        this.forceKill()
+      }
+    }, timeoutMs)
     
     this.process.stdout.on('data', (data: any) => {
       const lines = data.toString().split('\n')
@@ -165,6 +182,11 @@ export class CaptionEngine {
       }
       this.status = 'stopped'
       clearInterval(this.timerID)
+      // 清理启动超时计时器
+      if (this.startTimeoutID) {
+        clearTimeout(this.startTimeoutID)
+        this.startTimeoutID = undefined
+      }
       Log.info(`Engine exited with code ${code}`)
     });
   }
@@ -188,21 +210,47 @@ export class CaptionEngine {
   }
 
   public kill(){
-    if(!this.process || !this.process.pid) return
     if(this.status !== 'running'){
       Log.warn('Trying to kill engine which is not running, current status:', this.status)
+      return
     }
-    Log.warn('Trying to kill engine process, PID:', this.process.pid)
+    this.sendCommand('stop')
+    if(this.client){
+      this.client.destroy()
+      this.client = undefined
+    }
+    this.status = 'stopping'
+    this.timerID = setTimeout(() => {
+      if(this.status !== 'stopping') return
+      Log.warn('Engine process still not stopped, trying to kill...')
+      this.forceKill()
+    }, 4000);
+  }
+
+  public forceKill(){
+    if(!this.process || !this.process.pid) return
+    Log.warn('Force killing engine process, PID:', this.process.pid)
+    // 清理启动超时计时器
+    if (this.startTimeoutID) {
+      clearTimeout(this.startTimeoutID)
+      this.startTimeoutID = undefined
+    }
     if(this.client){
       this.client.destroy()
       this.client = undefined
     }
     if (this.process.pid) {
-      let cmd = `kill ${this.process.pid}`;
+      let cmd = `kill -9 ${this.process.pid}`;
       if (process.platform === "win32") {
         cmd = `taskkill /pid ${this.process.pid} /t /f`
       }
-      exec(cmd)
+      exec(cmd, (error) => {
+        if (error) {
+          Log.error('Failed to force kill process:', error)
+        } else {
+          Log.info('Process force killed successfully')
+        }
+      })
     }
     this.status = 'stopping'
   }

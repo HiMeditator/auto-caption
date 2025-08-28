@@ -39,7 +39,8 @@ const defaultControls: Controls = {
   translation: true,
   customized: false,
   customizedApp: '',
-  customizedCommand: ''
+  customizedCommand: '',
+  startTimeoutSeconds: 30
 };
 
 

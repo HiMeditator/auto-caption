@@ -27,6 +27,7 @@ export const useEngineControlStore = defineStore('engineControl', () => {
   const customized = ref<boolean>(false)
   const customizedApp = ref<string>('')
   const customizedCommand = ref<string>('')
+  const startTimeoutSeconds = ref<number>(30)
 
   const changeSignal = ref<boolean>(false)
   const errorSignal = ref<boolean>(false)
@@ -43,7 +44,8 @@ export const useEngineControlStore = defineStore('engineControl', () => {
       modelPath: modelPath.value,
       customized: customized.value,
       customizedApp: customizedApp.value,
-      customizedCommand: customizedCommand.value
+      customizedCommand: customizedCommand.value,
+      startTimeoutSeconds: startTimeoutSeconds.value
     }
     window.electron.ipcRenderer.send('control.controls.change', controls)
   }
@@ -75,6 +77,7 @@ export const useEngineControlStore = defineStore('engineControl', () => {
     customized.value = controls.customized
     customizedApp.value = controls.customizedApp
     customizedCommand.value = controls.customizedCommand
+    startTimeoutSeconds.value = controls.startTimeoutSeconds
     changeSignal.value = true
   }
 
@@ -137,6 +140,7 @@ export const useEngineControlStore = defineStore('engineControl', () => {
     customized,         // 是否使用自定义字幕引擎
     customizedApp,      // 自定义字幕引擎的应用程序
     customizedCommand,  // 自定义字幕引擎的命令
+    startTimeoutSeconds, // 启动超时时间（秒）
     setControls,        // 设置引擎配置
     sendControlsChange, // 发送最新控制消息到后端
     emptyModelPathErr,  // 模型路径为空时显示警告
