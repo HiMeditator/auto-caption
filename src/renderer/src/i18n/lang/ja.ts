@@ -27,7 +27,8 @@ export default {
     "engineChange": "字幕エンジンの設定が変更されました",
     "changeInfo": "字幕エンジンがすでに起動している場合、変更を有効にするには再起動が必要です。",
     "styleChange": "字幕のスタイルが変更されました",
-    "styleInfo": "字幕のスタイル変更が保存され、適用されました"
+    "styleInfo": "字幕のスタイル変更が保存され、適用されました",
+    "engineStartTimeout": "字幕エンジンの起動がタイムアウトしました。自動的に強制停止しました"
   },
   general: {
     "title": "一般設定",
@@ -54,8 +55,10 @@ export default {
     "showMore": "詳細設定",
     "apikey": "API KEY",
     "modelPath": "モデルパス",
+    "startTimeout": "起動タイムアウト",
     "apikeyInfo": "Gummy 字幕エンジンに必要な API KEY は、アリババクラウド百煉プラットフォームから取得する必要があります。詳細情報はプロジェクトのユーザーマニュアルをご覧ください。",
     "modelPathInfo": "Vosk 字幕エンジンに必要なモデルのフォルダパスです。必要なモデルを事前にローカルマシンにダウンロードする必要があります。詳細情報はプロジェクトのユーザーマニュアルをご覧ください。",
+    "startTimeoutInfo": "字幕エンジンの起動タイムアウト時間です。この時間を超えると自動的に強制停止されます。10-120秒の範囲で設定することを推奨します。",
     "customEngine": "カスタムエンジン",
     custom: {
       "title": "カスタムキャプションエンジン",
@@ -112,6 +115,11 @@ export default {
     "startEngine": "字幕エンジンを開始",
     "restartEngine": "字幕エンジンを再起動",
     "stopEngine": "字幕エンジンを停止",
+    "forceKill": "強制停止",
+    "forceKillStarting": "エンジン起動中... (強制停止)",
+    "forceKillConfirm": "字幕エンジンを強制停止しますか？プロセスが直ちに終了されます。",
+    "confirm": "確認",
+    "cancel": "キャンセル",
     about: {
       "title": "このプロジェクトについて",
       "proj": "Auto Caption プロジェクト",

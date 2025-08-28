@@ -159,6 +159,10 @@ class ControlWindow {
       captionEngine.stop()
     })
 
+    ipcMain.on('control.engine.forceKill', () => {
+      captionEngine.forceKill()
+    })
+
     ipcMain.on('control.captionLog.clear', () => {
       allConfig.captionLog.splice(0)
     })

@@ -67,11 +67,26 @@
       @click="openCaptionWindow"
     >{{ $t('status.openCaption') }}</a-button>
     <a-button
+      v-if="!isStarting"
       class="control-button"
       :loading="pending && !engineEnabled"
       :disabled="pending || engineEnabled"
       @click="startEngine"
     >{{ $t('status.startEngine') }}</a-button>
+    <a-popconfirm
+      v-if="isStarting"
+      :title="$t('status.forceKillConfirm')"
+      :ok-text="$t('status.confirm')"
+      :cancel-text="$t('status.cancel')"
+      @confirm="forceKillEngine"
+    >
+      <a-button
+        danger
+        class="control-button"
+        type="primary"
+        :loading="true"
+      >{{ $t('status.forceKillStarting') }}</a-button>
+    </a-popconfirm>
     <a-button
      danger class="control-button"
      :loading="pending && engineEnabled"
@@ -137,6 +152,7 @@ import { GithubOutlined, InfoCircleOutlined } from '@ant-design/icons-vue'
 
 const showAbout = ref(false)
 const pending = ref(false)
+const isStarting = ref(false)
 
 const captionLog = useCaptionLogStore()
 const { captionData } = storeToRefs(captionLog)
@@ -158,8 +174,11 @@ function openCaptionWindow() {
 
 function startEngine() {
   pending.value = true
+  isStarting.value = true
   if(engineControl.engine === 'vosk' && engineControl.modelPath.trim() === '') {
     engineControl.emptyModelPathErr()
+    pending.value = false
+    isStarting.value = false
     return
   }
   window.electron.ipcRenderer.send('control.engine.start')
@@ -168,6 +187,12 @@ function startEngine() {
 function stopEngine() {
   pending.value = true
   window.electron.ipcRenderer.send('control.engine.stop')
+}
+
+function forceKillEngine() {
+  pending.value = true
+  isStarting.value = false
+  window.electron.ipcRenderer.send('control.engine.forceKill')
 }
 
 function getEngineInfo() {
@@ -181,12 +206,16 @@ function getEngineInfo() {
   })
 }
 
-watch(engineEnabled, () => {
+watch(engineEnabled, (enabled) => {
   pending.value = false
+  if (enabled) {
+    isStarting.value = false
+  }
 })
 
 watch(errorSignal, () => {
   pending.value = false
+  isStarting.value = false
   errorSignal.value = false
 })
 </script>

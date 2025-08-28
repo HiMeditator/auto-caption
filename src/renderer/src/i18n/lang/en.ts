@@ -27,7 +27,8 @@ export default {
     "engineChange": "Cpation Engine Configuration Changed",
     "changeInfo": "If the caption engine is already running, you need to restart it for the changes to take effect.",
     "styleChange": "Caption Style Changed",
-    "styleInfo": "Caption style changes have been saved and applied."
+    "styleInfo": "Caption style changes have been saved and applied.",
+    "engineStartTimeout": "Caption engine startup timeout, automatically force stopped"
   },
   general: {
     "title": "General Settings",
@@ -54,8 +55,10 @@ export default {
     "showMore": "More Settings",
     "apikey": "API KEY",
     "modelPath": "Model Path",
+    "startTimeout": "Start Timeout",
     "apikeyInfo": "API KEY required for the Gummy subtitle engine, which needs to be obtained from the Alibaba Cloud Bailing platform. For more details, see the project user manual.",
     "modelPathInfo": "The folder path of the model required by the Vosk subtitle engine. You need to download the required model to your local machine in advance. For more details, see the project user manual.",
+    "startTimeoutInfo": "Caption engine startup timeout duration. Engine will be forcefully stopped if startup exceeds this time. Recommended range: 10-120 seconds.",
     "customEngine": "Custom Engine",
     custom: {
       "title": "Custom Caption Engine",
@@ -112,6 +115,11 @@ export default {
     "startEngine": "Start Caption Engine",
     "restartEngine": "Restart Caption Engine",
     "stopEngine": "Stop Caption Engine",
+    "forceKill": "Force Stop",
+    "forceKillStarting": "Starting Engine... (Force Stop)",
+    "forceKillConfirm": "Are you sure you want to force stop the caption engine? This will terminate the process immediately.",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
     about: {
       "title": "About This Project",
       "proj": "Auto Caption Project",
