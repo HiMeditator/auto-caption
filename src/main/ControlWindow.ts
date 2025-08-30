@@ -160,7 +160,7 @@ class ControlWindow {
     })
 
     ipcMain.on('control.engine.forceKill', () => {
-      captionEngine.forceKill()
+      captionEngine.kill()
     })
 
     ipcMain.on('control.captionLog.clear', () => {

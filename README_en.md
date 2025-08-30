@@ -49,7 +49,7 @@ The software has been adapted for Windows, macOS, and Linux platforms. The teste
 | OS Version         | Architecture | System Audio Input | System Audio Output |
 | ------------------ | ------------ | ------------------ | ------------------- |
 | Windows 11 24H2    | x64          | ✅                 | ✅                   |
-| macOS Sequoia 15.5 | arm64        | ✅ Additional config required | ✅        |
+| macOS Sequoia 15.5 | arm64        | ✅ [Additional config required](./docs/user-manual/en.md#capturing-system-audio-output-on-macos) | ✅        |
 | Ubuntu 24.04.2     | x64          | ✅                 | ✅                   |
 | Kali Linux 2022.3  | x64          | ✅                 | ✅                   |
 | Kylin Server V10 SP3 | x64 | ✅ | ✅ |

@@ -1,5 +1,5 @@
 appId: com.himeditator.autocaption
-productName: auto-caption
+productName: Auto Caption
 directories:
   buildResources: build
 files:
@@ -13,6 +13,9 @@ files:
   - '!engine/*'
   - '!docs/*'
   - '!assets/*'
+  - '!.repomap/*'
+  - '!.virtualme/*'
+
 extraResources:
   # For Windows
   - from: ./engine/dist/main.exe
