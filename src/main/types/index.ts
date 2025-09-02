@@ -46,6 +46,11 @@ export interface CaptionItem {
   translation: string
 }
 
+export interface CaptionTranslation {
+  time_s: string,
+  translation: string
+}
+
 export interface SoftwareLogItem {
   type: "INFO" | "WARN" | "ERROR",
   index: number,

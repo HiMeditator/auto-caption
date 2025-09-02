@@ -15,14 +15,13 @@ files:
   - '!assets/*'
   - '!.repomap/*'
   - '!.virtualme/*'
-
 extraResources:
   # For Windows
   - from: ./engine/dist/main.exe
     to: ./engine/main.exe
   # For macOS and Linux
-  # - from: ./engine/dist/main
-  #   to: ./engine/main
+  - from: ./engine/dist/main
+    to: ./engine/main
 win:
   executableName: auto-caption
   icon: build/icon.png

@@ -188,15 +188,3 @@ npm run build:mac
 # Linux 用
 npm run build:linux
 ```
-
-注意: プラットフォームに応じて、プロジェクトルートディレクトリにある `electron-builder.yml` ファイルの設定内容を変更する必要があります:
-
-```yml
-extraResources:
-  # Windows 用
-  - from: ./engine/dist/main.exe
-    to: ./engine/main.exe
-  # macOS と Linux 用
-  # - from: ./engine/dist/main
-  #   to: ./engine/main
-```

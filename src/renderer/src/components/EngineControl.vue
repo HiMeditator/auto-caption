@@ -8,6 +8,7 @@
     <div class="input-item">
       <span class="input-label">{{ $t('engine.sourceLang') }}</span>
       <a-select
+        :disabled="currentEngine === 'vosk'"
         class="input-area"
         v-model:value="currentSourceLang"
         :options="langList"
@@ -16,7 +17,6 @@
     <div class="input-item">
       <span class="input-label">{{ $t('engine.transLang') }}</span>
       <a-select
-        :disabled="currentEngine === 'vosk'"
         class="input-area"
         v-model:value="currentTargetLang"
         :options="langList.filter((item) => item.value !== 'auto')"
@@ -222,7 +222,10 @@ watch(changeSignal, (val) => {
 watch(currentEngine, (val) => {
   if(val == 'vosk'){
     currentSourceLang.value = 'auto'
-    currentTargetLang.value = ''
+    currentTargetLang.value = useGeneralSettingStore().uiLanguage
+    if(currentTargetLang.value === 'zh') {
+      currentTargetLang.value = 'zh-cn'
+    }
   }
   else if(val == 'gummy'){
     currentSourceLang.value = 'auto'

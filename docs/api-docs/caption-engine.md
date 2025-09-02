@@ -58,6 +58,18 @@ Electron 主进程通过 TCP Socket 向 Python 进程发送数据。发送的数
 
 Python 端监听到的音频流转换为的字幕数据。
 
+### `translation`
+
+```js
+{
+  command: "translation",
+  time_s: string,
+  translation: string
+}
+```
+
+语音识别的内容的翻译，可以根据起始时间确定对应的字幕。
+
 ### `print`
 
 ```js
@@ -67,7 +79,7 @@ Python 端监听到的音频流转换为的字幕数据。
 }
 ```
 
-输出 Python 端打印的内容。
+输出 Python 端打印的内容，不计入日志。
 
 ### `info`
 
@@ -78,7 +90,7 @@ Python 端监听到的音频流转换为的字幕数据。
 }
 ```
 
-Python 端打印的提示信息，比起 `print`，该信息更希望 Electron 端的关注。
+Python 端打印的提示信息，会计入日志。
 
 ### `error`
 

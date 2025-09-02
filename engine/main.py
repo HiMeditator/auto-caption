@@ -44,10 +44,10 @@ def main_gummy(s: str, t: str, a: int, c: int, k: str):
     engine.stop()
 
 
-def main_vosk(a: int, c: int, m: str):
+def main_vosk(a: int, c: int, m: str, t: str):
     global thread_data
     stream = AudioStream(a, c)
-    engine = VoskRecognizer(m)
+    engine = VoskRecognizer(m, None if t == 'none' else t)
 
     stream.open_stream()
     engine.start()
@@ -72,9 +72,9 @@ if __name__ == "__main__":
     parser.add_argument('-a', '--audio_type', default=0, help='Audio stream source: 0 for output, 1 for input')
     parser.add_argument('-c', '--chunk_rate', default=10, help='Number of audio stream chunks collected per second')
     parser.add_argument('-p', '--port', default=8080, help='The port to run the server on, 0 for no server')
+    parser.add_argument('-t', '--target_language', default='zh', help='Target language code, "none" for no translation')
     # gummy only
     parser.add_argument('-s', '--source_language', default='en', help='Source language code')
-    parser.add_argument('-t', '--target_language', default='zh', help='Target language code')
     parser.add_argument('-k', '--api_key', default='', help='API KEY for Gummy model')
     # vosk only
     parser.add_argument('-m', '--model_path', default='', help='The path to the vosk model.')
@@ -97,7 +97,8 @@ if __name__ == "__main__":
         main_vosk(
             int(args.audio_type),
             int(args.chunk_rate),
-            args.model_path
+            args.model_path,
+            args.target_language
         )
     else:
         raise ValueError('Invalid caption engine specified.')

@@ -67,21 +67,20 @@ export class CaptionEngine {
       this.command.push('-a', allConfig.controls.audio ? '1' : '0')
       this.port = Math.floor(Math.random() * (65535 - 1024 + 1)) + 1024
       this.command.push('-p', this.port.toString())
+      this.command.push(
+        '-t', allConfig.controls.translation ?
+        allConfig.controls.targetLang : 'none'
+      )
 
       if(allConfig.controls.engine === 'gummy') {
         this.command.push('-e', 'gummy')
         this.command.push('-s', allConfig.controls.sourceLang)
-        this.command.push(
-          '-t', allConfig.controls.translation ?
-          allConfig.controls.targetLang : 'none'
-        )
         if(allConfig.controls.API_KEY) {
           this.command.push('-k', allConfig.controls.API_KEY)
         }
       }
       else if(allConfig.controls.engine === 'vosk'){
         this.command.push('-e', 'vosk')
-        
         this.command.push('-m', `"${allConfig.controls.modelPath}"`)        
       }
     }
@@ -249,8 +248,11 @@ function handleEngineData(data: any) {
   else if(data.command === 'caption') {
     allConfig.updateCaptionLog(data);
   }
+  else if(data.command === 'translation') {
+    allConfig.updateCaptionTranslation(data);
+  }
   else if(data.command === 'print') {
-    Log.info('Engine Print:', data.content)
+    console.log(data.content)
   }
   else if(data.command === 'info') {
     Log.info('Engine Info:', data.content)

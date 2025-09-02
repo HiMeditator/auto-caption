@@ -188,15 +188,3 @@ npm run build:mac
 # For Linux
 npm run build:linux
 ```
-
-注意，根据不同的平台需要修改项目根目录下 `electron-builder.yml` 文件中的配置内容：
-
-```yml
-extraResources:
-  # For Windows
-  - from: ./engine/dist/main.exe
-    to: ./engine/main.exe
-  # For macOS and Linux
-  # - from: ./engine/dist/main
-  #   to: ./engine/main
-```

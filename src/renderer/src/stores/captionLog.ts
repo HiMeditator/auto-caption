@@ -15,7 +15,12 @@ export const useCaptionLogStore = defineStore('captionLog', () => {
   })
 
   window.electron.ipcRenderer.on('both.captionLog.upd', (_, log) => {
-    captionData.value.splice(captionData.value.length - 1, 1, log)
+    for(let i = captionData.value.length - 1; i >= 0; i--) {
+      if(captionData.value[i].time_s === log.time_s){
+        captionData.value.splice(i, 1, log)
+        break
+      }
+    }
   })
 
   window.electron.ipcRenderer.on('both.captionLog.set', (_, logs) => {

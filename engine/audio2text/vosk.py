@@ -1,8 +1,10 @@
 import json
+import threading
+import time
 from datetime import datetime
 
 from vosk import Model, KaldiRecognizer, SetLogLevel
-from utils import stdout_cmd, stdout_obj
+from utils import stdout_cmd, stdout_obj, google_translate
 
 
 class VoskRecognizer:
@@ -11,15 +13,18 @@ class VoskRecognizer:
 
     初始化参数：
         model_path: Vosk 识别模型路径
+        target: 翻译目标语言
     """
-    def __init__(self, model_path: str):
+    def __init__(self, model_path: str, target: str | None):
         SetLogLevel(-1)
         if model_path.startswith('"'):
             model_path = model_path[1:]
         if model_path.endswith('"'):
             model_path = model_path[:-1]
         self.model_path = model_path
+        self.target = target
         self.time_str = ''
+        self.trans_time = time.time()
         self.cur_id = 0
         self.prev_content = ''
 
@@ -48,7 +53,15 @@ class VoskRecognizer:
             caption['time_s'] = self.time_str
             caption['time_t'] = datetime.now().strftime('%H:%M:%S.%f')[:-3]
             self.prev_content = ''
+            if content == '': return
             self.cur_id += 1
+            if self.target:
+                self.trans_time = time.time()
+                th = threading.Thread(
+                    target=google_translate,
+                    args=(caption['text'], self.target, self.time_str)
+                )
+                th.start()
         else:
             content = json.loads(self.recognizer.PartialResult()).get('partial', '')
             if content == '' or content == self.prev_content:
@@ -62,6 +75,13 @@ class VoskRecognizer:
             self.prev_content = content
         
         stdout_obj(caption)
+        if self.target and time.time() - self.trans_time > 2.0:
+            self.trans_time = time.time()
+            th = threading.Thread(
+                target=google_translate,
+                args=(caption['text'], self.target, self.time_str)
+            )
+            th.start()
 
     def stop(self):
         """停止 Vosk 引擎"""

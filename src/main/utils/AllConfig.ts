@@ -1,6 +1,7 @@
 import {
   UILanguage, UITheme, Styles, Controls,
-  CaptionItem, FullConfig, SoftwareLogItem
+  CaptionItem, CaptionTranslation,
+  FullConfig, SoftwareLogItem
 } from '../types'
 import { Log } from './Log'
 import { app, BrowserWindow } from 'electron'
@@ -158,12 +159,28 @@ class AllConfig {
     }
   }
 
-  public sendCaptionLog(window: BrowserWindow, command: 'add' | 'upd' | 'set') {
+  public updateCaptionTranslation(trans: CaptionTranslation){
+    for(let i = this.captionLog.length - 1; i >= 0; i--){
+      if(this.captionLog[i].time_s === trans.time_s){
+        this.captionLog[i].translation = trans.translation
+        for(const window of BrowserWindow.getAllWindows()){
+          this.sendCaptionLog(window, 'upd', i)
+        }
+        break
+      }
+    }
+  }
+  public sendCaptionLog(
+    window: BrowserWindow,
+    command: 'add' | 'upd' | 'set',
+    index: number | undefined = undefined
+  ) {
     if(command === 'add'){
-      window.webContents.send(`both.captionLog.add`, this.captionLog[this.captionLog.length - 1])
+      window.webContents.send(`both.captionLog.add`, this.captionLog.at(-1))
     }
     else if(command === 'upd'){
-      window.webContents.send(`both.captionLog.upd`, this.captionLog[this.captionLog.length - 1])
+      if(index !== undefined) window.webContents.send(`both.captionLog.upd`, this.captionLog[index])
+      else window.webContents.send(`both.captionLog.upd`, this.captionLog.at(-1))
     }
     else if(command === 'set'){
       window.webContents.send(`both.captionLog.set`, this.captionLog)

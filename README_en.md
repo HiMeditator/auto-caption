@@ -188,15 +188,3 @@ npm run build:mac
 # For Linux
 npm run build:linux
 ```
-
-Note: You need to modify the configuration content in the `electron-builder.yml` file in the project root directory according to different platforms:
-
-```yml
-extraResources:
-  # For Windows
-  - from: ./engine/dist/main.exe
-    to: ./engine/main.exe
-  # For macOS and Linux
-  # - from: ./engine/dist/main
-  #   to: ./engine/main
-```

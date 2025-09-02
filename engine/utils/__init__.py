@@ -7,3 +7,4 @@ from .audioprcs import (
 from .sysout import stdout, stdout_err, stdout_cmd, stdout_obj, stderr
 from .thdata import thread_data
 from .server import start_server
+from .translation import ollama_translate, google_translate
