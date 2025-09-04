@@ -6,6 +6,8 @@ export interface Controls {
   engineEnabled: boolean,
   sourceLang: string,
   targetLang: string,
+  transModel: string,
+  ollamaName: string,
   engine: string,
   audio: 0 | 1,
   translation: boolean,
@@ -43,11 +45,6 @@ export interface CaptionItem {
   time_s: string,
   time_t: string,
   text: string,
-  translation: string
-}
-
-export interface CaptionTranslation {
-  time_s: string,
   translation: string
 }
 

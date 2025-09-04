@@ -28,7 +28,9 @@ export default {
     "changeInfo": "如果字幕引擎已经启动，需要重启字幕引擎修改才会生效",
     "styleChange": "字幕样式已修改",
     "styleInfo": "字幕样式修改已经保存并生效",
-    "engineStartTimeout": "字幕引擎启动超时，已自动强制停止"
+    "engineStartTimeout": "字幕引擎启动超时，已自动强制停止",
+    "ollamaNameNull": "Ollama 字段为空",
+    "ollamaNameNullNote": "选择 Ollama 模型作为翻译模型时，Ollama 字段不能为空，需要填写本地已经配置好的 Ollama 模型的名称。"
   },
   general: {
     "title": "通用设置",
@@ -47,6 +49,9 @@ export default {
     "cancelChange": "取消更改",
     "sourceLang": "源语言",
     "transLang": "翻译语言",
+    "transModel": "翻译模型",
+    "ollama": "Ollama",
+    "ollamaNote": "要使用的进行翻译的本地 Ollama 模型的名称，将调用默认端口的服务，建议使用参数量小于 1B 的非推理模型。",
     "captionEngine": "字幕引擎",
     "audioType": "音频类型",
     "systemOutput": "系统音频输出（扬声器）",

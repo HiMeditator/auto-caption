@@ -28,7 +28,9 @@ export default {
     "changeInfo": "字幕エンジンがすでに起動している場合、変更を有効にするには再起動が必要です。",
     "styleChange": "字幕のスタイルが変更されました",
     "styleInfo": "字幕のスタイル変更が保存され、適用されました",
-    "engineStartTimeout": "字幕エンジンの起動がタイムアウトしました。自動的に強制停止しました"
+    "engineStartTimeout": "字幕エンジンの起動がタイムアウトしました。自動的に強制停止しました",
+    "ollamaNameNull": "Ollama フィールドが空です",
+    "ollamaNameNullNote": "Ollama モデルを翻訳モデルとして選択する場合、Ollama フィールドは空にできません。ローカルで設定された Ollama モデルの名前を入力してください。"
   },
   general: {
     "title": "一般設定",
@@ -47,6 +49,9 @@ export default {
     "cancelChange": "変更をキャンセル",
     "sourceLang": "ソース言語",
     "transLang": "翻訳言語",
+    "transModel": "翻訳モデル",
+    "ollama": "Ollama",
+    "ollamaNote": "翻訳に使用する、デフォルトポートでサービスを呼び出すローカルOllamaモデルの名前。1B 未満のパラメータを持つ非推論モデルの使用を推奨します。",
     "captionEngine": "エンジン",
     "audioType": "オーディオ",
     "systemOutput": "システムオーディオ出力（スピーカー）",

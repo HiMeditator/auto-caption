@@ -81,7 +81,9 @@ export class CaptionEngine {
       }
       else if(allConfig.controls.engine === 'vosk'){
         this.command.push('-e', 'vosk')
-        this.command.push('-m', `"${allConfig.controls.modelPath}"`)        
+        this.command.push('-m', `"${allConfig.controls.modelPath}"`)
+        this.command.push('-tm', allConfig.controls.transModel)
+        this.command.push('-on', allConfig.controls.ollamaName)
       }
     }
     Log.info('Engine Path:', this.appPath)
@@ -256,6 +258,9 @@ function handleEngineData(data: any) {
   }
   else if(data.command === 'info') {
     Log.info('Engine Info:', data.content)
+  }
+  else if(data.command === 'warn') {
+    Log.warn('Engine Warn:', data.content)
   }
   else if(data.command === 'error') {
     Log.error('Engine Error:', data.content)

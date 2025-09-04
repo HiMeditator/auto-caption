@@ -44,10 +44,13 @@ def main_gummy(s: str, t: str, a: int, c: int, k: str):
     engine.stop()
 
 
-def main_vosk(a: int, c: int, m: str, t: str):
+def main_vosk(a: int, c: int, m: str, t: str, tm: str, on: str):
     global thread_data
     stream = AudioStream(a, c)
-    engine = VoskRecognizer(m, None if t == 'none' else t)
+    engine = VoskRecognizer(
+        m, None if t == 'none' else t,
+        tm, on
+    )
 
     stream.open_stream()
     engine.start()
@@ -78,6 +81,8 @@ if __name__ == "__main__":
     parser.add_argument('-k', '--api_key', default='', help='API KEY for Gummy model')
     # vosk only
     parser.add_argument('-m', '--model_path', default='', help='The path to the vosk model.')
+    parser.add_argument('-tm', '--translation_model', default='', help='Google translate API KEY')
+    parser.add_argument('-on', '--ollama_name', default='', help='Ollama model name for translation')
 
     args = parser.parse_args()
     if int(args.port) == 0:
@@ -98,7 +103,9 @@ if __name__ == "__main__":
             int(args.audio_type),
             int(args.chunk_rate),
             args.model_path,
-            args.target_language
+            args.target_language,
+            args.translation_model,
+            args.ollama_name
         )
     else:
         raise ValueError('Invalid caption engine specified.')

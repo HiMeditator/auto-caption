@@ -4,7 +4,7 @@ import time
 from datetime import datetime
 
 from vosk import Model, KaldiRecognizer, SetLogLevel
-from utils import stdout_cmd, stdout_obj, google_translate
+from utils import stdout_cmd, stdout_obj, google_translate, ollama_translate
 
 
 class VoskRecognizer:
@@ -14,8 +14,10 @@ class VoskRecognizer:
     初始化参数：
         model_path: Vosk 识别模型路径
         target: 翻译目标语言
+        trans_model: 翻译模型名称
+        ollama_name: Ollama 模型名称
     """
-    def __init__(self, model_path: str, target: str | None):
+    def __init__(self, model_path: str, target: str | None, trans_model: str, ollama_name: str):
         SetLogLevel(-1)
         if model_path.startswith('"'):
             model_path = model_path[1:]
@@ -23,8 +25,12 @@ class VoskRecognizer:
             model_path = model_path[:-1]
         self.model_path = model_path
         self.target = target
+        if trans_model == 'google':
+            self.trans_func = google_translate
+        else:
+            self.trans_func = ollama_translate
+        self.ollama_name = ollama_name
         self.time_str = ''
-        self.trans_time = time.time()
         self.cur_id = 0
         self.prev_content = ''
 
@@ -58,8 +64,8 @@ class VoskRecognizer:
             if self.target:
                 self.trans_time = time.time()
                 th = threading.Thread(
-                    target=google_translate,
-                    args=(caption['text'], self.target, self.time_str)
+                    target=self.trans_func,
+                    args=(self.ollama_name, self.target, caption['text'], self.time_str)
                 )
                 th.start()
         else:
@@ -75,13 +81,6 @@ class VoskRecognizer:
             self.prev_content = content
         
         stdout_obj(caption)
-        if self.target and time.time() - self.trans_time > 2.0:
-            self.trans_time = time.time()
-            th = threading.Thread(
-                target=google_translate,
-                args=(caption['text'], self.target, self.time_str)
-            )
-            th.start()
 
     def stop(self):
         """停止 Vosk 引擎"""

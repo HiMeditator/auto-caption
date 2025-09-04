@@ -1,12 +1,16 @@
 import {
   UILanguage, UITheme, Styles, Controls,
-  CaptionItem, CaptionTranslation,
-  FullConfig, SoftwareLogItem
+  CaptionItem, FullConfig, SoftwareLogItem
 } from '../types'
 import { Log } from './Log'
 import { app, BrowserWindow } from 'electron'
 import * as path from 'path'
 import * as fs from 'fs'
+
+interface CaptionTranslation {
+  time_s: string,
+  translation: string
+}
 
 const defaultStyles: Styles = {
   lineBreak: 1,
@@ -32,6 +36,8 @@ const defaultStyles: Styles = {
 const defaultControls: Controls = {
   sourceLang: 'en',
   targetLang: 'zh',
+  transModel: 'ollama',
+  ollamaName: '',
   engine: 'gummy',
   audio: 0,
   engineEnabled: false,

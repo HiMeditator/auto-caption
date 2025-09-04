@@ -28,7 +28,9 @@ export default {
     "changeInfo": "If the caption engine is already running, you need to restart it for the changes to take effect.",
     "styleChange": "Caption Style Changed",
     "styleInfo": "Caption style changes have been saved and applied.",
-    "engineStartTimeout": "Caption engine startup timeout, automatically force stopped"
+    "engineStartTimeout": "Caption engine startup timeout, automatically force stopped",
+    "ollamaNameNull": "'Ollama' Field is Empty",
+    "ollamaNameNullNote": "When selecting Ollama model as the translation model, the 'Ollama' field cannot be empty and must be filled with the name of a locally configured Ollama model."
   },
   general: {
     "title": "General Settings",
@@ -47,6 +49,9 @@ export default {
     "cancelChange": "Cancel Changes",
     "sourceLang": "Source",
     "transLang": "Translation",
+    "transModel": "Model",
+    "ollama": "Ollama",
+    "ollamaNote": "To use for translation, the name of the local Ollama model that will call the service on the default port. It is recommended to use a non-inference model with less than 1B parameters.",
     "captionEngine": "Engine",
     "audioType": "Audio Type",
     "systemOutput": "System Audio Output (Speaker)",

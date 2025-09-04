@@ -19,6 +19,8 @@ export const useEngineControlStore = defineStore('engineControl', () => {
   const engineEnabled = ref(false)
   const sourceLang = ref<string>('en')
   const targetLang = ref<string>('zh')
+  const transModel = ref<string>('ollama')
+  const ollamaName = ref<string>('')
   const engine = ref<string>('gummy')
   const audio = ref<0 | 1>(0)
   const translation = ref<boolean>(true)
@@ -37,6 +39,8 @@ export const useEngineControlStore = defineStore('engineControl', () => {
       engineEnabled: engineEnabled.value,
       sourceLang: sourceLang.value,
       targetLang: targetLang.value,
+      transModel: transModel.value,
+      ollamaName: ollamaName.value,
       engine: engine.value,
       audio: audio.value,
       translation: translation.value,
@@ -68,6 +72,8 @@ export const useEngineControlStore = defineStore('engineControl', () => {
     }
     sourceLang.value = controls.sourceLang
     targetLang.value = controls.targetLang
+    transModel.value = controls.transModel
+    ollamaName.value = controls.ollamaName
     engine.value = controls.engine
     audio.value = controls.audio
     engineEnabled.value = controls.engineEnabled
@@ -132,6 +138,8 @@ export const useEngineControlStore = defineStore('engineControl', () => {
     engineEnabled,      // 字幕引擎是否启用
     sourceLang,         // 源语言
     targetLang,         // 目标语言
+    transModel,         // 翻译模型
+    ollamaName,        // Ollama 模型
     engine,             // 字幕引擎
     audio,              // 选择音频
     translation,        // 是否启用翻译

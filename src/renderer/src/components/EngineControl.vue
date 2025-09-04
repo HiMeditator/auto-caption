@@ -6,6 +6,14 @@
       <a @click="cancelChange">{{ $t('engine.cancelChange') }}</a>
     </template>
     <div class="input-item">
+      <span class="input-label">{{ $t('engine.captionEngine') }}</span>
+      <a-select
+        class="input-area"
+        v-model:value="currentEngine"
+        :options="captionEngine"
+      ></a-select>
+    </div>
+    <div class="input-item">
       <span class="input-label">{{ $t('engine.sourceLang') }}</span>
       <a-select
         :disabled="currentEngine === 'vosk'"
@@ -22,13 +30,27 @@
         :options="langList.filter((item) => item.value !== 'auto')"
       ></a-select>
     </div>
-    <div class="input-item">
-      <span class="input-label">{{ $t('engine.captionEngine') }}</span>
+    <div class="input-item" v-if="transModel">
+      <span class="input-label">{{ $t('engine.transModel') }}</span>
       <a-select
         class="input-area"
-        v-model:value="currentEngine"
-        :options="captionEngine"
+        v-model:value="currentTransModel"
+        :options="transModel"
       ></a-select>
+    </div>
+    <div class="input-item" v-if="transModel && currentTransModel === 'ollama'">
+      <a-popover placement="right">
+        <template #content>
+          <p class="label-hover-info">{{ $t('engine.ollamaNote') }}</p>
+        </template>
+        <span class="input-label info-label"
+          :style="{color: uiColor}"
+        >{{ $t('engine.ollama') }}</span>
+      </a-popover>
+      <a-input
+        class="input-area"
+        v-model:value="currentOllamaName"
+      ></a-input>
     </div>
     <div class="input-item">
       <span class="input-label">{{ $t('engine.audioType') }}</span>
@@ -80,11 +102,13 @@
 
     <a-card size="small" :title="$t('engine.showMore')" v-show="showMore" style="margin-top:10px;">
       <div class="input-item">
-        <a-popover>
+        <a-popover placement="right">
           <template #content>
             <p class="label-hover-info">{{ $t('engine.apikeyInfo') }}</p>
           </template>
-          <span class="input-label info-label">{{ $t('engine.apikey') }}</span>
+          <span class="input-label info-label"
+            :style="{color: uiColor}"
+          >{{ $t('engine.apikey') }}</span>
         </a-popover>
         <a-input
           class="input-area"
@@ -93,14 +117,17 @@
         />
       </div>
       <div class="input-item">
-        <a-popover>
+        <a-popover placement="right">
           <template #content>
             <p class="label-hover-info">{{ $t('engine.modelPathInfo') }}</p>
           </template>
-          <span class="input-label info-label">{{ $t('engine.modelPath') }}</span>
+          <span class="input-label info-label"
+            :style="{color: uiColor}"
+          >{{ $t('engine.modelPath') }}</span>
         </a-popover>
         <span
           class="input-folder"
+          :style="{color: uiColor}"
           @click="selectFolderPath"
         ><span><FolderOpenOutlined /></span></span>
         <a-input
@@ -110,13 +137,13 @@
         />
       </div>
       <div class="input-item">
-        <a-popover>
+        <a-popover placement="right">
           <template #content>
             <p class="label-hover-info">{{ $t('engine.startTimeoutInfo') }}</p>
           </template>
           <span
             class="input-label info-label"
-            style="vertical-align: middle;"
+            :style="{color: uiColor, verticalAlign: 'middle'}"
           >{{ $t('engine.startTimeout') }}</span>
         </a-popover>
         <a-input-number
@@ -134,12 +161,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, h } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useGeneralSettingStore } from '@renderer/stores/generalSetting'
 import { useEngineControlStore } from '@renderer/stores/engineControl'
 import { notification } from 'ant-design-vue'
-import { FolderOpenOutlined ,InfoCircleOutlined } from '@ant-design/icons-vue';
+import { ExclamationCircleOutlined, FolderOpenOutlined ,InfoCircleOutlined } from '@ant-design/icons-vue';
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
@@ -148,11 +175,16 @@ const showMore = ref(false)
 const engineControl = useEngineControlStore()
 const { captionEngine, audioType, changeSignal } = storeToRefs(engineControl)
 
+const generalSetting = useGeneralSettingStore()
+const { uiColor } = storeToRefs(generalSetting)
+
 const currentSourceLang = ref('auto')
 const currentTargetLang = ref('zh')
 const currentEngine = ref<string>('gummy')
 const currentAudio = ref<0 | 1>(0)
-const currentTranslation = ref<boolean>(false)
+const currentTranslation = ref<boolean>(true)
+const currentTransModel = ref('ollama')
+const currentOllamaName = ref('')
 const currentAPI_KEY = ref<string>('')
 const currentModelPath = ref<string>('')
 const currentCustomized = ref<boolean>(false)
@@ -169,9 +201,33 @@ const langList = computed(() => {
   return []
 })
 
+const transModel = computed(() => {
+  for(let item of captionEngine.value){
+    if(item.value === currentEngine.value) {
+      return item.transModel
+    }
+  }
+  return []
+})
+
 function applyChange(){
+  if(
+    currentTranslation.value && transModel.value &&
+    currentTransModel.value === 'ollama' && !currentOllamaName.value.trim()
+  ) {
+    notification.open({
+      message: t('noti.ollamaNameNull'),
+      description: t('noti.ollamaNameNullNote'),
+      duration: null,
+      icon: () => h(ExclamationCircleOutlined, { style: 'color: #ff4d4f' })
+    })
+    return
+  }
+
   engineControl.sourceLang = currentSourceLang.value
   engineControl.targetLang = currentTargetLang.value
+  engineControl.transModel = currentTransModel.value
+  engineControl.ollamaName = currentOllamaName.value
   engineControl.engine = currentEngine.value
   engineControl.audio = currentAudio.value
   engineControl.translation = currentTranslation.value
@@ -194,6 +250,8 @@ function applyChange(){
 function cancelChange(){
   currentSourceLang.value = engineControl.sourceLang
   currentTargetLang.value = engineControl.targetLang
+  currentTransModel.value = engineControl.transModel
+  currentOllamaName.value = engineControl.ollamaName
   currentEngine.value = engineControl.engine
   currentAudio.value = engineControl.audio
   currentTranslation.value = engineControl.translation
@@ -243,8 +301,8 @@ watch(currentEngine, (val) => {
 }
 
 .info-label {
-  color: #1677ff;
   cursor: pointer;
+  font-style: italic;
 }
 
 .input-folder {
@@ -255,20 +313,12 @@ watch(currentEngine, (val) => {
   transition: all 0.25s;
 }
 
-.input-folder>span {
-  padding: 0 2px;
-  border: 2px solid #1677ff;
-  color: #1677ff;
-  border-radius: 30%;
-}
-
 .input-folder:hover {
   transform: scale(1.1);
 }
 
 .customize-note {
   padding: 10px 10px 0;
-  color: red;
   max-width: min(40vw, 480px);
 }
 </style>

@@ -6,6 +6,8 @@ export interface Controls {
   engineEnabled: boolean,
   sourceLang: string,
   targetLang: string,
+  transModel: string,
+  ollamaName: string,
   engine: string,
   audio: 0 | 1,
   translation: boolean,

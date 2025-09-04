@@ -30,6 +30,10 @@ export const engines = {
         { value: 'ru', label: '俄语' },
         { value: 'es', label: '西班牙语' },
         { value: 'it', label: '意大利语' },
+      ],
+      transModel: [
+        { value: 'ollama', label: 'Ollama 本地模型' },
+        { value: 'google', label: 'Google API 调用' },
       ]
     }
   ],
@@ -64,6 +68,10 @@ export const engines = {
         { value: 'ru', label: 'Russian' },
         { value: 'es', label: 'Spanish' },
         { value: 'it', label: 'Italian' },
+      ],
+      transModel: [
+        { value: 'ollama', label: 'Ollama Local Model' },
+        { value: 'google', label: 'Google API Call' },
       ]
     }
   ],
@@ -98,8 +106,11 @@ export const engines = {
         { value: 'ru', label: 'ロシア語' },
         { value: 'es', label: 'スペイン語' },
         { value: 'it', label: 'イタリア語' },
+      ],
+      transModel: [
+        { value: 'ollama', label: 'Ollama ローカルモデル' },
+        { value: 'google', label: 'Google API 呼び出し' },
       ]
     }
   ]
 }
-
