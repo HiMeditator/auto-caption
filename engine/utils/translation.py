@@ -13,6 +13,7 @@ lang_map = {
     'ru': 'Russian',
     'ja': 'Japanese',
     'ko': 'Korean',
+    'zh': 'Chinese',
     'zh-cn': 'Chinese'
 }
 

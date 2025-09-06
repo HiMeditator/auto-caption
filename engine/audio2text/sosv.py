@@ -9,6 +9,7 @@ https://github.com/k2-fsa/sherpa-onnx/blob/master/python-api-examples/simulate-s
 import time
 from datetime import datetime
 import sherpa_onnx
+import threading
 import numpy as np
 
 from utils import shared_data
@@ -23,23 +24,27 @@ class SosvRecognizer:
     初始化参数：
         model_path: Shepra ONNX Sense Voice 识别模型路径
         vad_model: Silero VAD 模型路径
+        source: 识别源语言(auto, zh, en, ja, ko, yue)
         target: 翻译目标语言
         trans_model: 翻译模型名称
         ollama_name: Ollama 模型名称
     """
-    def __init__(self, model_path: str, target: str | None, trans_model: str, ollama_name: str):
+    def __init__(self, model_path: str, source: str, target: str | None, trans_model: str, ollama_name: str):
         if model_path.startswith('"'):
             model_path = model_path[1:]
         if model_path.endswith('"'):
             model_path = model_path[:-1]
         self.model_path = model_path
+        self.ext = ""
+        if self.model_path[-4:] == "int8":
+            self.ext = ".int8"
+        self.source = source
         self.target = target
         if trans_model == 'google':
             self.trans_func = google_translate
         else:
             self.trans_func = ollama_translate
         self.ollama_name = ollama_name
-
         self.time_str = ''
         self.cur_id = 0
         self.prev_content = ''
@@ -47,19 +52,39 @@ class SosvRecognizer:
     def start(self):
         """启动 Sense Voice 模型"""
         self.recognizer = sherpa_onnx.OfflineRecognizer.from_sense_voice(
-            model=f"{self.model_path}/model.onnx",
-            tokens=f"{self.model_path}/tokens.txt",
+            model=f"{self.model_path}/sensevoice/model{self.ext}.onnx",
+            tokens=f"{self.model_path}/sensevoice/tokens.txt",
+            language=self.source,
             num_threads = 2,
         )
-        config = sherpa_onnx.VadModelConfig()
-        config.silero_vad.model = f"{self.model_path}/silero_vad.onnx"
-        config.silero_vad.threshold = 0.5
-        config.silero_vad.min_silence_duration = 0.1
-        config.silero_vad.min_speech_duration = 0.25
-        config.silero_vad.max_speech_duration = 8
-        config.sample_rate = 16000
-        self.window_size = config.silero_vad.window_size
-        self.vad = sherpa_onnx.VoiceActivityDetector(config, buffer_size_in_seconds=100)
+        
+        vad_config = sherpa_onnx.VadModelConfig()
+        vad_config.silero_vad.model = f"{self.model_path}/silero_vad.onnx"
+        vad_config.silero_vad.threshold = 0.5
+        vad_config.silero_vad.min_silence_duration = 0.1
+        vad_config.silero_vad.min_speech_duration = 0.25
+        vad_config.silero_vad.max_speech_duration = 8
+        vad_config.sample_rate = 16000
+        self.window_size = vad_config.silero_vad.window_size
+        self.vad = sherpa_onnx.VoiceActivityDetector(vad_config, buffer_size_in_seconds=100)
+
+        if self.source == 'en':
+            model_config = sherpa_onnx.OnlinePunctuationModelConfig(
+                cnn_bilstm=f"{self.model_path}/punct-en/model{self.ext}.onnx",
+                bpe_vocab=f"{self.model_path}/punct-en/bpe.vocab"
+            )
+            punct_config = sherpa_onnx.OnlinePunctuationConfig(
+                model_config=model_config,
+            )
+            self.punct = sherpa_onnx.OnlinePunctuation(punct_config)
+        else:
+            punct_config = sherpa_onnx.OfflinePunctuationConfig(
+                model=sherpa_onnx.OfflinePunctuationModelConfig(
+                    ct_transformer=f"{self.model_path}/punct/model{self.ext}.onnx"
+                ),
+            )
+            self.punct = sherpa_onnx.OfflinePunctuation(punct_config)
+
         self.buffer = []
         self.offset = 0
         self.started = False
@@ -112,15 +137,27 @@ class SosvRecognizer:
             self.vad.pop()
             self.recognizer.decode_stream(stream)
             text = stream.result.text.strip()
-            
+
+            if self.source == 'en':
+                text_with_punct = self.punct.add_punctuation_with_case(text)
+            else:
+                text_with_punct = self.punct.add_punctuation(text)
+
             caption['index'] = self.cur_id
-            caption['text'] = text
+            caption['text'] = text_with_punct
             caption['time_s'] = self.time_str
             caption['time_t'] = datetime.now().strftime('%H:%M:%S.%f')[:-3]
+            if text:
+                stdout_obj(caption)
+                if self.target:
+                    th = threading.Thread(
+                        target=self.trans_func,
+                        args=(self.ollama_name, self.target, caption['text'], self.time_str),
+                        daemon=True
+                    )
+                    th.start()    
+                self.cur_id += 1
             self.prev_content = ''
-            stdout_obj(caption)
-            
-            self.cur_id += 1
             self.time_str = datetime.now().strftime('%H:%M:%S.%f')[:-3]
             self.buffer = []
             self.offset = 0

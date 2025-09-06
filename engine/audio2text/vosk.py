@@ -62,11 +62,12 @@ class VoskRecognizer:
             self.prev_content = ''
             if content == '': return
             self.cur_id += 1
+            
             if self.target:
-                self.trans_time = time.time()
                 th = threading.Thread(
                     target=self.trans_func,
-                    args=(self.ollama_name, self.target, caption['text'], self.time_str)
+                    args=(self.ollama_name, self.target, caption['text'], self.time_str),
+                    daemon=True
                 )
                 th.start()
         else:

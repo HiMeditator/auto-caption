@@ -10,23 +10,26 @@ from audio2text import SosvRecognizer
 from sysaudio import AudioStream
 
 
-def audio_recording(stream: AudioStream, resample: bool, save = False):
+def audio_recording(stream: AudioStream, resample: bool, save = False, path = ''):
     global shared_data
     stream.open_stream()
+    wf = None
     if save:
-        wf = wave.open(f'record.wav', 'wb')
-        wf.setnchannels(1)
+        if path != '':
+            path += '/'
+        wf = wave.open(f'{path}record.wav', 'wb')
+        wf.setnchannels(stream.CHANNELS)
         wf.setsampwidth(stream.SAMP_WIDTH)
-        wf.setframerate(16000)
+        wf.setframerate(stream.CHUNK_RATE)
     while shared_data.status == 'running':
         raw_chunk = stream.read_chunk()
+        if save: wf.writeframes(raw_chunk) # type: ignore
         if raw_chunk is None: continue
         if resample:
             chunk = resample_chunk_mono(raw_chunk, stream.CHANNELS, stream.RATE, 16000)
         else:
             chunk = merge_chunk_channels(raw_chunk, stream.CHANNELS)
         shared_data.chunk_queue.put(chunk)
-        if save: wf.writeframes(chunk) # type: ignore
     if save: wf.close() # type: ignore
     stream.close_stream_signal()
 
@@ -88,21 +91,22 @@ def main_vosk(a: int, c: int, vosk: str, t: str, tm: str, omn: str):
     engine.stop()
 
 
-def main_sosv(a: int, c: int, sosv: str, t: str, tm: str, omn: str):
+def main_sosv(a: int, c: int, sosv: str, s: str, t: str, tm: str, omn: str):
     """
     Parameters:
         a: Audio source: 0 for output, 1 for input
         c: Chunk number in 1 second
         sosv: Sherpa-ONNX SenseVoice model path
+        s: Source language
         t: Target language
         tm: Translation model type, ollama or google
         omn: Ollama model name
     """
     stream = AudioStream(a, c)
     if t == 'none':
-        engine = SosvRecognizer(sosv, None, tm, omn)
+        engine = SosvRecognizer(sosv, s, None, tm, omn)
     else:
-        engine = SosvRecognizer(sosv, t, tm, omn)
+        engine = SosvRecognizer(sosv, s, t, tm, omn)
 
     engine.start()
     stream_thread = threading.Thread(
@@ -120,14 +124,15 @@ def main_sosv(a: int, c: int, sosv: str, t: str, tm: str, omn: str):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Convert system audio stream to text')
-    # both
+    # all
     parser.add_argument('-e', '--caption_engine', default='gummy', help='Caption engine: gummy or vosk')
     parser.add_argument('-a', '--audio_type', default=0, help='Audio stream source: 0 for output, 1 for input')
     parser.add_argument('-c', '--chunk_rate', default=10, help='Number of audio stream chunks collected per second')
     parser.add_argument('-p', '--port', default=0, help='The port to run the server on, 0 for no server')
     parser.add_argument('-t', '--target_language', default='zh', help='Target language code, "none" for no translation')
+    # gummy and sosv
+    parser.add_argument('-s', '--source_language', default='auto', help='Source language code')
     # gummy only
-    parser.add_argument('-s', '--source_language', default='en', help='Source language code')
     parser.add_argument('-k', '--api_key', default='', help='API KEY for Gummy model')
     # vosk and sosv
     parser.add_argument('-tm', '--translation_model', default='ollama', help='Model for translation: ollama or google')
@@ -165,6 +170,7 @@ if __name__ == "__main__":
             int(args.audio_type),
             int(args.chunk_rate),
             args.sosv_model,
+            args.source_language,
             args.target_language,
             args.translation_model,
             args.ollama_name

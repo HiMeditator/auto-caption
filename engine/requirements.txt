@@ -1,9 +1,10 @@
 dashscope
 numpy
-samplerate
+resampy
 vosk
 pyinstaller
 pyaudio; sys_platform == 'darwin'
 pyaudiowpatch; sys_platform == 'win32'
 googletrans
 ollama
+sherpa_onnx
