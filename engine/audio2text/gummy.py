@@ -5,9 +5,10 @@ from dashscope.audio.asr import (
     TranslationRecognizerRealtime
 )
 import dashscope
+from dashscope.common.error import InvalidParameter
 from datetime import datetime
-from utils import stdout_cmd, stdout_obj, stderr
-
+from utils import stdout_cmd, stdout_obj, stdout_err
+from utils import shared_data
 
 class Callback(TranslationRecognizerCallback):
     """
@@ -90,9 +91,23 @@ class GummyRecognizer:
         """启动 Gummy 引擎"""
         self.translator.start()
 
-    def send_audio_frame(self, data):
-        """发送音频帧，擎将自动识别并将识别结果输出到标准输出中"""
-        self.translator.send_audio_frame(data)
+    def translate(self):
+        """持续读取共享数据中的音频帧，并进行语音识别，将识别结果输出到标准输出中"""
+        global shared_data
+        restart_count = 0
+        while shared_data.status == 'running':
+            chunk = shared_data.chunk_queue.get()
+            try:
+                self.translator.send_audio_frame(chunk)
+            except InvalidParameter as e:
+                restart_count += 1
+                if restart_count > 5:
+                    stdout_err(str(e))
+                    shared_data.status = "kill"
+                    stdout_cmd('kill')
+                    break
+                else:
+                    stdout_cmd('info', f'Gummy engine stopped, restart attempt: {restart_count}...')
 
     def stop(self):
         """停止 Gummy 引擎"""

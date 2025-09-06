@@ -4,6 +4,7 @@ import time
 from datetime import datetime
 
 from vosk import Model, KaldiRecognizer, SetLogLevel
+from utils import shared_data
 from utils import stdout_cmd, stdout_obj, google_translate, ollama_translate
 
 
@@ -81,6 +82,13 @@ class VoskRecognizer:
             self.prev_content = content
         
         stdout_obj(caption)
+
+    def translate(self):
+        """持续读取共享数据中的音频帧，并进行语音识别，将识别结果输出到标准输出中"""
+        global shared_data
+        while shared_data.status == 'running':
+            chunk = shared_data.chunk_queue.get()
+            self.send_audio_frame(chunk)
 
     def stop(self):
         """停止 Vosk 引擎"""

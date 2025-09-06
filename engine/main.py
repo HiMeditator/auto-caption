@@ -1,70 +1,120 @@
+import wave
 import argparse
-from utils import stdout_cmd, stdout_err
-from utils import thread_data, start_server
+import threading
+from utils import stdout, stdout_cmd
+from utils import shared_data, start_server
 from utils import merge_chunk_channels, resample_chunk_mono
-from audio2text import InvalidParameter, GummyRecognizer
+from audio2text import GummyRecognizer
 from audio2text import VoskRecognizer
+from audio2text import SosvRecognizer
 from sysaudio import AudioStream
 
 
+def audio_recording(stream: AudioStream, resample: bool, save = False):
+    global shared_data
+    stream.open_stream()
+    if save:
+        wf = wave.open(f'record.wav', 'wb')
+        wf.setnchannels(1)
+        wf.setsampwidth(stream.SAMP_WIDTH)
+        wf.setframerate(16000)
+    while shared_data.status == 'running':
+        raw_chunk = stream.read_chunk()
+        if raw_chunk is None: continue
+        if resample:
+            chunk = resample_chunk_mono(raw_chunk, stream.CHANNELS, stream.RATE, 16000)
+        else:
+            chunk = merge_chunk_channels(raw_chunk, stream.CHANNELS)
+        shared_data.chunk_queue.put(chunk)
+        if save: wf.writeframes(chunk) # type: ignore
+    if save: wf.close() # type: ignore
+    stream.close_stream_signal()
+
+
 def main_gummy(s: str, t: str, a: int, c: int, k: str):
-    global thread_data
+    """
+    Parameters:
+        s: Source language
+        t: Target language
+        k: Aliyun Bailian API key
+    """
     stream = AudioStream(a, c)
     if t == 'none':
         engine = GummyRecognizer(stream.RATE, s, None, k)
     else:
         engine = GummyRecognizer(stream.RATE, s, t, k)
 
-    stream.open_stream()
     engine.start()
-    chunk_mono = bytes()
-
-    restart_count = 0
-    while thread_data.status == "running":
-        try:
-            chunk = stream.read_chunk()
-            if chunk is None: continue
-            chunk_mono = merge_chunk_channels(chunk, stream.CHANNELS)
-            try:
-                engine.send_audio_frame(chunk_mono)
-            except InvalidParameter as e:
-                restart_count += 1
-                if restart_count > 5:
-                    stdout_err(str(e))
-                    thread_data.status = "kill"
-                    stdout_cmd('kill')
-                    break
-                else:
-                    stdout_cmd('info', f'Gummy engine stopped, restart attempt: {restart_count}...')
-        except KeyboardInterrupt:
-            break
-
-    engine.send_audio_frame(chunk_mono)
-    stream.close_stream()
+    stream_thread = threading.Thread(
+        target=audio_recording,
+        args=(stream, False),
+        daemon=True
+    )
+    stream_thread.start()
+    try:
+        engine.translate()
+    except KeyboardInterrupt:
+        stdout("Keyboard interrupt detected. Exiting...")
     engine.stop()
 
 
-def main_vosk(a: int, c: int, m: str, t: str, tm: str, on: str):
-    global thread_data
+def main_vosk(a: int, c: int, vosk: str, t: str, tm: str, omn: str):
+    """
+    Parameters:
+        a: Audio source: 0 for output, 1 for input
+        c: Chunk number in 1 second
+        vosk: Vosk model path
+        t: Target language
+        tm: Translation model type, ollama or google
+        omn: Ollama model name
+    """
     stream = AudioStream(a, c)
-    engine = VoskRecognizer(
-        m, None if t == 'none' else t,
-        tm, on
-    )
+    if t == 'none':
+        engine = VoskRecognizer(vosk, None, tm, omn)
+    else:
+        engine = VoskRecognizer(vosk, t, tm, omn)
 
-    stream.open_stream()
     engine.start()
+    stream_thread = threading.Thread(
+        target=audio_recording,
+        args=(stream, True),
+        daemon=True
+    )
+    stream_thread.start()
+    try:
+        engine.translate()
+    except KeyboardInterrupt:
+        stdout("Keyboard interrupt detected. Exiting...")
+    engine.stop()
 
-    while thread_data.status == "running":
-        try:
-            chunk = stream.read_chunk()
-            if chunk is None: continue
-            chunk_mono = resample_chunk_mono(chunk, stream.CHANNELS, stream.RATE, 16000)
-            engine.send_audio_frame(chunk_mono)
-        except KeyboardInterrupt:
-            break
 
-    stream.close_stream()
+def main_sosv(a: int, c: int, sosv: str, t: str, tm: str, omn: str):
+    """
+    Parameters:
+        a: Audio source: 0 for output, 1 for input
+        c: Chunk number in 1 second
+        sosv: Sherpa-ONNX SenseVoice model path
+        t: Target language
+        tm: Translation model type, ollama or google
+        omn: Ollama model name
+    """
+    stream = AudioStream(a, c)
+    if t == 'none':
+        engine = SosvRecognizer(sosv, None, tm, omn)
+    else:
+        engine = SosvRecognizer(sosv, t, tm, omn)
+
+    engine.start()
+    stream_thread = threading.Thread(
+        target=audio_recording,
+        args=(stream, True),
+        daemon=True
+    )
+    stream_thread.start()
+    try:
+        engine.translate()
+    except KeyboardInterrupt:
+        stdout("Keyboard interrupt detected. Exiting...")
     engine.stop()
 
 
@@ -74,22 +124,25 @@ if __name__ == "__main__":
     parser.add_argument('-e', '--caption_engine', default='gummy', help='Caption engine: gummy or vosk')
     parser.add_argument('-a', '--audio_type', default=0, help='Audio stream source: 0 for output, 1 for input')
     parser.add_argument('-c', '--chunk_rate', default=10, help='Number of audio stream chunks collected per second')
-    parser.add_argument('-p', '--port', default=8080, help='The port to run the server on, 0 for no server')
+    parser.add_argument('-p', '--port', default=0, help='The port to run the server on, 0 for no server')
     parser.add_argument('-t', '--target_language', default='zh', help='Target language code, "none" for no translation')
     # gummy only
     parser.add_argument('-s', '--source_language', default='en', help='Source language code')
     parser.add_argument('-k', '--api_key', default='', help='API KEY for Gummy model')
+    # vosk and sosv
+    parser.add_argument('-tm', '--translation_model', default='ollama', help='Model for translation: ollama or google')
+    parser.add_argument('-omn', '--ollama_name', default='', help='Ollama model name for translation')
     # vosk only
-    parser.add_argument('-m', '--model_path', default='', help='The path to the vosk model.')
-    parser.add_argument('-tm', '--translation_model', default='', help='Google translate API KEY')
-    parser.add_argument('-on', '--ollama_name', default='', help='Ollama model name for translation')
+    parser.add_argument('-vosk', '--vosk_model', default='', help='The path to the vosk model.')
+    # sosv only
+    parser.add_argument('-sosv', '--sosv_model', default=None, help='The SenseVoice model path')
 
     args = parser.parse_args()
     if int(args.port) == 0:
-        thread_data.status = "running"
+        shared_data.status = "running"
     else:
         start_server(int(args.port))
-
+    
     if args.caption_engine == 'gummy':
         main_gummy(
             args.source_language,
@@ -102,7 +155,16 @@ if __name__ == "__main__":
         main_vosk(
             int(args.audio_type),
             int(args.chunk_rate),
-            args.model_path,
+            args.vosk_model,
+            args.target_language,
+            args.translation_model,
+            args.ollama_name
+        )
+    elif args.caption_engine == 'sosv':
+        main_sosv(
+            int(args.audio_type),
+            int(args.chunk_rate),
+            args.sosv_model,
             args.target_language,
             args.translation_model,
             args.ollama_name
@@ -110,5 +172,5 @@ if __name__ == "__main__":
     else:
         raise ValueError('Invalid caption engine specified.')
     
-    if thread_data.status == "kill":
+    if shared_data.status == "kill":
         stdout_cmd('kill')

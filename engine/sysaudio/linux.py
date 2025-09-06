@@ -55,14 +55,9 @@ class AudioStream:
         self.FORMAT = 16
         self.SAMP_WIDTH = 2
         self.CHANNELS = 2
-        self.RATE = 48000
+        self.RATE = 16000
+        self.CHUNK_RATE = chunk_rate
         self.CHUNK = self.RATE // chunk_rate
-
-    def reset_chunk_size(self, chunk_size: int):
-        """
-        重新设置音频块大小
-        """
-        self.CHUNK = chunk_size
 
     def get_info(self):
         dev_info = f"""
@@ -84,7 +79,7 @@ class AudioStream:
         启动音频捕获进程
         """
         self.process = subprocess.Popen(
-            ["parec", "-d", self.source, "--format=s16le", "--rate=48000", "--channels=2"],
+            ["parec", "-d", self.source, "--format=s16le", "--rate=16000", "--channels=2"],
             stdout=subprocess.PIPE
         )
 

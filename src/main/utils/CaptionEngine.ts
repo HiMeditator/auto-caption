@@ -81,9 +81,9 @@ export class CaptionEngine {
       }
       else if(allConfig.controls.engine === 'vosk'){
         this.command.push('-e', 'vosk')
-        this.command.push('-m', `"${allConfig.controls.modelPath}"`)
+        this.command.push('-vosk', `"${allConfig.controls.modelPath}"`)
         this.command.push('-tm', allConfig.controls.transModel)
-        this.command.push('-on', allConfig.controls.ollamaName)
+        this.command.push('-omn', allConfig.controls.ollamaName)
       }
     }
     Log.info('Engine Path:', this.appPath)

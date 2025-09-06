@@ -61,14 +61,13 @@ class AudioStream:
         self.FORMAT = pyaudio.paInt16
         self.SAMP_WIDTH = pyaudio.get_sample_size(self.FORMAT)
         self.CHANNELS = int(self.device["maxInputChannels"])
-        self.RATE = int(self.device["defaultSampleRate"])
-        self.CHUNK = self.RATE // chunk_rate
+        self.DEFAULT_RATE = int(self.device["defaultSampleRate"])
+        self.CHUNK_RATE = chunk_rate
 
-    def reset_chunk_size(self, chunk_size: int):
-        """
-        重新设置音频块大小
-        """
-        self.CHUNK = chunk_size
+        self.RATE = 16000
+        self.CHUNK = self.RATE // self.CHUNK_RATE
+        self.open_stream()
+        self.close_stream()
 
     def get_info(self):
         dev_info = f"""
@@ -96,13 +95,24 @@ class AudioStream:
         打开并返回系统音频输出流
         """
         if self.stream: return self.stream
-        self.stream = self.mic.open(
-            format = self.FORMAT,
-            channels = self.CHANNELS,
-            rate = self.RATE,
-            input = True,
-            input_device_index = self.INDEX
-        )
+        try: 
+            self.stream = self.mic.open(
+                format = self.FORMAT,
+                channels = self.CHANNELS,
+                rate = self.RATE,
+                input = True,
+                input_device_index = self.INDEX
+            )
+        except OSError:
+            self.RATE = self.DEFAULT_RATE
+            self.CHUNK = self.RATE // self.CHUNK_RATE
+            self.stream = self.mic.open(
+                format = self.FORMAT,
+                channels = self.CHANNELS,
+                rate = self.RATE,
+                input = True,
+                input_device_index = self.INDEX
+            )
         return self.stream
 
     def read_chunk(self) -> bytes | None:
