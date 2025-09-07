@@ -6,6 +6,16 @@
       <a @click="resetStyle">{{ $t('style.resetStyle') }}</a>
     </template>
 
+      <div class="input-item">
+        <span class="input-label">{{ '字幕行数' }}</span>
+        <a-radio-group v-model:value="currentLineNumber">
+          <a-radio-button :value="1">1</a-radio-button>
+          <a-radio-button :value="2">2</a-radio-button>
+          <a-radio-button :value="3">3</a-radio-button>
+          <a-radio-button :value="4">4</a-radio-button>
+        </a-radio-group>
+      </div>
+
     <div class="input-item">
       <span class="input-label">{{ $t('style.longCaption') }}</span>
       <a-select
@@ -178,28 +188,57 @@
         textShadow: currentTextShadow ? `${currentOffsetX}px ${currentOffsetY}px ${currentBlur}px ${currentTextShadowColor}` : 'none'
       }"
     >
-      <p :class="[currentLineBreak?'':'left-ellipsis']"
-        :style="{
-          fontFamily: currentFontFamily,
-          fontSize: currentFontSize + 'px',
-          color: currentFontColor,
-          fontWeight: currentFontWeight * 100
-      }">
-        <span v-if="captionData.length">{{ captionData[captionData.length-1].text }}</span>
-        <span v-else>{{ $t('example.original') }}</span>
-      </p>
-      <p :class="[currentLineBreak?'':'left-ellipsis']"
-        v-if="currentTransDisplay"
-        :style="{
-          fontFamily: currentTransFontFamily,
-          fontSize: currentTransFontSize + 'px',
-          color: currentTransFontColor,
-          fontWeight: currentTransFontWeight * 100
-        }"
-      >
-        <span v-if="captionData.length">{{ captionData[captionData.length-1].translation }}</span>
-        <span v-else>{{ $t('example.translation') }}</span>
-      </p>
+      <template v-if="captionData.length">
+        <template
+          v-for="val in revArr[Math.min(currentLineNumber, captionData.length)]"
+          :key="captionData[captionData.length - val].time_s"
+        >
+          <p :class="[currentLineBreak?'':'left-ellipsis']"
+            :style="{
+              fontFamily: currentFontFamily,
+              fontSize: currentFontSize + 'px',
+              color: currentFontColor,
+              fontWeight: currentFontWeight * 100
+          }">
+            <span>{{ captionData[captionData.length - val].text }}</span>
+          </p>
+          <p :class="[currentLineBreak?'':'left-ellipsis']"
+            v-if="currentTransDisplay && captionData[captionData.length - val].translation"
+            :style="{
+              fontFamily: currentTransFontFamily,
+              fontSize: currentTransFontSize + 'px',
+              color: currentTransFontColor,
+              fontWeight: currentTransFontWeight * 100
+            }"
+          >
+            <span>{{ captionData[captionData.length - val].translation }}</span>
+          </p>
+        </template>
+      </template>
+      <template v-else>
+        <template v-for="val in currentLineNumber" :key="val">
+          <p :class="[currentLineBreak?'':'left-ellipsis']"
+            :style="{
+              fontFamily: currentFontFamily,
+              fontSize: currentFontSize + 'px',
+              color: currentFontColor,
+              fontWeight: currentFontWeight * 100
+          }">
+            <span>{{ $t('example.original') }}</span>
+          </p>
+          <p :class="[currentLineBreak?'':'left-ellipsis']"
+            v-if="currentTransDisplay"
+            :style="{
+              fontFamily: currentTransFontFamily,
+              fontSize: currentTransFontSize + 'px',
+              color: currentTransFontColor,
+              fontWeight: currentTransFontWeight * 100
+            }"
+          >
+            <span>{{ $t('example.translation') }}</span>
+          </p>
+        </template>
+      </template>
     </div>
   </Teleport>
 
@@ -212,6 +251,14 @@ import { storeToRefs } from 'pinia'
 import { notification } from 'ant-design-vue'
 import { useI18n } from 'vue-i18n'
 import { useCaptionLogStore } from '@renderer/stores/captionLog';
+
+const revArr = {
+  1: [1],
+  2: [2, 1],
+  3: [3, 2, 1],
+  4: [4, 3, 2, 1],
+}
+
 const captionLog = useCaptionLogStore();
 const { captionData } = storeToRefs(captionLog);
 
@@ -220,6 +267,7 @@ const { t } = useI18n()
 const captionStyle = useCaptionStyleStore()
 const { changeSignal } = storeToRefs(captionStyle)
 
+const currentLineNumber = ref<number>(1)
 const currentLineBreak = ref<number>(0)
 const currentFontFamily = ref<string>('sans-serif')
 const currentFontSize = ref<number>(24)
@@ -253,6 +301,7 @@ function useSameStyle(){
 }
 
 function applyStyle(){
+  captionStyle.lineNumber = currentLineNumber.value;
   captionStyle.lineBreak = currentLineBreak.value;
   captionStyle.fontFamily = currentFontFamily.value;
   captionStyle.fontSize = currentFontSize.value;
@@ -282,6 +331,7 @@ function applyStyle(){
 }
 
 function backStyle(){
+  currentLineNumber.value = captionStyle.lineNumber;
   currentLineBreak.value = captionStyle.lineBreak;
   currentFontFamily.value = captionStyle.fontFamily;
   currentFontSize.value = captionStyle.fontSize;

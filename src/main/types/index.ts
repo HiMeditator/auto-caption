@@ -23,6 +23,7 @@ export interface Controls {
 }
 
 export interface Styles {
+  lineNumber: number,
   lineBreak: number,
   fontFamily: string,
   fontSize: number,

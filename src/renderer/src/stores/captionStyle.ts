@@ -4,6 +4,7 @@ import { Styles } from '@renderer/types'
 import { breakOptions } from '@renderer/i18n'
 
 export const useCaptionStyleStore = defineStore('captionStyle', () => {
+  const lineNumber = ref<number>(1)
   const lineBreak = ref<number>(1)
   const fontFamily = ref<string>('sans-serif')
   const fontSize = ref<number>(24)
@@ -38,6 +39,7 @@ export const useCaptionStyleStore = defineStore('captionStyle', () => {
 
   function sendStylesChange() {
     const styles: Styles = {
+      lineNumber: lineNumber.value,
       lineBreak: lineBreak.value,
       fontFamily: fontFamily.value,
       fontSize: fontSize.value,
@@ -65,6 +67,7 @@ export const useCaptionStyleStore = defineStore('captionStyle', () => {
   }
 
   function setStyles(args: Styles){
+    lineNumber.value = args.lineNumber
     lineBreak.value = args.lineBreak
     fontFamily.value = args.fontFamily
     fontSize.value = args.fontSize
@@ -91,6 +94,7 @@ export const useCaptionStyleStore = defineStore('captionStyle', () => {
   })
 
   return {
+    lineNumber,         // 显示字幕行数 
     lineBreak,          // 换行方式
     fontFamily,         // 字体族
     fontSize,           // 字体大小

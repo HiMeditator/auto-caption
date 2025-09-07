@@ -17,8 +17,11 @@ def audio_recording(stream: AudioStream, resample: bool, record = False, path = 
     wf = None
     full_name = ''
     if record:
-        if path != '' and path[-1] != '/':
-            path += '/'
+        if path != '':
+            if path.startswith('"') and path.endswith('"'):
+                path = path[1:-1]
+            if path[-1] != '/':
+                path += '/'
         cur_dt = datetime.datetime.now()
         name = cur_dt.strftime("audio-%Y-%m-%dT%H-%M-%S")
         full_name = f'{path}{name}.wav'

@@ -19,6 +19,7 @@ function getDesktopPath() {
 }
 
 const defaultStyles: Styles = {
+  lineNumber: 1,
   lineBreak: 1,
   fontFamily: 'sans-serif',
   fontSize: 24,

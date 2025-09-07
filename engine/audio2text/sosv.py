@@ -63,7 +63,7 @@ class SosvRecognizer:
         vad_config.silero_vad.threshold = 0.5
         vad_config.silero_vad.min_silence_duration = 0.1
         vad_config.silero_vad.min_speech_duration = 0.25
-        vad_config.silero_vad.max_speech_duration = 8
+        vad_config.silero_vad.max_speech_duration = 5
         vad_config.sample_rate = 16000
         self.window_size = vad_config.silero_vad.window_size
         self.vad = sherpa_onnx.VoiceActivityDetector(vad_config, buffer_size_in_seconds=100)

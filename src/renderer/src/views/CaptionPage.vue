@@ -12,26 +12,53 @@
         textShadow: captionStyle.textShadow ? `${captionStyle.offsetX}px ${captionStyle.offsetY}px ${captionStyle.blur}px ${captionStyle.textShadowColor}` : 'none'
       }"
     >
-      <p :class="[captionStyle.lineBreak?'':'left-ellipsis']" :style="{
-        fontFamily: captionStyle.fontFamily,
-        fontSize: captionStyle.fontSize + 'px',
-        color: captionStyle.fontColor,
-        fontWeight: captionStyle.fontWeight * 100
-      }">
-        <span v-if="captionData.length">{{ captionData[captionData.length-1].text }}</span>
-        <span v-else>{{ $t('example.original') }}</span>
-      </p>
-      <p :class="[captionStyle.lineBreak?'':'left-ellipsis']"
-        v-if="captionStyle.transDisplay"
-        :style="{
-        fontFamily: captionStyle.transFontFamily,
-        fontSize: captionStyle.transFontSize + 'px',
-        color: captionStyle.transFontColor,
-        fontWeight: captionStyle.transFontWeight * 100
-      }">
-        <span v-if="captionData.length">{{ captionData[captionData.length-1].translation }}</span>
-        <span v-else>{{ $t('example.translation') }}</span>
-      </p>
+      <template v-if="captionData.length">
+        <template
+          v-for="val in revArr[Math.min(captionStyle.lineNumber, captionData.length)]"
+          :key="captionData[captionData.length - val].time_s"
+        >
+          <p :class="[captionStyle.lineBreak?'':'left-ellipsis']" :style="{
+            fontFamily: captionStyle.fontFamily,
+            fontSize: captionStyle.fontSize + 'px',
+            color: captionStyle.fontColor,
+            fontWeight: captionStyle.fontWeight * 100
+          }">
+            <span>{{ captionData[captionData.length - val].text }}</span>
+          </p>
+          <p :class="[captionStyle.lineBreak?'':'left-ellipsis']"
+            v-if="captionStyle.transDisplay && captionData[captionData.length - val].translation"
+            :style="{
+            fontFamily: captionStyle.transFontFamily,
+            fontSize: captionStyle.transFontSize + 'px',
+            color: captionStyle.transFontColor,
+            fontWeight: captionStyle.transFontWeight * 100
+          }">
+            <span>{{ captionData[captionData.length - val].translation }}</span>
+          </p>
+        </template>
+      </template>
+      <template v-else>
+        <template v-for="val in captionStyle.lineNumber" :key="val">
+          <p :class="[captionStyle.lineBreak?'':'left-ellipsis']" :style="{
+            fontFamily: captionStyle.fontFamily,
+            fontSize: captionStyle.fontSize + 'px',
+            color: captionStyle.fontColor,
+            fontWeight: captionStyle.fontWeight * 100
+          }">
+            <span>{{ $t('example.original') }}</span>
+          </p>
+          <p :class="[captionStyle.lineBreak?'':'left-ellipsis']"
+            v-if="captionStyle.transDisplay"
+            :style="{
+            fontFamily: captionStyle.transFontFamily,
+            fontSize: captionStyle.transFontSize + 'px',
+            color: captionStyle.transFontColor,
+            fontWeight: captionStyle.transFontWeight * 100
+          }">
+            <span>{{ $t('example.translation') }}</span>
+          </p>
+        </template>
+      </template>
     </div>
 
     <div class="title-bar" :style="{color: captionStyle.fontColor}">
@@ -56,6 +83,14 @@ import { ref, onMounted } from 'vue';
 import { useCaptionStyleStore } from '@renderer/stores/captionStyle';
 import { useCaptionLogStore } from '@renderer/stores/captionLog';
 import { storeToRefs } from 'pinia';
+
+const revArr = {
+  1: [1],
+  2: [2, 1],
+  3: [3, 2, 1],
+  4: [4, 3, 2, 1],
+}
+
 const captionStyle = useCaptionStyleStore();
 const captionLog = useCaptionLogStore();
 const { captionData } = storeToRefs(captionLog);

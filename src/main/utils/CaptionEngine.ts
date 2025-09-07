@@ -66,7 +66,7 @@ export class CaptionEngine {
       this.command.push('-a', allConfig.controls.audio ? '1' : '0')
       if(allConfig.controls.recording) {
         this.command.push('-r', '1')
-        this.command.push('-rp', allConfig.controls.recordingPath)
+        this.command.push('-rp', `"${allConfig.controls.recordingPath}"`)
       }
       this.port = Math.floor(Math.random() * (65535 - 1024 + 1)) + 1024
       this.command.push('-p', this.port.toString())
