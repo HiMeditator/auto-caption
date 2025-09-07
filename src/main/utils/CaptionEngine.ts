@@ -63,8 +63,11 @@ export class CaptionEngine {
           this.appPath = path.join(process.resourcesPath, 'engine', 'main')
         }
       }
-
       this.command.push('-a', allConfig.controls.audio ? '1' : '0')
+      if(allConfig.controls.recording) {
+        this.command.push('-r', '1')
+        this.command.push('-rp', allConfig.controls.recordingPath)
+      }
       this.port = Math.floor(Math.random() * (65535 - 1024 + 1)) + 1024
       this.command.push('-p', this.port.toString())
       this.command.push(
@@ -81,7 +84,14 @@ export class CaptionEngine {
       }
       else if(allConfig.controls.engine === 'vosk'){
         this.command.push('-e', 'vosk')
-        this.command.push('-vosk', `"${allConfig.controls.modelPath}"`)
+        this.command.push('-vosk', `"${allConfig.controls.voskModelPath}"`)
+        this.command.push('-tm', allConfig.controls.transModel)
+        this.command.push('-omn', allConfig.controls.ollamaName)
+      }
+      else if(allConfig.controls.engine === 'sosv'){
+        this.command.push('-e', 'sosv')
+        this.command.push('-s', allConfig.controls.sourceLang)
+        this.command.push('-sosv', `"${allConfig.controls.sosvModelPath}"`)
         this.command.push('-tm', allConfig.controls.transModel)
         this.command.push('-omn', allConfig.controls.ollamaName)
       }

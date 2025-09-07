@@ -24,8 +24,11 @@ export const useEngineControlStore = defineStore('engineControl', () => {
   const engine = ref<string>('gummy')
   const audio = ref<0 | 1>(0)
   const translation = ref<boolean>(true)
+  const recording = ref<boolean>(false)
   const API_KEY = ref<string>('')
-  const modelPath = ref<string>('')
+  const voskModelPath = ref<string>('')
+  const sosvModelPath = ref<string>('')
+  const recordingPath = ref<string>('')
   const customized = ref<boolean>(false)
   const customizedApp = ref<string>('')
   const customizedCommand = ref<string>('')
@@ -44,8 +47,11 @@ export const useEngineControlStore = defineStore('engineControl', () => {
       engine: engine.value,
       audio: audio.value,
       translation: translation.value,
+      recording: recording.value,
       API_KEY: API_KEY.value,
-      modelPath: modelPath.value,
+      voskModelPath: voskModelPath.value,
+      sosvModelPath: sosvModelPath.value,
+      recordingPath: recordingPath.value,
       customized: customized.value,
       customizedApp: customizedApp.value,
       customizedCommand: customizedCommand.value,
@@ -78,8 +84,11 @@ export const useEngineControlStore = defineStore('engineControl', () => {
     audio.value = controls.audio
     engineEnabled.value = controls.engineEnabled
     translation.value = controls.translation
+    recording.value = controls.recording
     API_KEY.value = controls.API_KEY
-    modelPath.value = controls.modelPath
+    voskModelPath.value = controls.voskModelPath
+    sosvModelPath.value = controls.sosvModelPath
+    recordingPath.value = controls.recordingPath
     customized.value = controls.customized
     customizedApp.value = controls.customizedApp
     customizedCommand.value = controls.customizedCommand
@@ -89,9 +98,10 @@ export const useEngineControlStore = defineStore('engineControl', () => {
 
   function emptyModelPathErr() {
     notification.open({
-      placement: 'topLeft',
       message: t('noti.empty'),
-      description: t('noti.emptyInfo')
+      description: t('noti.emptyInfo'),
+      duration: null,
+      icon: () => h(ExclamationCircleOutlined, { style: 'color: #ff4d4f' })
     });
   }
 
@@ -139,12 +149,15 @@ export const useEngineControlStore = defineStore('engineControl', () => {
     sourceLang,         // 源语言
     targetLang,         // 目标语言
     transModel,         // 翻译模型
-    ollamaName,        // Ollama 模型
+    ollamaName,         // Ollama 模型
     engine,             // 字幕引擎
     audio,              // 选择音频
     translation,        // 是否启用翻译
+    recording,          // 是否启用录音
     API_KEY,            // API KEY
-    modelPath,          // vosk 模型路径
+    voskModelPath,      // vosk 模型路径
+    sosvModelPath,      // sosv 模型路径
+    recordingPath,      // 录音保存路径
     customized,         // 是否使用自定义字幕引擎
     customizedApp,      // 自定义字幕引擎的应用程序
     customizedCommand,  // 自定义字幕引擎的命令

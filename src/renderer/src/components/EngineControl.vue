@@ -19,7 +19,7 @@
         :disabled="currentEngine === 'vosk'"
         class="input-area"
         v-model:value="currentSourceLang"
-        :options="langList"
+        :options="sLangList"
       ></a-select>
     </div>
     <div class="input-item">
@@ -27,7 +27,7 @@
       <a-select
         class="input-area"
         v-model:value="currentTargetLang"
-        :options="langList.filter((item) => item.value !== 'auto')"
+        :options="tLangList"
       ></a-select>
     </div>
     <div class="input-item" v-if="transModel">
@@ -65,9 +65,13 @@
       <a-switch v-model:checked="currentTranslation" />
       <span style="display:inline-block;width:10px;"></span>
       <div style="display: inline-block;">
-        <span class="switch-label">{{ $t('engine.customEngine') }}</span>
-        <a-switch v-model:checked="currentCustomized" />
+        <span class="switch-label">{{ $t('engine.enableRecording') }}</span>
+        <a-switch v-model:checked="currentRecording" />
       </div>
+    </div>
+    <div class="input-item">
+      <span class="input-label">{{ $t('engine.customEngine') }}</span>
+      <a-switch v-model:checked="currentCustomized" />
       <span style="display:inline-block;width:10px;"></span>
       <div style="display: inline-block;">
         <span class="switch-label">{{ $t('engine.showMore') }}</span>
@@ -105,6 +109,9 @@
         <a-popover placement="right">
           <template #content>
             <p class="label-hover-info">{{ $t('engine.apikeyInfo') }}</p>
+            <p><a href="https://bailian.console.aliyun.com" target="_blank">
+              https://bailian.console.aliyun.com
+            </a></p>
           </template>
           <span class="input-label info-label"
             :style="{color: uiColor}"
@@ -119,21 +126,67 @@
       <div class="input-item">
         <a-popover placement="right">
           <template #content>
-            <p class="label-hover-info">{{ $t('engine.modelPathInfo') }}</p>
+            <p class="label-hover-info">{{ $t('engine.voskModelPathInfo') }}</p>
+            <p class="label-hover-info">
+              <a href="https://alphacephei.com/vosk/models" target="_blank">Vosk {{ $t('engine.modelDownload') }}</a>
+            </p>
           </template>
           <span class="input-label info-label"
             :style="{color: uiColor}"
-          >{{ $t('engine.modelPath') }}</span>
+          >{{ $t('engine.voskModelPath') }}</span>
         </a-popover>
         <span
           class="input-folder"
           :style="{color: uiColor}"
-          @click="selectFolderPath"
+          @click="selectFolderPath('vosk')"
         ><span><FolderOpenOutlined /></span></span>
         <a-input
           class="input-area"
           style="width:calc(100% - 140px);"
-          v-model:value="currentModelPath"
+          v-model:value="currentVoskModelPath"
+        />
+      </div>
+      <div class="input-item">
+        <a-popover placement="right">
+          <template #content>
+            <p class="label-hover-info">{{ $t('engine.sosvModelPathInfo') }}</p>
+            <p class="label-hover-info">
+              <a href="https://github.com/HiMeditator/auto-caption/releases/tag/sosv-model" target="_blank">SOSV {{ $t('engine.modelDownload') }}</a>
+            </p>
+          </template>
+          <span class="input-label info-label"
+            :style="{color: uiColor}"
+          >{{ $t('engine.sosvModelPath') }}</span>
+        </a-popover>
+        <span
+          class="input-folder"
+          :style="{color: uiColor}"
+          @click="selectFolderPath('sosv')"
+        ><span><FolderOpenOutlined /></span></span>
+        <a-input
+          class="input-area"
+          style="width:calc(100% - 140px);"
+          v-model:value="currentSosvModelPath"
+        />
+      </div>
+      <div class="input-item">
+        <a-popover placement="right">
+          <template #content>
+            <p class="label-hover-info">{{ $t('engine.recordingPathInfo') }}</p>
+          </template>
+          <span class="input-label info-label"
+            :style="{color: uiColor}"
+          >{{ $t('engine.recordingPath') }}</span>
+        </a-popover>
+        <span
+          class="input-folder"
+          :style="{color: uiColor}"
+          @click="selectFolderPath('rec')"
+        ><span><FolderOpenOutlined /></span></span>
+        <a-input
+          class="input-area"
+          style="width:calc(100% - 140px);"
+          v-model:value="currentRecordingPath"
         />
       </div>
       <div class="input-item">
@@ -183,19 +236,31 @@ const currentTargetLang = ref('zh')
 const currentEngine = ref<string>('gummy')
 const currentAudio = ref<0 | 1>(0)
 const currentTranslation = ref<boolean>(true)
+const currentRecording = ref<boolean>(false)
 const currentTransModel = ref('ollama')
 const currentOllamaName = ref('')
 const currentAPI_KEY = ref<string>('')
-const currentModelPath = ref<string>('')
+const currentVoskModelPath = ref<string>('')
+const currentSosvModelPath = ref<string>('')
+const currentRecordingPath = ref<string>('')
 const currentCustomized = ref<boolean>(false)
 const currentCustomizedApp = ref('')
 const currentCustomizedCommand = ref('')
 const currentStartTimeoutSeconds = ref<number>(30)
 
-const langList = computed(() => {
+const sLangList = computed(() => {
   for(let item of captionEngine.value){
     if(item.value === currentEngine.value) {
-      return item.languages
+      return item.languages.filter(item => item.type <= 0)
+    }
+  }
+  return []
+})
+
+const tLangList = computed(() => {
+  for(let item of captionEngine.value){
+    if(item.value === currentEngine.value) {
+      return item.languages.filter(item => item.type >= 0)
     }
   }
   return []
@@ -231,8 +296,11 @@ function applyChange(){
   engineControl.engine = currentEngine.value
   engineControl.audio = currentAudio.value
   engineControl.translation = currentTranslation.value
+  engineControl.recording = currentRecording.value
   engineControl.API_KEY = currentAPI_KEY.value
-  engineControl.modelPath = currentModelPath.value
+  engineControl.voskModelPath = currentVoskModelPath.value
+  engineControl.sosvModelPath = currentSosvModelPath.value
+  engineControl.recordingPath = currentRecordingPath.value
   engineControl.customized = currentCustomized.value
   engineControl.customizedApp = currentCustomizedApp.value
   engineControl.customizedCommand = currentCustomizedCommand.value
@@ -255,18 +323,26 @@ function cancelChange(){
   currentEngine.value = engineControl.engine
   currentAudio.value = engineControl.audio
   currentTranslation.value = engineControl.translation
+  currentRecording.value = engineControl.recording
   currentAPI_KEY.value = engineControl.API_KEY
-  currentModelPath.value = engineControl.modelPath
+  currentVoskModelPath.value = engineControl.voskModelPath
+  currentSosvModelPath.value = engineControl.sosvModelPath
+  currentRecordingPath.value = engineControl.recordingPath
   currentCustomized.value = engineControl.customized
   currentCustomizedApp.value = engineControl.customizedApp
   currentCustomizedCommand.value = engineControl.customizedCommand
   currentStartTimeoutSeconds.value = engineControl.startTimeoutSeconds
 }
 
-function selectFolderPath() {
+function selectFolderPath(type: 'vosk' | 'sosv' | 'rec') {
   window.electron.ipcRenderer.invoke('control.folder.select').then((folderPath) => {
     if(!folderPath) return
-    currentModelPath.value = folderPath
+    if(type == 'vosk')
+      currentVoskModelPath.value = folderPath
+    else if(type == 'sosv')
+      currentSosvModelPath.value = folderPath
+    else if(type == 'rec')
+      currentRecordingPath.value = folderPath
   })
 }
 
@@ -285,7 +361,7 @@ watch(currentEngine, (val) => {
       currentTargetLang.value = 'zh-cn'
     }
   }
-  else if(val == 'gummy'){
+  else{
     currentSourceLang.value = 'auto'
     currentTargetLang.value = useGeneralSettingStore().uiLanguage
   }

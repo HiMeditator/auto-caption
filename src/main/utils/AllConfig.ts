@@ -6,10 +6,16 @@ import { Log } from './Log'
 import { app, BrowserWindow } from 'electron'
 import * as path from 'path'
 import * as fs from 'fs'
+import os from 'os'
 
 interface CaptionTranslation {
   time_s: string,
   translation: string
+}
+
+function getDesktopPath() {
+  const homeDir = os.homedir()
+  return path.join(homeDir, 'Desktop')
 }
 
 const defaultStyles: Styles = {
@@ -42,8 +48,11 @@ const defaultControls: Controls = {
   audio: 0,
   engineEnabled: false,
   API_KEY: '',
-  modelPath: '',
+  voskModelPath: '',
+  sosvModelPath: '',
+  recordingPath: getDesktopPath(),
   translation: true,
+  recording: false,
   customized: false,
   customizedApp: '',
   customizedCommand: '',

@@ -175,7 +175,13 @@ function openCaptionWindow() {
 function startEngine() {
   pending.value = true
   isStarting.value = true
-  if(engineControl.engine === 'vosk' && engineControl.modelPath.trim() === '') {
+  if(engineControl.engine === 'vosk' && engineControl.voskModelPath.trim() === '') {
+    engineControl.emptyModelPathErr()
+    pending.value = false
+    isStarting.value = false
+    return
+  }
+  if(engineControl.engine === 'sosv' && engineControl.sosvModelPath.trim() === '') {
     engineControl.emptyModelPathErr()
     pending.value = false
     isStarting.value = false

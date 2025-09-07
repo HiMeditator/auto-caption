@@ -1,6 +1,7 @@
 import wave
 import argparse
 import threading
+import datetime
 from utils import stdout, stdout_cmd
 from utils import shared_data, start_server
 from utils import merge_chunk_channels, resample_chunk_mono
@@ -10,36 +11,45 @@ from audio2text import SosvRecognizer
 from sysaudio import AudioStream
 
 
-def audio_recording(stream: AudioStream, resample: bool, save = False, path = ''):
+def audio_recording(stream: AudioStream, resample: bool, record = False, path = ''):
     global shared_data
     stream.open_stream()
     wf = None
-    if save:
-        if path != '':
+    full_name = ''
+    if record:
+        if path != '' and path[-1] != '/':
             path += '/'
-        wf = wave.open(f'{path}record.wav', 'wb')
+        cur_dt = datetime.datetime.now()
+        name = cur_dt.strftime("audio-%Y-%m-%dT%H-%M-%S")
+        full_name = f'{path}{name}.wav'
+        wf = wave.open(full_name, 'wb')
         wf.setnchannels(stream.CHANNELS)
         wf.setsampwidth(stream.SAMP_WIDTH)
-        wf.setframerate(stream.CHUNK_RATE)
+        wf.setframerate(stream.RATE)
+        stdout_cmd("info", "Audio recording...")
     while shared_data.status == 'running':
         raw_chunk = stream.read_chunk()
-        if save: wf.writeframes(raw_chunk) # type: ignore
+        if record: wf.writeframes(raw_chunk) # type: ignore
         if raw_chunk is None: continue
         if resample:
             chunk = resample_chunk_mono(raw_chunk, stream.CHANNELS, stream.RATE, 16000)
         else:
             chunk = merge_chunk_channels(raw_chunk, stream.CHANNELS)
         shared_data.chunk_queue.put(chunk)
-    if save: wf.close() # type: ignore
+    if record:
+        stdout_cmd("info", f"Audio saved to {full_name}")
+        wf.close() # type: ignore
     stream.close_stream_signal()
 
 
-def main_gummy(s: str, t: str, a: int, c: int, k: str):
+def main_gummy(s: str, t: str, a: int, c: int, k: str, r: bool, rp: str):
     """
     Parameters:
         s: Source language
         t: Target language
         k: Aliyun Bailian API key
+        r: Whether to record the audio
+        rp: Path to save the recorded audio
     """
     stream = AudioStream(a, c)
     if t == 'none':
@@ -50,7 +60,7 @@ def main_gummy(s: str, t: str, a: int, c: int, k: str):
     engine.start()
     stream_thread = threading.Thread(
         target=audio_recording,
-        args=(stream, False),
+        args=(stream, False, r, rp),
         daemon=True
     )
     stream_thread.start()
@@ -61,7 +71,7 @@ def main_gummy(s: str, t: str, a: int, c: int, k: str):
     engine.stop()
 
 
-def main_vosk(a: int, c: int, vosk: str, t: str, tm: str, omn: str):
+def main_vosk(a: int, c: int, vosk: str, t: str, tm: str, omn: str, r: bool, rp: str):
     """
     Parameters:
         a: Audio source: 0 for output, 1 for input
@@ -70,6 +80,8 @@ def main_vosk(a: int, c: int, vosk: str, t: str, tm: str, omn: str):
         t: Target language
         tm: Translation model type, ollama or google
         omn: Ollama model name
+        r: Whether to record the audio
+        rp: Path to save the recorded audio
     """
     stream = AudioStream(a, c)
     if t == 'none':
@@ -80,7 +92,7 @@ def main_vosk(a: int, c: int, vosk: str, t: str, tm: str, omn: str):
     engine.start()
     stream_thread = threading.Thread(
         target=audio_recording,
-        args=(stream, True),
+        args=(stream, True, r, rp),
         daemon=True
     )
     stream_thread.start()
@@ -91,7 +103,7 @@ def main_vosk(a: int, c: int, vosk: str, t: str, tm: str, omn: str):
     engine.stop()
 
 
-def main_sosv(a: int, c: int, sosv: str, s: str, t: str, tm: str, omn: str):
+def main_sosv(a: int, c: int, sosv: str, s: str, t: str, tm: str, omn: str, r: bool, rp: str):
     """
     Parameters:
         a: Audio source: 0 for output, 1 for input
@@ -101,6 +113,8 @@ def main_sosv(a: int, c: int, sosv: str, s: str, t: str, tm: str, omn: str):
         t: Target language
         tm: Translation model type, ollama or google
         omn: Ollama model name
+        r: Whether to record the audio
+        rp: Path to save the recorded audio
     """
     stream = AudioStream(a, c)
     if t == 'none':
@@ -111,7 +125,7 @@ def main_sosv(a: int, c: int, sosv: str, s: str, t: str, tm: str, omn: str):
     engine.start()
     stream_thread = threading.Thread(
         target=audio_recording,
-        args=(stream, True),
+        args=(stream, True, r, rp),
         daemon=True
     )
     stream_thread.start()
@@ -130,6 +144,8 @@ if __name__ == "__main__":
     parser.add_argument('-c', '--chunk_rate', default=10, help='Number of audio stream chunks collected per second')
     parser.add_argument('-p', '--port', default=0, help='The port to run the server on, 0 for no server')
     parser.add_argument('-t', '--target_language', default='zh', help='Target language code, "none" for no translation')
+    parser.add_argument('-r', '--record', default=0, help='Whether to record the audio, 0 for no recording, 1 for recording')
+    parser.add_argument('-rp', '--record_path', default='', help='Path to save the recorded audio')
     # gummy and sosv
     parser.add_argument('-s', '--source_language', default='auto', help='Source language code')
     # gummy only
@@ -154,7 +170,9 @@ if __name__ == "__main__":
             args.target_language,
             int(args.audio_type),
             int(args.chunk_rate),
-            args.api_key
+            args.api_key,
+            True if int(args.record) == 1 else False,
+            args.record_path
         )
     elif args.caption_engine == 'vosk':
         main_vosk(
@@ -163,7 +181,9 @@ if __name__ == "__main__":
             args.vosk_model,
             args.target_language,
             args.translation_model,
-            args.ollama_name
+            args.ollama_name,
+            True if int(args.record) == 1 else False,
+            args.record_path
         )
     elif args.caption_engine == 'sosv':
         main_sosv(
@@ -173,7 +193,9 @@ if __name__ == "__main__":
             args.source_language,
             args.target_language,
             args.translation_model,
-            args.ollama_name
+            args.ollama_name,
+            True if int(args.record) == 1 else False,
+            args.record_path
         )
     else:
         raise ValueError('Invalid caption engine specified.')
