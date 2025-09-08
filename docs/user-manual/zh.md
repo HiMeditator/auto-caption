@@ -1,6 +1,6 @@
 # Auto Caption 用户手册
 
-对应版本：v0.6.0
+对应版本：v1.0.0
 
 ## 软件简介
 
@@ -41,9 +41,13 @@ Auto Caption 是一个跨平台的字幕显示软件，能够实时获取系统�
 
 ## Vosk 引擎使用前准备
 
-如果要使用 Vosk 本地字幕引擎，首先需要在 [Vosk Models](https://alphacephei.com/vosk/models) 页面下载你需要的模型。然后将下载的模型安装包解压到本地，并将对应的模型文件夹的路径添加到软件的设置中。目前 Vosk 字幕引擎还不支持翻译字幕内容。
+如果要使用 Vosk 本地字幕引擎，首先需要在 [Vosk Models](https://alphacephei.com/vosk/models) 页面下载你需要的模型。然后将下载的模型安装包解压到本地，并将对应的模型文件夹的路径添加到软件的设置中。
 
-![](../../assets/media/vosk_zh.png)
+![](../../assets/media/config_zh.png)
+
+## 使用 SOSV 模型
+
+使用 SOSV 模型的方式和 Vosk 一样，下载地址如下：https://github.com/HiMeditator/auto-caption/releases/tag/sosv-model
 
 ## macOS 获取系统音频输出
 

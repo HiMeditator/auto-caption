@@ -1,6 +1,6 @@
 # 字幕引擎说明文档
 
-对应版本：v0.6.0
+对应版本：v1.0.0
 
 ![](../../assets/media/structure_zh.png)
 
@@ -16,22 +16,21 @@
 
 ### 启动引擎
 
-- 主进程：使用 `child_process.spawn()` 启动字幕引擎进程
+- Electron 主进程：使用 `child_process.spawn()` 启动字幕引擎进程
 - 字幕引擎进程：创建 TCP Socket 服务器线程，创建后在标准输出中输出转化为字符串的 JSON 对象，该对象中包含 `command` 字段，值为 `connect`
 - 主进程：监听字幕引擎进程的标准输出，尝试将标准输出按行分割，解析为 JSON 对象，并判断对象的 `command` 字段值是否为 `connect`，如果是则连接 TCP Socket 服务器
 
 ### 字幕识别
 
-- 字幕引擎进程：在主线程监听系统音频输出，并将音频数据块发送给字幕引擎解析，字幕引擎解析音频数据块，通过标准输出发送解析的字幕数据对象字符串
-- 主进程：继续监听字幕引擎的标准输出，并根据解析的对象的 `command` 字段采取不同的操作
+- 字幕引擎进程：新建线程监听系统音频输出，将获取的音频数据块放入共享队列中（`shared_data.chunk_queue`）。字幕引擎不断读取共享队列中的音频数据块并解析。字幕引擎还可能新建线程执行翻译操作。最后字幕引擎通过标准输出发送解析的字幕数据对象字符串
+- Electron 主进程：持续监听字幕引擎的标准输出，并根据解析的对象的 `command` 字段采取不同的操作
 
 ### 关闭引擎
 
-- 主进程：当用户在前端操作关闭字幕引擎时，主进程通过 Socket 通信给字幕引擎进程发送 `command` 字段为 `stop` 的对象字符串
-- 字幕引擎进程：接收主引擎进程发送的字幕数据对象字符串，将字符串解析为对象，如果对象的 `command` 字段为 `stop`，则将全局变量 `thread_data.status` 的值设置为 `stop`
+- Electron 主进程：当用户在前端操作关闭字幕引擎时，主进程通过 Socket 通信给字幕引擎进程发送 `command` 字段为 `stop` 的对象字符串
+- 字幕引擎进程：接收主引擎进程发送的字幕数据对象字符串，将字符串解析为对象，如果对象的 `command` 字段为 `stop`，则将全局变量 `shared_data.status` 的值设置为 `stop`
 - 字幕引擎进程：主线程循环监听系统音频输出，当 `thread_data.status` 的值不为 `running` 时，则结束循环，释放资源，结束运行
-- 主进程：如果检测到字幕引擎进程结束，进行相应处理，并向前端反馈
-
+- Electron 主进程：如果检测到字幕引擎进程结束，进行相应处理，并向前端反馈
 
 ## 项目已经实现的功能
 
@@ -45,21 +44,25 @@
 
 ```python
 from utils import stdout, stdout_cmd, stdout_obj, stderr
-stdout("Hello") # {"command": "print", "content": "Hello"}\n
-stdout_cmd("connect", "8080") # {"command": "connect", "content": "8080"}\n
-stdout_obj({"command": "print", "content": "Hello"})
+# {"command": "print", "content": "Hello"}\n
+stdout("Hello")
+# {"command": "connect", "content": "8080"}\n
+stdout_cmd("connect", "8080")
+# {"command": "print", "content": "print"}\n
+stdout_obj({"command": "print", "content": "print"})
+# sys.stderr.write("Error Info" + "\n")
 stderr("Error Info")
 ```
 
 ### 创建 Socket 服务
 
-该 Socket 服务会监听指定端口，会解析 Electron 主程序发送的内容，并可能改变 `thread_data.status` 的值。
+该 Socket 服务会监听指定端口，会解析 Electron 主程序发送的内容，并可能改变 `shared_data.status` 的值。
 
 样例：
 
 ```python
 from utils import start_server
-from utils import thread_data
+from utils import shared_data
 port = 8080
 start_server(port)
 while thread_data == 'running':
@@ -72,13 +75,14 @@ while thread_data == 'running':
 `AudioStream` 类用于获取音频数据，实现是跨平台的，支持 Windows、Linux 和 macOS。该类初始化包含两个参数：
 
 - `audio_type`: 获取音频类型，0 表示系统输出音频（扬声器），1 表示系统输入音频（麦克风）
-- `chunk_rate`: 音频数据获取频率，每秒音频获取的音频块的数量
+- `chunk_rate`: 音频数据获取频率，每秒音频获取的音频块的数量，默认为 10
 
-该类包含三个方法：
+该类包含四个方法：
 
 - `open_stream()`: 开启音频获取
 - `read_chunk() -> bytes`: 读取一个音频块
 - `close_stream()`: 关闭音频获取
+- `close_stream_signal()` 线程安全的关闭系统音频输入流
 
 样例：
 
@@ -97,11 +101,22 @@ stream.close_stream()
 
 ### 音频处理
 
-获取到的音频流在转文字之前可能需要进行预处理。一般需要将多通道音频转换为单通道音频，还可能需要进行重采样。本项目提供了三个音频处理函数：
+获取到的音频流在转文字之前可能需要进行预处理。一般需要将多通道音频转换为单通道音频，还可能需要进行重采样。本项目提供了两个音频处理函数：
 
 - `merge_chunk_channels(chunk: bytes, channels: int) -> bytes`： 将多通道音频块转换为单通道音频块
-- `resample_chunk_mono(chunk: bytes, channels: int, orig_sr: int, target_sr: int, mode="sinc_best") -> bytes`：将当前多通道音频数据块转换成单通道音频数据块，然后进行重采样
-- `resample_mono_chunk(chunk: bytes, orig_sr: int, target_sr: int, mode="sinc_best") -> bytes`：将当前单通道音频块进行重采样
+- `resample_chunk_mono(chunk: bytes, channels: int, orig_sr: int, target_sr: int) -> bytes`：将当前多通道音频数据块转换成单通道音频数据块，然后进行重采样
+
+样例：
+
+```python
+from sysaudio import AudioStream
+from utils import merge_chunk_channels
+stream =  AudioStream(1)
+while True:
+    raw_chunk = stream.read_chunk()
+    chunk = resample_chunk_mono(raw_chunk, stream.CHANNELS, stream.RATE, 16000)
+    # do something with chunk
+```
 
 ## 字幕引擎需要实现的功能
 
@@ -109,20 +124,31 @@ stream.close_stream()
 
 在得到了合适的音频流后，需要将音频流转换为文字了。一般使用各种模型（云端或本地）来实现音频流转文字。需要根据需求选择合适的模型。
 
-这部分建议封装为一个类，需要实现三个方法：
+这部分建议封装为一个类，需要实现四个方法：
 
 - `start(self)`：启动模型
 - `send_audio_frame(self, data: bytes)`：处理当前音频块数据，**生成的字幕数据通过标准输出发送给 Electron 主进程**
+- `translate(self)`：持续从 `shared_data.chunk_queue` 中取出数据块，并调用 `send_audio_frame` 方法处理数据块
 - `stop(self)`：停止模型
 
 完整的字幕引擎实例如下：
 
 - [gummy.py](../../engine/audio2text/gummy.py)
 - [vosk.py](../../engine/audio2text/vosk.py)
+- [sosv.py](../../engine/audio2text/sosv.py)
 
 ### 字幕翻译
 
-有的语音转文字模型并不提供翻译，如果有需求，需要再添加一个翻译模块。
+有的语音转文字模型并不提供翻译，如果有需求，需要再添加一个翻译模块，也可以使用自带的翻译模块。
+
+样例：
+
+```python
+from utils import google_translate, ollama_translate
+text = "这是一个翻译测试。"
+google_translate("", "en", text, "time_s")
+ollama_translate("qwen3:0.6b", "en", text, "time_s")
+```
 
 ### 字幕数据发送
 
@@ -133,37 +159,42 @@ stream.close_stream()
 ```typescript
 export interface CaptionItem {
   command: "caption",
-  index: number, // 字幕序号
-  time_s: string, // 当前字幕开始时间
-  time_t: string, // 当前字幕结束时间
-  text: string, // 字幕内容
-  translation: string // 字幕翻译
+  index: number,        // 字幕序号
+  time_s: string,       // 当前字幕开始时间
+  time_t: string,       // 当前字幕结束时间
+  text: string,         // 字幕内容
+  translation: string   // 字幕翻译
 }
 ```
 
-**注意必须确保每输出一次字幕 JSON 数据就得刷新缓冲区，确保 electron 主进程每次接收到的字符串都可以被解释为 JSON 对象。**
-
-建议使用项目已经实现的 `stdout_obj` 函数来发送。
+**注意必须确保每输出一次字幕 JSON 数据就得刷新缓冲区，确保 electron 主进程每次接收到的字符串都可以被解释为 JSON 对象。** 建议使用项目已经实现的 `stdout_obj` 函数来发送。
 
 ### 命令行参数的指定
 
 自定义字幕引擎的设置提供命令行参数指定，因此需要设置好字幕引擎的参数，本项目目前用到的参数如下：
 
 ```python
-import argparse
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Convert system audio stream to text')
-    # both
+    # all
     parser.add_argument('-e', '--caption_engine', default='gummy', help='Caption engine: gummy or vosk')
     parser.add_argument('-a', '--audio_type', default=0, help='Audio stream source: 0 for output, 1 for input')
     parser.add_argument('-c', '--chunk_rate', default=10, help='Number of audio stream chunks collected per second')
-    parser.add_argument('-p', '--port', default=8080, help='The port to run the server on, 0 for no server')
+    parser.add_argument('-p', '--port', default=0, help='The port to run the server on, 0 for no server')
+    parser.add_argument('-t', '--target_language', default='zh', help='Target language code, "none" for no translation')
+    parser.add_argument('-r', '--record', default=0, help='Whether to record the audio, 0 for no recording, 1 for recording')
+    parser.add_argument('-rp', '--record_path', default='', help='Path to save the recorded audio')
+    # gummy and sosv
+    parser.add_argument('-s', '--source_language', default='auto', help='Source language code')
     # gummy only
-    parser.add_argument('-s', '--source_language', default='en', help='Source language code')
-    parser.add_argument('-t', '--target_language', default='zh', help='Target language code')
     parser.add_argument('-k', '--api_key', default='', help='API KEY for Gummy model')
+    # vosk and sosv
+    parser.add_argument('-tm', '--translation_model', default='ollama', help='Model for translation: ollama or google')
+    parser.add_argument('-omn', '--ollama_name', default='', help='Ollama model name for translation')
     # vosk only
-    parser.add_argument('-m', '--model_path', default='', help='The path to the vosk model.')
+    parser.add_argument('-vosk', '--vosk_model', default='', help='The path to the vosk model.')
+    # sosv only
+    parser.add_argument('-sosv', '--sosv_model', default=None, help='The SenseVoice model path')
 ```
 
 比如对于本项目的字幕引擎，我想使用 Gummy 模型，指定原文为日语，翻译为中文，获取系统音频输出的字幕，每次截取 0.1s 的音频数据，那么命令行参数如下：
@@ -184,7 +215,7 @@ python main.py -e gummy -s ja -t zh -a 0 -c 10 -k <dashscope-api-key>
 
 ### 开发建议
 
-除音频转文字外，其他建议直接复用本项目代码。如果这样，那么需要添加的内容为：
+除音频转文字和翻译外，其他（音频获取、音频重采样、与主进程通信）建议直接复用本项目代码。如果这样，那么需要添加的内容为：
 
 - `engine/audio2text/`：添加新的音频转文字类（文件级别）
 - `engine/main.py`：添加新参数设置、流程函数（参考 `main_gummy` 函数和 `main_vosk` 函数）

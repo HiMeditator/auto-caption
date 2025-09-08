@@ -85,6 +85,7 @@ export default {
     "applyStyle": "应用样式",
     "cancelChange": "取消更改",
     "resetStyle": "恢复默认",
+    "lineNumber": "字幕行数",
     "longCaption": "长字幕",
     "fontFamily": "字体族",
     "fontColor": "字体颜色",
@@ -141,7 +142,7 @@ export default {
       "projLink": "项目链接",
       "manual": "用户手册",
       "engineDoc": "字幕引擎手册",
-      "date": "2025 年 8 月 20 日"
+      "date": "2025 年 9 月 8 日"
     }
   },
   log: {

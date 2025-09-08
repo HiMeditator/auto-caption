@@ -7,7 +7,7 @@
     </template>
 
       <div class="input-item">
-        <span class="input-label">{{ '字幕行数' }}</span>
+        <span class="input-label">{{ $t('style.lineNumber') }}</span>
         <a-radio-group v-model:value="currentLineNumber">
           <a-radio-button :value="1">1</a-radio-button>
           <a-radio-button :value="2">2</a-radio-button>

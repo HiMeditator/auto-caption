@@ -85,6 +85,7 @@ export default {
     "title": "Caption Style Settings",
     "applyStyle": "Apply",
     "cancelChange": "Cancel",
+    "lineNumber": "CaptionLines",
     "resetStyle": "Reset",
     "longCaption": "LongCaption",
     "fontFamily": "Font Family",
@@ -142,7 +143,7 @@ export default {
       "projLink": "Project Link",
       "manual": "User Manual",
       "engineDoc": "Caption Engine Manual",
-      "date": "August 20, 2025"
+      "date": "September 8th, 2025"
     }
   },
   log: {

@@ -1,6 +1,6 @@
 # Auto Caption User Manual
 
-Corresponding Version: v0.6.0
+Corresponding Version: v1.0.0
 
 **Note: Due to limited personal resources, the English and Japanese documentation files for this project (except for the README document) will no longer be maintained. The content of this document may not be consistent with the latest version of the project. If you are willing to help with translation, please submit relevant Pull Requests.**
 
@@ -43,9 +43,13 @@ Alibaba Cloud provides detailed tutorials for this part, which can be referenced
 
 ## Preparation for Using Vosk Engine
 
-To use the Vosk local caption engine, first download your required model from the [Vosk Models](https://alphacephei.com/vosk/models) page. Then extract the downloaded model package locally and add the corresponding model folder path to the software settings. Currently, the Vosk caption engine does not support translated caption content.
+To use the Vosk local caption engine, first download your required model from the [Vosk Models](https://alphacephei.com/vosk/models) page. Then extract the downloaded model package locally and add the corresponding model folder path to the software settings.
 
-![](../../assets/media/vosk_en.png)
+![](../../assets/media/config_en.png)
+
+## Using SOSV Model
+
+The way to use the SOSV model is the same as Vosk. The download address is as follows: https://github.com/HiMeditator/auto-caption/releases/tag/sosv-model
 
 ## Capturing System Audio Output on macOS
 

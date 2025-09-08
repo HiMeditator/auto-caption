@@ -1,175 +1,207 @@
-# Caption Engine Documentation  
+# Caption Engine Documentation
 
-Corresponding Version: v0.6.0  
+Corresponding version: v1.0.0
 
-![](../../assets/media/structure_en.png)  
+![](../../assets/media/structure_en.png)
 
-## Introduction to the Caption Engine  
+## Introduction to the Caption Engine
 
-The so-called caption engine is essentially a subprogram that continuously captures real-time streaming data from the system's audio input (microphone) or output (speakers) and invokes an audio-to-text model to generate corresponding captions for the audio. The generated captions are converted into JSON-formatted string data and passed to the main program via standard output (ensuring the string can be correctly interpreted as a JSON object by the main program). The main program reads and interprets the caption data, processes it, and displays it in the window.  
+The so-called caption engine is actually a subprocess that captures streaming data from system audio input (microphone) or output (speaker) in real-time, and invokes an audio-to-text model to generate captions for the corresponding audio. The generated captions are converted into JSON-formatted string data and transmitted to the main program through standard output (ensuring that the string received by the main program can be correctly interpreted as a JSON object). The main program reads and interprets the caption data, processes it, and displays it in the window.
 
-**The communication standard between the caption engine process and the Electron main process is: [caption engine api-doc](../api-docs/caption-engine.md).**  
+**Communication between the caption engine process and Electron main process follows the standard: [caption engine api-doc](../api-docs/caption-engine.md).**
 
-## Workflow  
+## Execution Flow
 
-The communication flow between the main process and the caption engine:  
+Process of communication between main process and caption engine:
 
-### Starting the Engine  
+### Starting the Engine
 
-- **Main Process**: Uses `child_process.spawn()` to launch the caption engine process.  
-- **Caption Engine Process**: Creates a TCP Socket server thread. After creation, it outputs a JSON object string via standard output, containing a `command` field with the value `connect`.  
-- **Main Process**: Monitors the standard output of the caption engine process, attempts to split it line by line, parses it into a JSON object, and checks if the `command` field value is `connect`. If so, it connects to the TCP Socket server.  
+- Electron main process: Use `child_process.spawn()` to start the caption engine process
+- Caption engine process: Create a TCP Socket server thread, after creation output a JSON object converted to string via standard output, containing the `command` field with value `connect`
+- Main process: Listen to the caption engine process's standard output, try to split the standard output by lines, parse it into a JSON object, and check if the object's `command` field value is `connect`. If so, connect to the TCP Socket server
 
-### Caption Recognition  
+### Caption Recognition
 
-- **Caption Engine Process**: The main thread monitors system audio output, sends audio data chunks to the caption engine for parsing, and outputs the parsed caption data object strings via standard output.  
-- **Main Process**: Continues to monitor the standard output of the caption engine and performs different operations based on the `command` field of the parsed object.  
+- Caption engine process: Create a new thread to monitor system audio output, put acquired audio data chunks into a shared queue (`shared_data.chunk_queue`). The caption engine continuously reads audio data chunks from the shared queue and parses them. The caption engine may also create a new thread to perform translation operations. Finally, the caption engine sends parsed caption data object strings through standard output
+- Electron main process: Continuously listen to the caption engine's standard output and take different actions based on the parsed object's `command` field
 
-### Closing the Engine  
+### Stopping the Engine
 
-- **Main Process**: When the user closes the caption engine via the frontend, the main process sends a JSON object string with the `command` field set to `stop` to the caption engine process via Socket communication.  
-- **Caption Engine Process**: Receives the object string, parses it, and if the `command` field is `stop`, sets the global variable `thread_data.status` to `stop`.  
-- **Caption Engine Process**: The main thread's loop for monitoring system audio output ends when `thread_data.status` is not `running`, releases resources, and terminates.  
-- **Main Process**: Detects the termination of the caption engine process, performs corresponding cleanup, and provides feedback to the frontend.  
+- Electron main process: When the user operates to close the caption engine in the frontend, the main process sends an object string with `command` field set to `stop` to the caption engine process through Socket communication
+- Caption engine process: Receive the caption data object string sent by the main engine process, parse the string into an object. If the object's `command` field is `stop`, set the value of global variable `shared_data.status` to `stop`
+- Caption engine process: Main thread continuously monitors system audio output, when `thread_data.status` value is not `running`, end the loop, release resources, and terminate execution
+- Electron main process: If the caption engine process termination is detected, perform corresponding processing and provide feedback to the frontend
 
-## Implemented Features  
+## Implemented Features
 
-The following features are already implemented and can be reused directly.  
+The following features have been implemented and can be directly reused.
 
-### Standard Output  
+### Standard Output
 
-Supports printing general information, commands, and error messages.  
+Can output regular information, commands, and error messages.
 
-Example:  
+Examples:
 
-```python  
-from utils import stdout, stdout_cmd, stdout_obj, stderr  
-stdout("Hello") # {"command": "print", "content": "Hello"}\n  
-stdout_cmd("connect", "8080") # {"command": "connect", "content": "8080"}\n  
-stdout_obj({"command": "print", "content": "Hello"})  
-stderr("Error Info")  
-```  
+```python
+from utils import stdout, stdout_cmd, stdout_obj, stderr
+# {"command": "print", "content": "Hello"}\n
+stdout("Hello")
+# {"command": "connect", "content": "8080"}\n
+stdout_cmd("connect", "8080")
+# {"command": "print", "content": "print"}\n
+stdout_obj({"command": "print", "content": "print"})
+# sys.stderr.write("Error Info" + "\n")
+stderr("Error Info")
+```
 
-### Creating a Socket Service  
+### Creating Socket Service
 
-This Socket service listens on a specified port, parses content sent by the Electron main program, and may modify the value of `thread_data.status`.  
+This Socket service listens on a specified port, parses content sent by the Electron main program, and may change the value of `shared_data.status`.
 
-Example:  
+Example:
 
-```python  
-from utils import start_server  
-from utils import thread_data  
-port = 8080  
-start_server(port)  
-while thread_data == 'running':  
-    # do something  
-    pass  
-```  
+```python
+from utils import start_server
+from utils import shared_data
+port = 8080
+start_server(port)
+while thread_data == 'running':
+    # do something
+    pass
+```
 
-### Audio Capture  
+### Audio Acquisition
 
-The `AudioStream` class captures audio data and is cross-platform, supporting Windows, Linux, and macOS. Its initialization includes two parameters:  
+The `AudioStream` class is used to acquire audio data, with cross-platform implementation supporting Windows, Linux, and macOS. The class initialization includes two parameters:
 
-- `audio_type`: The type of audio to capture. `0` for system output audio (speakers), `1` for system input audio (microphone).  
-- `chunk_rate`: The frequency of audio data capture, i.e., the number of audio chunks captured per second.  
+- `audio_type`: Audio acquisition type, 0 for system output audio (speaker), 1 for system input audio (microphone)
+- `chunk_rate`: Audio data acquisition frequency, number of audio chunks acquired per second, default is 10
 
-The class includes three methods:  
+The class contains four methods:
 
-- `open_stream()`: Starts audio capture.  
-- `read_chunk() -> bytes`: Reads an audio chunk.  
-- `close_stream()`: Stops audio capture.  
+- `open_stream()`: Start audio acquisition
+- `read_chunk() -> bytes`: Read an audio chunk
+- `close_stream()`: Close audio acquisition
+- `close_stream_signal()`: Thread-safe closing of system audio input stream
 
-Example:  
+Example:
 
-```python  
-from sysaudio import AudioStream  
-audio_type = 0  
-chunk_rate = 20  
-stream = AudioStream(audio_type, chunk_rate)  
-stream.open_stream()  
-while True:  
-    data = stream.read_chunk()  
-    # do something with data  
-    pass  
-stream.close_stream()  
-```  
+```python
+from sysaudio import AudioStream
+audio_type = 0
+chunk_rate = 20
+stream =  AudioStream(audio_type, chunk_rate)
+stream.open_stream()
+while True:
+    data = stream.read_chunk()
+    # do something with data
+    pass
+stream.close_stream()
+```
 
-### Audio Processing  
+### Audio Processing
 
-The captured audio stream may require preprocessing before conversion to text. Typically, multi-channel audio needs to be converted to mono, and resampling may be necessary. This project provides three audio processing functions:  
+Before converting audio streams to text, preprocessing may be required. Usually, multi-channel audio needs to be converted to single-channel audio, and resampling may also be needed. This project provides two audio processing functions:
 
-- `merge_chunk_channels(chunk: bytes, channels: int) -> bytes`: Converts a multi-channel audio chunk to mono.  
-- `resample_chunk_mono(chunk: bytes, channels: int, orig_sr: int, target_sr: int, mode="sinc_best") -> bytes`: Converts a multi-channel audio chunk to mono and resamples it.  
-- `resample_mono_chunk(chunk: bytes, orig_sr: int, target_sr: int, mode="sinc_best") -> bytes`: Resamples a mono audio chunk.  
+- `merge_chunk_channels(chunk: bytes, channels: int) -> bytes`: Convert multi-channel audio chunks to single-channel audio chunks
+- `resample_chunk_mono(chunk: bytes, channels: int, orig_sr: int, target_sr: int) -> bytes`: Convert current multi-channel audio data chunks to single-channel audio data chunks, then perform resampling
 
-## Features to Be Implemented in the Caption Engine  
+Example:
 
-### Audio-to-Text Conversion  
+```python
+from sysaudio import AudioStream
+from utils import merge_chunk_channels
+stream =  AudioStream(1)
+while True:
+    raw_chunk = stream.read_chunk()
+    chunk = resample_chunk_mono(raw_chunk, stream.CHANNELS, stream.RATE, 16000)
+    # do something with chunk
+```
 
-After obtaining a suitable audio stream, it needs to be converted to text. Typically, various models (cloud-based or local) are used for this purpose. Choose the appropriate model based on requirements.  
+## Features to be Implemented by the Caption Engine
 
-This part is recommended to be encapsulated as a class with three methods:  
+### Audio to Text Conversion
 
-- `start(self)`: Starts the model.  
-- `send_audio_frame(self, data: bytes)`: Processes the current audio chunk data. **The generated caption data is sent to the Electron main process via standard output.**  
-- `stop(self)`: Stops the model.  
+After obtaining suitable audio streams, the audio stream needs to be converted to text. Generally, various models (cloud or local) are used to implement audio-to-text conversion. Appropriate models should be selected according to requirements.
 
-Complete caption engine examples:  
+It is recommended to encapsulate this as a class, implementing four methods:
 
-- [gummy.py](../../engine/audio2text/gummy.py)  
-- [vosk.py](../../engine/audio2text/vosk.py)  
+- `start(self)`: Start the model
+- `send_audio_frame(self, data: bytes)`: Process current audio chunk data, **generated caption data is sent to Electron main process through standard output**
+- `translate(self)`: Continuously retrieve data chunks from `shared_data.chunk_queue` and call `send_audio_frame` method to process data chunks
+- `stop(self)`: Stop the model
 
-### Caption Translation  
+Complete caption engine examples:
 
-Some speech-to-text models do not provide translation. If needed, a translation module must be added.  
+- [gummy.py](../../engine/audio2text/gummy.py)
+- [vosk.py](../../engine/audio2text/vosk.py)
+- [sosv.py](../../engine/audio2text/sosv.py)
 
-### Sending Caption Data  
+### Caption Translation
 
-After obtaining the text for the current audio stream, it must be sent to the main program. The caption engine process passes caption data to the Electron main process via standard output.  
+Some speech-to-text models do not provide translation. If needed, an additional translation module needs to be added, or built-in translation modules can be used.
 
-The content must be a JSON string, with the JSON object including the following parameters:  
+Example:
 
-```typescript  
-export interface CaptionItem {  
-  command: "caption",  
-  index: number, // Caption sequence number  
-  time_s: string, // Start time of the current caption  
-  time_t: string, // End time of the current caption  
-  text: string, // Caption content  
-  translation: string // Caption translation  
-}  
-```  
+```python
+from utils import google_translate, ollama_translate
+text = "This is a translation test."
+google_translate("", "en", text, "time_s")
+ollama_translate("qwen3:0.6b", "en", text, "time_s")
+```
 
-**Note: Ensure the buffer is flushed after each JSON output to guarantee the Electron main process receives a string that can be parsed as a JSON object.**  
+### Caption Data Transmission
 
-It is recommended to use the project's `stdout_obj` function for sending.  
+After obtaining the text from the current audio stream, the text needs to be sent to the main program. The caption engine process transmits caption data to the Electron main process through standard output.
 
-### Command-Line Parameter Specification  
+The transmitted content must be a JSON string, where the JSON object needs to contain the following parameters:
 
-Custom caption engine settings are provided via command-line arguments. The current project uses the following parameters:  
+```typescript
+export interface CaptionItem {
+  command: "caption",
+  index: number,        // Caption sequence number
+  time_s: string,       // Current caption start time
+  time_t: string,       // Current caption end time
+  text: string,         // Caption content
+  translation: string   // Caption translation
+}
+```
 
-```python  
-import argparse  
-if __name__ == "__main__":  
-    parser = argparse.ArgumentParser(description='Convert system audio stream to text')  
-    # Common parameters  
-    parser.add_argument('-e', '--caption_engine', default='gummy', help='Caption engine: gummy or vosk')  
-    parser.add_argument('-a', '--audio_type', default=0, help='Audio stream source: 0 for output, 1 for input')  
-    parser.add_argument('-c', '--chunk_rate', default=10, help='Number of audio stream chunks collected per second')  
-    parser.add_argument('-p', '--port', default=8080, help='The port to run the server on, 0 for no server')  
-    # Gummy-specific parameters  
-    parser.add_argument('-s', '--source_language', default='en', help='Source language code')  
-    parser.add_argument('-t', '--target_language', default='zh', help='Target language code')  
-    parser.add_argument('-k', '--api_key', default='', help='API KEY for Gummy model')  
-    # Vosk-specific parameters  
-    parser.add_argument('-m', '--model_path', default='', help='The path to the vosk model.')  
-```  
+**Note that the buffer must be flushed after each caption JSON data output to ensure that the Electron main process receives strings that can be interpreted as JSON objects each time.** It is recommended to use the project's existing `stdout_obj` function for transmission.
 
-For example, to use the Gummy model with Japanese as the source language, Chinese as the target language, and system audio output captions with 0.1s audio chunks, the command-line arguments would be:  
+### Command Line Parameter Specification
 
-```bash  
-python main.py -e gummy -s ja -t zh -a 0 -c 10 -k <dashscope-api-key>  
-```  
+Custom caption engine settings provide command line parameter specification, so the caption engine parameters need to be set properly. Currently used parameters in this project are as follows:
+
+```python
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Convert system audio stream to text')
+    # all
+    parser.add_argument('-e', '--caption_engine', default='gummy', help='Caption engine: gummy or vosk')
+    parser.add_argument('-a', '--audio_type', default=0, help='Audio stream source: 0 for output, 1 for input')
+    parser.add_argument('-c', '--chunk_rate', default=10, help='Number of audio stream chunks collected per second')
+    parser.add_argument('-p', '--port', default=0, help='The port to run the server on, 0 for no server')
+    parser.add_argument('-t', '--target_language', default='zh', help='Target language code, "none" for no translation')
+    parser.add_argument('-r', '--record', default=0, help='Whether to record the audio, 0 for no recording, 1 for recording')
+    parser.add_argument('-rp', '--record_path', default='', help='Path to save the recorded audio')
+    # gummy and sosv
+    parser.add_argument('-s', '--source_language', default='auto', help='Source language code')
+    # gummy only
+    parser.add_argument('-k', '--api_key', default='', help='API KEY for Gummy model')
+    # vosk and sosv
+    parser.add_argument('-tm', '--translation_model', default='ollama', help='Model for translation: ollama or google')
+    parser.add_argument('-omn', '--ollama_name', default='', help='Ollama model name for translation')
+    # vosk only
+    parser.add_argument('-vosk', '--vosk_model', default='', help='The path to the vosk model.')
+    # sosv only
+    parser.add_argument('-sosv', '--sosv_model', default=None, help='The SenseVoice model path')
+```
+
+For example, for this project's caption engine, if I want to use the Gummy model, specify the original text as Japanese, translate to Chinese, and capture captions from system audio output, with 0.1s audio data segments each time, the command line parameters would be:
+
+```bash
+python main.py -e gummy -s ja -t zh -a 0 -c 10 -k <dashscope-api-key>
+```
 
 ## Additional Notes  
 
@@ -183,7 +215,7 @@ python main.py -e gummy -s ja -t zh -a 0 -c 10 -k <dashscope-api-key>
 
 ### Development Recommendations  
 
-Apart from audio-to-text conversion, it is recommended to reuse the existing code. In this case, the following additions are needed:  
+Except for audio-to-text conversion and translation, other components (audio acquisition, audio resampling, and communication with the main process) are recommended to directly reuse the project's code. If this approach is taken, the content that needs to be added includes:
 
 - `engine/audio2text/`: Add a new audio-to-text class (file-level).  
 - `engine/main.py`: Add new parameter settings and workflow functions (refer to `main_gummy` and `main_vosk` functions).  

@@ -3,7 +3,7 @@
     <h1 align="center">auto-caption</h1>
     <p>Auto Caption is a cross-platform real-time caption display software.</p>
     <p>
-      <a href="https://github.com/HiMeditator/auto-caption/releases"><img src="https://img.shields.io/badge/release-0.7.0-blue"></a>
+      <a href="https://github.com/HiMeditator/auto-caption/releases"><img src="https://img.shields.io/badge/release-1.0.0-blue"></a>
       <a href="https://github.com/HiMeditator/auto-caption/issues"><img src="https://img.shields.io/github/issues/HiMeditator/auto-caption?color=orange"></a>
       <img src="https://img.shields.io/github/languages/top/HiMeditator/auto-caption?color=royalblue">
       <img src="https://img.shields.io/github/repo-size/HiMeditator/auto-caption?color=green">
@@ -14,14 +14,18 @@
         | <b>English</b>
         | <a href="./README_ja.md">日本語</a> |
     </p>
-    <p><i>Version 0.7.0 has been released, imporving the software interface and adding software log display. The local caption engine is under development and is expected to be released in the form of Python code...</i></p>
+    <p><i>Version 1.0.0 has been released, with the addition of the SOSV local caption model. More caption models are being developed...</i></p>
 </div>
 
 ![](./assets/media/main_en.png)
 
 ## 📥 Download
 
-[GitHub Releases](https://github.com/HiMeditator/auto-caption/releases)
+Software Download: [GitHub Releases](https://github.com/HiMeditator/auto-caption/releases)
+
+Vosk Model Download: [Vosk Models](https://alphacephei.com/vosk/models)
+
+SOSV Model Download: [Shepra-ONNX SenseVoice Model](https://github.com/HiMeditator/auto-caption/releases/tag/sosv-model)
 
 ## 📚 Documentation
 
@@ -29,16 +33,15 @@
 
 [Caption Engine Documentation](./docs/engine-manual/en.md)
 
-[Project API Documentation (Chinese)](./docs/api-docs/)
-
 [Changelog](./docs/CHANGELOG.md)
 
 ## ✨ Features
 
 - Generate captions from audio output or microphone input
+- Supports translation by calling local Ollama models or cloud-based Google Translate API
 - Cross-platform (Windows, macOS, Linux) and multi-language interface (Chinese, English, Japanese) support
 - Rich caption style settings (font, font size, font weight, font color, background color, etc.)
-- Flexible caption engine selection (Alibaba Cloud Gummy cloud model, local Vosk model, self-developed model)
+- Flexible caption engine selection (Alibaba Cloud Gummy cloud model, local Vosk model, local SOSV model, or you can develop your own model)
 - Multi-language recognition and translation (see below "⚙️ Built-in Subtitle Engines")
 - Subtitle record display and export (supports exporting `.srt` and `.json` formats)
 
@@ -51,29 +54,63 @@ The software has been adapted for Windows, macOS, and Linux platforms. The teste
 | Windows 11 24H2    | x64          | ✅                 | ✅                   |
 | macOS Sequoia 15.5 | arm64        | ✅ [Additional config required](./docs/user-manual/en.md#capturing-system-audio-output-on-macos) | ✅        |
 | Ubuntu 24.04.2     | x64          | ✅                 | ✅                   |
-| Kali Linux 2022.3  | x64          | ✅                 | ✅                   |
-| Kylin Server V10 SP3 | x64 | ✅ | ✅ |
 
 Additional configuration is required to capture system audio output on macOS and Linux platforms. See [Auto Caption User Manual](./docs/user-manual/en.md) for details.
 
-> The international version of Alibaba Cloud services does not provide the Gummy model, so non-Chinese users currently cannot use the Gummy caption engine.
 
-To use the default Gummy caption engine (which uses cloud-based models for speech recognition and translation), you first need to obtain an API KEY from the Alibaba Cloud Bailian platform. Then add the API KEY to the software settings or configure it in environment variables (only Windows platform supports reading API KEY from environment variables) to properly use this model. Related tutorials:
+After downloading the software, you need to select the corresponding model according to your needs and then configure the model.
 
-- [Obtaining API KEY (Chinese)](https://help.aliyun.com/zh/model-studio/get-api-key)
-- [Configuring API Key through Environment Variables (Chinese)](https://help.aliyun.com/zh/model-studio/configure-api-key-through-environment-variables)
+|                                                              | Recognition Quality | Deployment Type    | Supported Languages | Translation   | Notes                                                      |
+| ------------------------------------------------------------ | ------------------- | ------------------ | ------------------- | ------------- | ---------------------------------------------------------- |
+| [Gummy](https://help.aliyun.com/zh/model-studio/gummy-speech-recognition-translation) | Excellent 😊         | Alibaba Cloud | 10 languages        | Built-in      | Paid, 0.54 CNY/hour                                        |
+| [Vosk](https://alphacephei.com/vosk)                         | Poor 😞             | Local / CPU        | Over 30 languages   | Requires setup | Supports many languages                                    |
+| [SOSV](https://k2-fsa.github.io/sherpa/onnx/sense-voice/index.html) | Fair 😐             | Local / CPU        | 5 languages         | Requires setup | Only one model available                                   |
+| DIY Development                                              | 🤔                  | Custom             | Custom              | Custom        | Develop your own using Python according to [documentation](./docs/engine-manual/zh.md) |
 
-> The recognition performance of Vosk models is suboptimal, please use with caution.
+If you choose to use the Vosk or SOSV model, you also need to configure your own translation model.
 
-To use the Vosk local caption engine, first download your required model from [Vosk Models](https://alphacephei.com/vosk/models) page, extract the model locally, and add the model folder path to the software settings. Currently, the Vosk caption engine does not support translated captions.
+### Configuring Translation Models
 
-![](./assets/media/vosk_en.png)
+![](./assets/media/engine_en.png)
 
-**If you find the above caption engines don't meet your needs and you know Python, you may consider developing your own caption engine. For detailed instructions, please refer to the [Caption Engine Documentation](./docs/engine-manual/en.md).**
+> Note: Translation is not real-time. The translation model is only called after each sentence recognition is completed.
+
+#### Ollama Local Model
+
+> Note: Using models with too many parameters will lead to high resource consumption and translation delays. It is recommended to use models with less than 1B parameters, such as: `qwen2.5:0.5b`, `qwen3:0.6b`.
+
+Before using this model, you need to ensure that [Ollama](https://ollama.com/) software is installed on your machine and the required large language model has been downloaded. Simply add the name of the large model you want to call to the `Ollama` field in the settings.
+
+#### Google Translate API
+
+> Note: Google Translate API is not available in some regions.
+
+No configuration required, just connect to the internet to use.
+
+### Using Gummy Model
+
+> The international version of Alibaba Cloud services does not seem to provide the Gummy model, so non-Chinese users may not be able to use the Gummy caption engine at present.
+
+To use the default Gummy caption engine (using cloud models for speech recognition and translation), you first need to obtain an API KEY from Alibaba Cloud Bailian platform, then add the API KEY to the software settings or configure it in the environment variables (only Windows platform supports reading API KEY from environment variables), so that the model can be used normally. Related tutorials:
+
+- [Get API KEY](https://help.aliyun.com/zh/model-studio/get-api-key)
+- [Configure API Key through Environment Variables](https://help.aliyun.com/zh/model-studio/configure-api-key-through-environment-variables)
+
+### Using Vosk Model
+
+> The recognition effect of the Vosk model is poor, please use it with caution.
+
+To use the Vosk local caption engine, first download the model you need from the [Vosk Models](https://alphacephei.com/vosk/models) page, unzip the model locally, and add the path of the model folder to the software settings.
+
+![](./assets/media/config_en.png)
+
+### Using SOSV Model
+
+The way to use the SOSV model is the same as Vosk. The download address is as follows: https://github.com/HiMeditator/auto-caption/releases/tag/sosv-model
 
 ## ⚙️ Built-in Subtitle Engines
 
-Currently, the software comes with 2 subtitle engines, with new engines under development. Their detailed information is as follows.
+Currently, the software comes with 3 caption engines, with new engines under development. Their detailed information is as follows.
 
 ### Gummy Subtitle Engine (Cloud)
 
@@ -92,7 +129,7 @@ Developed based on Tongyi Lab's [Gummy Speech Translation Model](https://help.al
 
 **Network Traffic Consumption:**
 
-The subtitle engine uses native sample rate (assumed to be 48kHz) for sampling, with 16bit sample depth and mono channel, so the upload rate is approximately:
+The caption engine uses native sample rate (assumed to be 48kHz) for sampling, with 16bit sample depth and mono channel, so the upload rate is approximately:
 
 $$
 48000\ \text{samples/second} \times 2\ \text{bytes/sample} \times 1\ \text{channel}  = 93.75\ \text{KB/s}
@@ -102,7 +139,11 @@ The engine only uploads data when receiving audio streams, so the actual upload 
 
 ### Vosk Subtitle Engine (Local)
 
-Developed based on [vosk-api](https://github.com/alphacep/vosk-api). Currently only supports generating original text from audio, does not support translation content.
+Developed based on [vosk-api](https://github.com/alphacep/vosk-api). The advantage of this caption engine is that there are many optional language models (over 30 languages), but the disadvantage is that the recognition effect is relatively poor, and the generated content has no punctuation.
+
+### SOSV Subtitle Engine (Local)
+
+[SOSV](https://github.com/HiMeditator/auto-caption/releases/tag/sosv-model) is an integrated package, mainly based on [Shepra-ONNX SenseVoice](https://k2-fsa.github.io/sherpa/onnx/sense-voice/index.html), with added endpoint detection model and punctuation restoration model. The languages supported by this model for recognition are: English, Chinese, Japanese, Korean, and Cantonese.
 
 ### Planned New Subtitle Engines
 
@@ -112,6 +153,7 @@ The following are candidate models that will be selected based on model performa
 - [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx)
 - [SenseVoice](https://github.com/FunAudioLLM/SenseVoice)
 - [FunASR](https://github.com/modelscope/FunASR)
+- [WhisperLiveKit](https://github.com/QuentinFuxa/WhisperLiveKit)
 
 ## 🚀 Project Setup
 
@@ -128,6 +170,7 @@ npm install
 First enter the `engine` folder and execute the following commands to create a virtual environment (requires Python 3.10 or higher, with Python 3.12 recommended):
 
 ```bash
+cd ./engine
 # in ./engine folder
 python -m venv .venv
 # or
@@ -147,12 +190,6 @@ Then install dependencies (this step might result in errors on macOS and Linux, 
 
 ```bash
 pip install -r requirements.txt
-```
-
-If you encounter errors when installing the `samplerate` module on Linux systems, you can try installing it separately with this command:
-
-```bash
-pip install samplerate --only-binary=:all:
 ```
 
 Then use `pyinstaller` to build the project:
