@@ -96,6 +96,7 @@ const columns = [
 
 <style scoped>
 .log-title {
+  color: var(--icon-color);
   display: inline-block;
   font-size: 24px;
   font-weight: bold;
