@@ -64,6 +64,7 @@ Python 端监听到的音频流转换为的字幕数据。
 {
   command: "translation",
   time_s: string,
+  text: string,
   translation: string
 }
 ```

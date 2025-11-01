@@ -2,7 +2,7 @@ import wave
 import argparse
 import threading
 import datetime
-from utils import stdout, stdout_cmd
+from utils import stdout, stdout_cmd, change_caption_display
 from utils import shared_data, start_server
 from utils import merge_chunk_channels, resample_chunk_mono
 from audio2text import GummyRecognizer
@@ -142,11 +142,12 @@ def main_sosv(a: int, c: int, sosv: str, s: str, t: str, tm: str, omn: str, r: b
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Convert system audio stream to text')
     # all
-    parser.add_argument('-e', '--caption_engine', default='gummy', help='Caption engine: gummy or vosk')
+    parser.add_argument('-e', '--caption_engine', default='gummy', help='Caption engine: gummy or vosk or sosv')
     parser.add_argument('-a', '--audio_type', default=0, help='Audio stream source: 0 for output, 1 for input')
     parser.add_argument('-c', '--chunk_rate', default=10, help='Number of audio stream chunks collected per second')
     parser.add_argument('-p', '--port', default=0, help='The port to run the server on, 0 for no server')
-    parser.add_argument('-t', '--target_language', default='zh', help='Target language code, "none" for no translation')
+    parser.add_argument('-d', '--display_caption', default=0, help='Display caption on terminal, 0 for no display, 1 for display')
+    parser.add_argument('-t', '--target_language', default='none', help='Target language code, "none" for no translation')
     parser.add_argument('-r', '--record', default=0, help='Whether to record the audio, 0 for no recording, 1 for recording')
     parser.add_argument('-rp', '--record_path', default='', help='Path to save the recorded audio')
     # gummy and sosv
@@ -167,6 +168,10 @@ if __name__ == "__main__":
     else:
         start_server(int(args.port))
     
+    if int(args.display_caption) != 0:
+        change_caption_display(True)
+        print("Caption will be displayed on terminal")
+
     if args.caption_engine == 'gummy':
         main_gummy(
             args.source_language,

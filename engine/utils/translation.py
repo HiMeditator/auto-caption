@@ -33,6 +33,7 @@ def ollama_translate(model: str, target: str, text: str, time_s: str):
     stdout_obj({
         "command": "translation",
         "time_s": time_s,
+        "text": text,
         "translation": content.strip()
     })
 
@@ -43,6 +44,7 @@ def google_translate(model: str, target: str, text: str, time_s: str):
         stdout_obj({
             "command": "translation",
             "time_s": time_s,
+            "text": text,
             "translation": res.text
         })
     except Exception as e:
