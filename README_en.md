@@ -14,7 +14,7 @@
         | <b>English</b>
         | <a href="./README_ja.md">日本語</a> |
     </p>
-    <p><i>Version 1.0.0 has been released, with the addition of the SOSV local caption model. More caption models are being developed...</i></p>
+    <p><i>Version 1.0.0 has been released, with the addition of the SOSV local caption model. The current features are basically complete, and there are no further development plans...</i></p>
 </div>
 
 ![](./assets/media/main_en.png)
@@ -107,6 +107,29 @@ To use the Vosk local caption engine, first download the model you need from the
 ### Using SOSV Model
 
 The way to use the SOSV model is the same as Vosk. The download address is as follows: https://github.com/HiMeditator/auto-caption/releases/tag/sosv-model
+
+## ⌨️ Using in Terminal
+
+The software adopts a modular design and can be divided into two parts: the main software body and caption engine. The main software calls caption engine through a graphical interface. Audio acquisition and speech recognition functions are implemented in the caption engine, which can be used independently without the main software.
+
+Caption engine is developed using Python and packaged as executable files via PyInstaller. Therefore, there are two ways to use caption engine:
+
+1. Use the source code of the project's caption engine part and run it with a Python environment that has the required libraries installed
+2. Run the packaged executable file of the caption engine through the terminal
+
+For runtime parameters and detailed usage instructions, please refer to the [User Manual](./docs/user-manual/en.md#using-caption-engine-standalone).
+
+```bash
+python main.py \
+-e gummy \
+-k sk-******************************** \
+-a 0 \
+-d 1 \
+-s en \
+-t zh
+```
+
+![](./docs/img/07.png)
 
 ## ⚙️ Built-in Subtitle Engines
 

@@ -29,14 +29,18 @@ def caption_display(obj):
     if caption_index >=0 and caption_index != int(obj['index']):
         display.finalize_current_sentence()
     caption_index = int(obj['index'])
-    full_text = f"{obj['text']} {obj['translation']}"
+    full_text = f"{obj['text']}\n{obj['translation']}"
+    if obj['translation']:
+        full_text += "\n"
     display.update_text(full_text)
     display.display()
 
 def translation_display(obj):
     global original_caption
     global display
-    full_text = f"{obj['text']} {obj['translation']}"
+    full_text = f"{obj['text']}\n{obj['translation']}"
+    if obj['translation']:
+        full_text += "\n"
     display.update_text(full_text)
     display.display()
     display.finalize_current_sentence()

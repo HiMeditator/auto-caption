@@ -130,3 +130,175 @@ The software provides two default caption engines. If you need other caption eng
 Note that when using a custom caption engine, all previous caption engine settings will be ineffective, and the configuration of the custom caption engine is entirely done through the engine command.
 
 If you are a developer and want to develop a custom caption engine, please refer to the [Caption Engine Explanation Document](../engine-manual/en.md).
+
+## Using Caption Engine Standalone
+
+### Runtime Parameter Description
+
+> The following content assumes users have some knowledge of running programs via terminal.
+
+The complete set of runtime parameters available for the caption engine is shown below:
+
+![](../img/06.png)
+
+However, when used standalone, some parameters may not need to be used or should not be modified.
+
+The following parameter descriptions only include necessary parameters.
+
+#### `-e , --caption_engine`
+
+The caption engine model to select, currently three options are available: `gummy, vosk, sosv`.
+
+The default value is `gummy`.
+
+This applies to all models.
+
+#### `-a, --audio_type`
+
+The audio type to recognize, where `0` represents system audio output and `1` represents microphone audio input.
+
+The default value is `0`.
+
+This applies to all models.
+
+#### `-d, --display_caption`
+
+Whether to display captions in the console, `0` means do not display, `1` means display.
+
+The default value is `0`, but it's recommended to choose `1` when using only the caption engine.
+
+This applies to all models.
+
+#### `-t, --target_language`
+
+> Note that Vosk and SOSV models have poor sentence segmentation, which can make translated content difficult to understand. It's not recommended to use translation with these two models.
+
+Target language for translation. All models support the following translation languages:
+
+- `none` No translation
+- `zh` Simplified Chinese
+- `en` English
+- `ja` Japanese
+- `ko` Korean
+
+Additionally, `vosk` and `sosv` models also support the following translations:
+
+- `de` German
+- `fr` French
+- `ru` Russian
+- `es` Spanish
+- `it` Italian
+
+The default value is `none`.
+
+This applies to all models.
+
+#### `-s, --source_language`
+
+Source language for recognition. Default value is `auto`, meaning no specific source language.
+
+Specifying the source language can improve recognition accuracy to some extent. You can specify the source language using the language codes above.
+
+This only applies to Gummy and SOSV models.
+
+The Gummy model can use all the languages mentioned above, plus Cantonese (`yue`).
+
+The SOSV model supports specifying the following languages: English, Chinese, Japanese, Korean, and Cantonese.
+
+#### `-k, --api_key`
+
+Specify the Alibaba Cloud API KEY required for the `Gummy` model.
+
+Default value is empty.
+
+This only applies to the Gummy model.
+
+#### `-tm, --translation_model`
+
+Specify the translation method for Vosk and SOSV models. Default is `ollama`.
+
+Supported values are:
+
+- `ollama` Use local Ollama model for translation. Users need to install Ollama software and corresponding models
+- `google` Use Google Translate API for translation. No additional configuration needed, but requires network access to Google
+
+This only applies to Vosk and SOSV models.
+
+#### `-omn, --ollama_name`
+
+Specify the Ollama model to call for translation. Default value is empty.
+
+It's recommended to use models with less than 1B parameters, such as: `qwen2.5:0.5b`, `qwen3:0.6b`.
+
+Users need to download the corresponding model in Ollama to use it properly.
+
+This only applies to Vosk and SOSV models.
+
+#### `-vosk, --vosk_model`
+
+Specify the path to the local folder of the Vosk model to call. Default value is empty.
+
+This only applies to the Vosk model.
+
+#### `-sosv, --sosv_model`
+
+Specify the path to the local folder of the SOSV model to call. Default value is empty.
+
+This only applies to the SOSV model.
+
+### Running Caption Engine Using Source Code
+
+> The following content assumes users who use this method have knowledge of Python environment configuration and usage.
+
+First, download the project source code locally. The caption engine source code is located in the  `engine` directory of the project. Then configure the Python environment, where the project dependencies are listed in the `requirements.txt` file in the `engine` directory.
+
+After configuration, enter the `engine` directory and execute commands to run the caption engine.
+
+For example, to use the Gummy model, specify audio type as system audio output, source language as English, and target language as Chinese, execute the following command:
+
+> Note: For better visualization, the commands below are written on multiple lines. If execution fails, try removing backslashes and executing as a single line command.
+
+```bash
+python main.py \
+-e gummy \
+-k sk-******************************** \
+-a 0 \
+-d 1 \
+-s en \
+-t zh
+```
+
+To specify the Vosk model, audio type as system audio output, translate to English, and use Ollama `qwen3:0.6b` model for translation:
+
+```bash
+python main.py \
+-e vosk \
+-vosk D:\Projects\auto-caption\engine\models\vosk-model-small-cn-0.22 \
+-a 0 \
+-d 1 \
+-t en \
+```
+
+To specify the SOSV model, audio type as microphone, automatically select source language, and no translation:
+
+```bash
+python main.py \
+-e sosv \
+-sosv D:\\Projects\\auto-caption\\engine\\models\\sosv-int8 \
+-a 1 \
+-d 1 \
+-s auto \
+-t none
+```
+
+Running result using the Gummy model is shown below:
+
+![](../img/07.png)
+
+### Running Subtitle Engine Executable File
+
+First, download the executable file for your platform from [GitHub Releases](https://github.com/HiMeditator/auto-caption/releases/tag/engine) (currently only Windows and Linux platform executable files are provided).
+
+Then open a terminal in the directory containing the caption engine executable file and execute commands to run the caption engine.
+
+Simply replace `python main.py` in the above commands with the executable file name (for example: `engine-win.exe`).
