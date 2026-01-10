@@ -18,7 +18,7 @@ class VoskRecognizer:
         trans_model: 翻译模型名称
         ollama_name: Ollama 模型名称
     """
-    def __init__(self, model_path: str, target: str | None, trans_model: str, ollama_name: str):
+    def __init__(self, model_path: str, target: str | None, trans_model: str, ollama_name: str, ollama_url: str = '', ollama_api_key: str = ''):
         SetLogLevel(-1)
         if model_path.startswith('"'):
             model_path = model_path[1:]
@@ -31,6 +31,8 @@ class VoskRecognizer:
         else:
             self.trans_func = ollama_translate
         self.ollama_name = ollama_name
+        self.ollama_url = ollama_url
+        self.ollama_api_key = ollama_api_key
         self.time_str = ''
         self.cur_id = 0
         self.prev_content = ''
@@ -66,7 +68,7 @@ class VoskRecognizer:
             if self.target:
                 th = threading.Thread(
                     target=self.trans_func,
-                    args=(self.ollama_name, self.target, caption['text'], self.time_str),
+                    args=(self.ollama_name, self.target, caption['text'], self.time_str, self.ollama_url, self.ollama_api_key),
                     daemon=True
                 )
                 th.start()

@@ -47,7 +47,6 @@ def translation_display(obj):
 
 def stdout_obj(obj):
     global display_caption
-    print(obj['command'], display_caption)
     if obj['command'] == 'caption' and display_caption:
         caption_display(obj)
         return

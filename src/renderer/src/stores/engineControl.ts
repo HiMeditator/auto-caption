@@ -21,6 +21,8 @@ export const useEngineControlStore = defineStore('engineControl', () => {
   const targetLang = ref<string>('zh')
   const transModel = ref<string>('ollama')
   const ollamaName = ref<string>('')
+  const ollamaUrl = ref<string>('')
+  const ollamaApiKey = ref<string>('')
   const engine = ref<string>('gummy')
   const audio = ref<0 | 1>(0)
   const translation = ref<boolean>(true)
@@ -28,6 +30,9 @@ export const useEngineControlStore = defineStore('engineControl', () => {
   const API_KEY = ref<string>('')
   const voskModelPath = ref<string>('')
   const sosvModelPath = ref<string>('')
+  const glmUrl = ref<string>('https://open.bigmodel.cn/api/paas/v4/audio/transcriptions')
+  const glmModel = ref<string>('glm-asr-2512')
+  const glmApiKey = ref<string>('')
   const recordingPath = ref<string>('')
   const customized = ref<boolean>(false)
   const customizedApp = ref<string>('')
@@ -44,6 +49,8 @@ export const useEngineControlStore = defineStore('engineControl', () => {
       targetLang: targetLang.value,
       transModel: transModel.value,
       ollamaName: ollamaName.value,
+      ollamaUrl: ollamaUrl.value,
+      ollamaApiKey: ollamaApiKey.value,
       engine: engine.value,
       audio: audio.value,
       translation: translation.value,
@@ -51,6 +58,9 @@ export const useEngineControlStore = defineStore('engineControl', () => {
       API_KEY: API_KEY.value,
       voskModelPath: voskModelPath.value,
       sosvModelPath: sosvModelPath.value,
+      glmUrl: glmUrl.value,
+      glmModel: glmModel.value,
+      glmApiKey: glmApiKey.value,
       recordingPath: recordingPath.value,
       customized: customized.value,
       customizedApp: customizedApp.value,
@@ -80,6 +90,8 @@ export const useEngineControlStore = defineStore('engineControl', () => {
     targetLang.value = controls.targetLang
     transModel.value = controls.transModel
     ollamaName.value = controls.ollamaName
+    ollamaUrl.value = controls.ollamaUrl
+    ollamaApiKey.value = controls.ollamaApiKey
     engine.value = controls.engine
     audio.value = controls.audio
     engineEnabled.value = controls.engineEnabled
@@ -88,6 +100,9 @@ export const useEngineControlStore = defineStore('engineControl', () => {
     API_KEY.value = controls.API_KEY
     voskModelPath.value = controls.voskModelPath
     sosvModelPath.value = controls.sosvModelPath
+    glmUrl.value = controls.glmUrl || 'https://open.bigmodel.cn/api/paas/v4/audio/transcriptions'
+    glmModel.value = controls.glmModel || 'glm-asr-2512'
+    glmApiKey.value = controls.glmApiKey
     recordingPath.value = controls.recordingPath
     customized.value = controls.customized
     customizedApp.value = controls.customizedApp
@@ -150,6 +165,8 @@ export const useEngineControlStore = defineStore('engineControl', () => {
     targetLang,         // 目标语言
     transModel,         // 翻译模型
     ollamaName,         // Ollama 模型
+    ollamaUrl,
+    ollamaApiKey,
     engine,             // 字幕引擎
     audio,              // 选择音频
     translation,        // 是否启用翻译
@@ -157,6 +174,9 @@ export const useEngineControlStore = defineStore('engineControl', () => {
     API_KEY,            // API KEY
     voskModelPath,      // vosk 模型路径
     sosvModelPath,      // sosv 模型路径
+    glmUrl,             // GLM API URL
+    glmModel,           // GLM 模型名称
+    glmApiKey,          // GLM API Key
     recordingPath,      // 录音保存路径
     customized,         // 是否使用自定义字幕引擎
     customizedApp,      // 自定义字幕引擎的应用程序

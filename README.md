@@ -41,7 +41,7 @@ SOSV 模型下载：[ Shepra-ONNX SenseVoice Model](https://github.com/HiMeditat
 - 支持调用本地 Ollama 模型或云端 Google 翻译 API 进行翻译
 - 跨平台（Windows、macOS、Linux）、多界面语言（中文、英语、日语）支持
 - 丰富的字幕样式设置（字体、字体大小、字体粗细、字体颜色、背景颜色等）
-- 灵活的字幕引擎选择（阿里云 Gummy 云端模型、本地 Vosk 模型、本地 SOSV 模型、还可以自己开发模型）
+- 灵活的字幕引擎选择（阿里云 Gummy 云端模型、GLM-ASR 云端模型、本地 Vosk 模型、本地 SOSV 模型、还可以自己开发模型）
 - 多语言识别与翻译（见下文“⚙️ 自带字幕引擎说明”）
 - 字幕记录展示与导出（支持导出 `.srt` 和 `.json` 格式）
 
@@ -62,6 +62,7 @@ macOS 平台和 Linux 平台获取系统音频输出需要进行额外设置，�
 |                                                              | 识别效果 | 部署类型          | 支持语言   | 翻译       | 备注                                                       |
 | ------------------------------------------------------------ | -------- | ------------- | ---------- | ---------- | ---------------------------------------------------------- |
 | [Gummy](https://help.aliyun.com/zh/model-studio/gummy-speech-recognition-translation) | 很好😊    | 云端 / 阿里云 | 10 种      | 自带翻译   | 收费，0.54CNY / 小时                                       |
+| [glm-asr-2512](https://docs.bigmodel.cn/cn/guide/models/sound-and-video/glm-asr-2512) | 很好😊 | 云端 / 智谱 AI | 4 种 | 需额外配置 | 收费，约 0.72CNY / 小时 |
 | [Vosk](https://alphacephei.com/vosk)                         | 较差😞    | 本地 / CPU    | 超过 30 种 | 需额外配置 | 支持的语言非常多                                           |
 | [SOSV](https://k2-fsa.github.io/sherpa/onnx/sense-voice/index.html) | 一般😐    | 本地 / CPU    | 5 种       | 需额外配置 | 仅有一个模型                                               |
 | 自己开发                                                     | 🤔        | 自定义        | 自定义     | 自定义     | 根据[文档](./docs/engine-manual/zh.md)使用 Python 自己开发 |

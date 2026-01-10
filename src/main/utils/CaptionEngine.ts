@@ -1,12 +1,13 @@
 import { exec, spawn } from 'child_process'
 import { app } from 'electron'
 import { is } from '@electron-toolkit/utils'
-import path from 'path'
-import net from 'net'
+import * as path from 'path'
+import * as net from 'net'
 import { controlWindow } from '../ControlWindow'
 import { allConfig } from './AllConfig'
 import { i18n } from '../i18n'
 import { Log } from './Log'
+import { passwordMaskingForList } from './UtilsFunc'
 
 export class CaptionEngine {
   appPath: string = ''
@@ -60,7 +61,7 @@ export class CaptionEngine {
           this.appPath = path.join(process.resourcesPath, 'engine', 'main.exe')
         }
         else {
-          this.appPath = path.join(process.resourcesPath, 'engine', 'main')
+          this.appPath = path.join(process.resourcesPath, 'engine', 'main', 'main')
         }
       }
       this.command.push('-a', allConfig.controls.audio ? '1' : '0')
@@ -87,6 +88,8 @@ export class CaptionEngine {
         this.command.push('-vosk', `"${allConfig.controls.voskModelPath}"`)
         this.command.push('-tm', allConfig.controls.transModel)
         this.command.push('-omn', allConfig.controls.ollamaName)
+        if(allConfig.controls.ollamaUrl) this.command.push('-ourl', allConfig.controls.ollamaUrl)
+        if(allConfig.controls.ollamaApiKey) this.command.push('-okey', allConfig.controls.ollamaApiKey)
       }
       else if(allConfig.controls.engine === 'sosv'){
         this.command.push('-e', 'sosv')
@@ -94,15 +97,25 @@ export class CaptionEngine {
         this.command.push('-sosv', `"${allConfig.controls.sosvModelPath}"`)
         this.command.push('-tm', allConfig.controls.transModel)
         this.command.push('-omn', allConfig.controls.ollamaName)
+        if(allConfig.controls.ollamaUrl) this.command.push('-ourl', allConfig.controls.ollamaUrl)
+        if(allConfig.controls.ollamaApiKey) this.command.push('-okey', allConfig.controls.ollamaApiKey)
+      }
+      else if(allConfig.controls.engine === 'glm'){
+        this.command.push('-e', 'glm')
+        this.command.push('-s', allConfig.controls.sourceLang)
+        this.command.push('-gurl', allConfig.controls.glmUrl)
+        this.command.push('-gmodel', allConfig.controls.glmModel)
+        if(allConfig.controls.glmApiKey) {
+          this.command.push('-gkey', allConfig.controls.glmApiKey)
+        }
+        this.command.push('-tm', allConfig.controls.transModel)
+        this.command.push('-omn', allConfig.controls.ollamaName)
+        if(allConfig.controls.ollamaUrl) this.command.push('-ourl', allConfig.controls.ollamaUrl)
+        if(allConfig.controls.ollamaApiKey) this.command.push('-okey', allConfig.controls.ollamaApiKey)
       }
     }
     Log.info('Engine Path:', this.appPath)
-    if(this.command.length > 2 && this.command.at(-2) === '-k') {
-      const _command = [...this.command]
-      _command[_command.length -1] = _command[_command.length -1].replace(/./g, '*')
-      Log.info('Engine Command:', _command)
-    }
-    else Log.info('Engine Command:', this.command)
+    Log.info('Engine Command:', passwordMaskingForList(this.command))
     return true
   }
 
@@ -165,7 +178,7 @@ export class CaptionEngine {
             const data_obj = JSON.parse(line)
             handleEngineData(data_obj)
           } catch (e) {
-            controlWindow.sendErrorMessage(i18n('engine.output.parse.error') + e)
+            // controlWindow.sendErrorMessage(i18n('engine.output.parse.error') + e)
             Log.error('Error parsing JSON:', e)
           }
         }

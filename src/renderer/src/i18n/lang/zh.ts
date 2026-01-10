@@ -50,8 +50,10 @@ export default {
     "sourceLang": "源语言",
     "transLang": "翻译语言",
     "transModel": "翻译模型",
-    "ollama": "Ollama",
-    "ollamaNote": "要使用的进行翻译的本地 Ollama 模型的名称，将调用默认端口的服务，建议使用参数量小于 1B 的非推理模型。",
+    "modelName": "模型名称",
+    "modelNameNote": "请输入要使用的翻译模型名称，可以是 Ollama 本地模型，也可以是 OpenAI API 兼容的云端模型。若未填写 Base URL 字段，则默认调用本地 Ollama 服务，否则会通过 Python OpenAI 库调用该地址指向的 API 服务。",
+    "baseURL": "调用 OpenAI API 的基础请求地址，如果不填写则调用本地默认端口的 Ollama 模型。",
+    "apiKey": "调用 OpenAI API 对应的模型需要使用的 API KEY。",
     "captionEngine": "字幕引擎",
     "audioType": "音频类型",
     "systemOutput": "系统音频输出（扬声器）",
@@ -66,6 +68,7 @@ export default {
     "startTimeout": "启动超时",
     "seconds": "秒",
     "apikeyInfo": "Gummy 字幕引擎需要的 API KEY，需要在阿里云百炼平台获取。详细信息见项目用户手册。",
+    "glmApikeyInfo": "GLM 字幕引擎需要的 API KEY，需要在智谱 AI 平台获取。",
     "voskModelPathInfo": "Vosk 字幕引擎需要的模型的文件夹路径，需要提前下载需要的模型到本地。信息详情见项目用户手册。",
     "sosvModelPathInfo": "SOSV 字幕引擎需要的模型的文件夹路径，需要提前下载需要的模型到本地。信息详情见项目用户手册。",
     "recordingPathInfo": "录音文件保存路径，需要提供文件夹路径。软件会自动命名录音文件并保存为 .wav 文件。",
@@ -142,7 +145,7 @@ export default {
       "projLink": "项目链接",
       "manual": "用户手册",
       "engineDoc": "字幕引擎手册",
-      "date": "2025 年 9 月 8 日"
+      "date": "2026 年 1 月 10 日"
     }
   },
   log: {

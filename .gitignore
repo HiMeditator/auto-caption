@@ -7,8 +7,13 @@ out
 __pycache__
 .venv
 test.py
+
 engine/build
+engine/portaudio
+engine/pyinstaller_cache
 engine/models
 engine/notebook
+# engine/main.spec
+
 .repomap
 .virtualme

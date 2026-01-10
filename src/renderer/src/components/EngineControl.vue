@@ -41,15 +41,61 @@
     <div class="input-item" v-if="transModel && currentTransModel === 'ollama'">
       <a-popover placement="right">
         <template #content>
-          <p class="label-hover-info">{{ $t('engine.ollamaNote') }}</p>
+          <p class="label-hover-info">{{ $t('engine.modelNameNote') }}</p>
         </template>
         <span class="input-label info-label"
           :style="{color: uiColor}"
-        >{{ $t('engine.ollama') }}</span>
+        >{{ $t('engine.modelName') }}</span>
       </a-popover>
       <a-input
         class="input-area"
         v-model:value="currentOllamaName"
+      ></a-input>
+    </div>
+    <div class="input-item" v-if="transModel && currentTransModel === 'ollama'">
+      <a-popover placement="right">
+        <template #content>
+          <p class="label-hover-info">{{ $t('engine.baseURL') }}</p>
+        </template>
+        <span class="input-label info-label"
+          :style="{color: uiColor}"
+        >Base URL</span>
+      </a-popover>
+      <a-input
+        class="input-area"
+        v-model:value="currentOllamaUrl"
+        placeholder="http://localhost:11434"
+      ></a-input>
+    </div>
+    <div class="input-item" v-if="transModel && currentTransModel === 'ollama'">
+      <a-popover placement="right">
+        <template #content>
+          <p class="label-hover-info">{{ $t('engine.apiKey') }}</p>
+        </template>
+        <span class="input-label info-label"
+          :style="{color: uiColor}"
+        >API Key</span>
+      </a-popover>
+      <a-input
+          class="input-area"
+          type="password"
+          v-model:value="currentOllamaApiKey"
+      />
+    </div>
+    <div class="input-item" v-if="currentEngine === 'glm'">
+      <span class="input-label">GLM API URL</span>
+      <a-input
+        class="input-area"
+        v-model:value="currentGlmUrl"
+        placeholder="https://open.bigmodel.cn/api/paas/v4/audio/transcriptions"
+      ></a-input>
+    </div>
+    <div class="input-item" v-if="currentEngine === 'glm'">
+      <span class="input-label">GLM Model Name</span>
+      <a-input
+        class="input-area"
+        v-model:value="currentGlmModel"
+        placeholder="glm-asr-2512"
       ></a-input>
     </div>
     <div class="input-item">
@@ -115,12 +161,30 @@
           </template>
           <span class="input-label info-label"
             :style="{color: uiColor}"
-          >{{ $t('engine.apikey') }}</span>
+          >ALI {{ $t('engine.apikey') }}</span>
         </a-popover>
         <a-input
           class="input-area"
           type="password"
           v-model:value="currentAPI_KEY"
+        />
+      </div>
+      <div class="input-item">
+        <a-popover placement="right">
+          <template #content>
+            <p class="label-hover-info">{{ $t('engine.glmApikeyInfo') }}</p>
+            <p><a href="https://open.bigmodel.cn/" target="_blank">
+              https://open.bigmodel.cn
+            </a></p>
+          </template>
+          <span class="input-label info-label"
+            :style="{color: uiColor}"
+          >GLM {{ $t('engine.apikey') }}</span>
+        </a-popover>
+        <a-input
+          class="input-area"
+          type="password"
+          v-model:value="currentGlmApiKey"
         />
       </div>
       <div class="input-item">
@@ -239,9 +303,14 @@ const currentTranslation = ref<boolean>(true)
 const currentRecording = ref<boolean>(false)
 const currentTransModel = ref('ollama')
 const currentOllamaName = ref('')
+const currentOllamaUrl = ref('')
+const currentOllamaApiKey = ref('')
 const currentAPI_KEY = ref<string>('')
 const currentVoskModelPath = ref<string>('')
 const currentSosvModelPath = ref<string>('')
+const currentGlmUrl = ref<string>('')
+const currentGlmModel = ref<string>('')
+const currentGlmApiKey = ref<string>('')
 const currentRecordingPath = ref<string>('')
 const currentCustomized = ref<boolean>(false)
 const currentCustomizedApp = ref('')
@@ -294,12 +363,17 @@ function applyChange(){
   engineControl.transModel = currentTransModel.value
   engineControl.ollamaName = currentOllamaName.value
   engineControl.engine = currentEngine.value
+  engineControl.ollamaUrl = currentOllamaUrl.value ?? "http://localhost:11434"
+  engineControl.ollamaApiKey = currentOllamaApiKey.value
   engineControl.audio = currentAudio.value
   engineControl.translation = currentTranslation.value
   engineControl.recording = currentRecording.value
   engineControl.API_KEY = currentAPI_KEY.value
   engineControl.voskModelPath = currentVoskModelPath.value
   engineControl.sosvModelPath = currentSosvModelPath.value
+  engineControl.glmUrl = currentGlmUrl.value ?? "https://open.bigmodel.cn/api/paas/v4/audio/transcriptions"
+  engineControl.glmModel = currentGlmModel.value ?? "glm-asr-2512"
+  engineControl.glmApiKey = currentGlmApiKey.value
   engineControl.recordingPath = currentRecordingPath.value
   engineControl.customized = currentCustomized.value
   engineControl.customizedApp = currentCustomizedApp.value
@@ -320,6 +394,8 @@ function cancelChange(){
   currentTargetLang.value = engineControl.targetLang
   currentTransModel.value = engineControl.transModel
   currentOllamaName.value = engineControl.ollamaName
+  currentOllamaUrl.value = engineControl.ollamaUrl
+  currentOllamaApiKey.value = engineControl.ollamaApiKey
   currentEngine.value = engineControl.engine
   currentAudio.value = engineControl.audio
   currentTranslation.value = engineControl.translation
@@ -327,6 +403,9 @@ function cancelChange(){
   currentAPI_KEY.value = engineControl.API_KEY
   currentVoskModelPath.value = engineControl.voskModelPath
   currentSosvModelPath.value = engineControl.sosvModelPath
+  currentGlmUrl.value = engineControl.glmUrl
+  currentGlmModel.value = engineControl.glmModel
+  currentGlmApiKey.value = engineControl.glmApiKey
   currentRecordingPath.value = engineControl.recordingPath
   currentCustomized.value = engineControl.customized
   currentCustomizedApp.value = engineControl.customizedApp
