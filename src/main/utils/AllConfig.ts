@@ -4,6 +4,7 @@ import {
 } from '../types'
 import { Log } from './Log'
 import { app, BrowserWindow } from 'electron'
+import { passwordMaskingForObject } from './UtilsFunc'
 import * as path from 'path'
 import * as fs from 'fs'
 import * as os from 'os'
@@ -151,9 +152,7 @@ class AllConfig {
       }
     }
     this.controls.engineEnabled = engineEnabled
-    let _controls = {...this.controls}
-    _controls.API_KEY = _controls.API_KEY.replace(/./g, '*')
-    Log.info('Set Controls:', _controls)
+    Log.info('Set Controls:', passwordMaskingForObject(this.controls))
   }
 
   public sendControls(window: BrowserWindow, info = true) {

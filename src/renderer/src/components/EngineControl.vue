@@ -41,11 +41,11 @@
     <div class="input-item" v-if="transModel && currentTransModel === 'ollama'">
       <a-popover placement="right">
         <template #content>
-          <p class="label-hover-info">{{ $t('engine.ollamaNote') }}</p>
+          <p class="label-hover-info">{{ $t('engine.modelNameNote') }}</p>
         </template>
         <span class="input-label info-label"
           :style="{color: uiColor}"
-        >{{ $t('engine.ollama') }}</span>
+        >{{ $t('engine.modelName') }}</span>
       </a-popover>
       <a-input
         class="input-area"
@@ -53,7 +53,14 @@
       ></a-input>
     </div>
     <div class="input-item" v-if="transModel && currentTransModel === 'ollama'">
-      <span class="input-label">Ollama Domain</span>
+      <a-popover placement="right">
+        <template #content>
+          <p class="label-hover-info">{{ $t('engine.baseURL') }}</p>
+        </template>
+        <span class="input-label info-label"
+          :style="{color: uiColor}"
+        >Base URL</span>
+      </a-popover>
       <a-input
         class="input-area"
         v-model:value="currentOllamaUrl"
@@ -61,11 +68,19 @@
       ></a-input>
     </div>
     <div class="input-item" v-if="transModel && currentTransModel === 'ollama'">
-      <span class="input-label">Ollama API Key</span>
-      <a-input-password
-        class="input-area"
-        v-model:value="currentOllamaApiKey"
-      ></a-input-password>
+      <a-popover placement="right">
+        <template #content>
+          <p class="label-hover-info">{{ $t('engine.apiKey') }}</p>
+        </template>
+        <span class="input-label info-label"
+          :style="{color: uiColor}"
+        >API Key</span>
+      </a-popover>
+      <a-input
+          class="input-area"
+          type="password"
+          v-model:value="currentOllamaApiKey"
+      />
     </div>
     <div class="input-item" v-if="currentEngine === 'glm'">
       <span class="input-label">GLM API URL</span>
@@ -82,13 +97,6 @@
         v-model:value="currentGlmModel"
         placeholder="glm-asr-2512"
       ></a-input>
-    </div>
-    <div class="input-item" v-if="currentEngine === 'glm'">
-      <span class="input-label">GLM API Key</span>
-      <a-input-password
-        class="input-area"
-        v-model:value="currentGlmApiKey"
-      ></a-input-password>
     </div>
     <div class="input-item">
       <span class="input-label">{{ $t('engine.audioType') }}</span>
@@ -153,12 +161,30 @@
           </template>
           <span class="input-label info-label"
             :style="{color: uiColor}"
-          >{{ $t('engine.apikey') }}</span>
+          >ALI {{ $t('engine.apikey') }}</span>
         </a-popover>
         <a-input
           class="input-area"
           type="password"
           v-model:value="currentAPI_KEY"
+        />
+      </div>
+      <div class="input-item">
+        <a-popover placement="right">
+          <template #content>
+            <p class="label-hover-info">{{ $t('engine.glmApikeyInfo') }}</p>
+            <p><a href="https://open.bigmodel.cn/" target="_blank">
+              https://open.bigmodel.cn
+            </a></p>
+          </template>
+          <span class="input-label info-label"
+            :style="{color: uiColor}"
+          >GLM {{ $t('engine.apikey') }}</span>
+        </a-popover>
+        <a-input
+          class="input-area"
+          type="password"
+          v-model:value="currentGlmApiKey"
         />
       </div>
       <div class="input-item">

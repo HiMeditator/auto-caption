@@ -27,14 +27,14 @@ def ollama_translate(model: str, target: str, text: str, time_s: str, url: str =
         if url:
             if OpenAI:
                 client = OpenAI(base_url=url, api_key=key if key else "ollama")
-                response = client.chat.completions.create(
+                openai_response = client.chat.completions.create(
                     model=model,
                     messages=[
                         {"role": "system", "content": f"/no_think Translate the following content into {lang_map[target]}, and do not output any additional information."},
                         {"role": "user", "content": text}
                     ]
                 )
-                content = response.choices[0].message.content or ""
+                content = openai_response.choices[0].message.content or ""
             else:
                 client = Client(host=url)
                 response: ChatResponse = client.chat(

@@ -50,8 +50,10 @@ export default {
     "sourceLang": "ソース言語",
     "transLang": "翻訳言語",
     "transModel": "翻訳モデル",
-    "ollama": "Ollama",
-    "ollamaNote": "翻訳に使用する、デフォルトポートでサービスを呼び出すローカルOllamaモデルの名前。1B 未満のパラメータを持つ非推論モデルの使用を推奨します。",
+    "modelName": "モデル名",
+    "modelNameNote": "使用する翻訳モデル名を入力してください。Ollama のローカルモデルでも OpenAI API 互換のクラウドモデルでも可能です。Base URL フィールドが未入力の場合、デフォルトでローカルの Ollama サービスが呼び出され、それ以外の場合は Python OpenAI ライブラリ経由で指定されたアドレスの API サービスが呼び出されます。",
+    "baseURL": "OpenAI API を呼び出すための基本リクエスト URL です。未記入の場合、ローカルのデフォルトポートの Ollama モデルが呼び出されます。",
+    "apiKey": "OpenAI API に対応するモデルを使用するために必要な API キーです。",
     "captionEngine": "エンジン",
     "audioType": "オーディオ",
     "systemOutput": "システムオーディオ出力（スピーカー）",
@@ -66,6 +68,7 @@ export default {
     "startTimeout": "時間制限",
     "seconds": "秒",
     "apikeyInfo": "Gummy 字幕エンジンに必要な API KEY は、アリババクラウド百煉プラットフォームから取得する必要があります。詳細情報はプロジェクトのユーザーマニュアルをご覧ください。",
+    "glmApikeyInfo": "GLM 字幕エンジンに必要な API KEY で、智譜 AI プラットフォームから取得する必要があります。",
     "voskModelPathInfo": "Vosk 字幕エンジンに必要なモデルのフォルダパスです。必要なモデルを事前にローカルマシンにダウンロードする必要があります。詳細情報はプロジェクトのユーザーマニュアルをご覧ください。",
     "sosvModelPathInfo": "SOSV 字幕エンジンに必要なモデルのフォルダパスです。必要なモデルを事前にローカルマシンにダウンロードする必要があります。詳細情報はプロジェクトのユーザーマニュアルをご覧ください。",
     "recordingPathInfo": "録音ファイルの保存パスで、フォルダパスを指定する必要があります。ソフトウェアが自動的に録音ファイルに名前を付けて .wav ファイルとして保存します。",
@@ -142,7 +145,7 @@ export default {
       "projLink": "プロジェクトリンク",
       "manual": "ユーザーマニュアル",
       "engineDoc": "字幕エンジンマニュアル",
-      "date": "2025 年 9 月 8 日"
+      "date": "2026 年 1 月 10 日"
     }
   },
   log: {

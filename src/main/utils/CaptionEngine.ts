@@ -7,6 +7,7 @@ import { controlWindow } from '../ControlWindow'
 import { allConfig } from './AllConfig'
 import { i18n } from '../i18n'
 import { Log } from './Log'
+import { passwordMaskingForList } from './UtilsFunc'
 
 export class CaptionEngine {
   appPath: string = ''
@@ -114,12 +115,7 @@ export class CaptionEngine {
       }
     }
     Log.info('Engine Path:', this.appPath)
-    if(this.command.length > 2 && this.command[this.command.length - 2] === '-k') {
-      const _command = [...this.command]
-      _command[_command.length -1] = _command[_command.length -1].replace(/./g, '*')
-      Log.info('Engine Command:', _command)
-    }
-    else Log.info('Engine Command:', this.command)
+    Log.info('Engine Command:', passwordMaskingForList(this.command))
     return true
   }
 
@@ -182,7 +178,7 @@ export class CaptionEngine {
             const data_obj = JSON.parse(line)
             handleEngineData(data_obj)
           } catch (e) {
-            controlWindow.sendErrorMessage(i18n('engine.output.parse.error') + e)
+            // controlWindow.sendErrorMessage(i18n('engine.output.parse.error') + e)
             Log.error('Error parsing JSON:', e)
           }
         }

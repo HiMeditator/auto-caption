@@ -34,7 +34,7 @@ export const engines = {
         { value: 'it', type: 1, label: '意大利语' },
       ],
       transModel: [
-        { value: 'ollama', label: 'Ollama 本地模型' },
+        { value: 'ollama', label: 'Ollama 模型或 OpenAI 兼容模型' },
         { value: 'google', label: 'Google API 调用' },
       ]
     },
@@ -55,7 +55,7 @@ export const engines = {
         { value: 'it', type: 1, label: '意大利语' },
       ],
       transModel: [
-        { value: 'ollama', label: 'Ollama 本地模型' },
+        { value: 'ollama', label: 'Ollama 模型或 OpenAI 兼容模型' },
         { value: 'google', label: 'Google API 调用' },
       ]
     },
@@ -70,7 +70,7 @@ export const engines = {
         { value: 'ko', type: 0, label: '韩语' },
       ],
       transModel: [
-        { value: 'ollama', label: 'Ollama 本地模型' },
+        { value: 'ollama', label: 'Ollama 模型或 OpenAI 兼容模型' },
         { value: 'google', label: 'Google API 调用' },
       ]
     }
@@ -109,7 +109,7 @@ export const engines = {
         { value: 'it', type: 1, label: 'Italian' },
       ],
       transModel: [
-        { value: 'ollama', label: 'Ollama Local Model' },
+        { value: 'ollama', label: 'Ollama Model or OpenAI-compatible Model' },
         { value: 'google', label: 'Google API Call' },
       ]
     },
@@ -130,7 +130,7 @@ export const engines = {
         { value: 'it', type: 1, label: 'Italian' },
       ],
       transModel: [
-        { value: 'ollama', label: 'Ollama Local Model' },
+        { value: 'ollama', label: 'Ollama Model or OpenAI-compatible Model' },
         { value: 'google', label: 'Google API Call' },
       ]
     },
@@ -145,7 +145,7 @@ export const engines = {
         { value: 'ko', type: 0, label: 'Korean' },
       ],
       transModel: [
-        { value: 'ollama', label: 'Ollama Local Model' },
+        { value: 'ollama', label: 'Ollama Model or OpenAI-compatible Model' },
         { value: 'google', label: 'Google API Call' },
       ]
     }
@@ -184,7 +184,7 @@ export const engines = {
         { value: 'it', type: 1, label: 'イタリア語' },
       ],
       transModel: [
-        { value: 'ollama', label: 'Ollama ローカルモデル' },
+        { value: 'ollama', label: 'Ollama モデルまたは OpenAI 互換モデル' },
         { value: 'google', label: 'Google API 呼び出し' },
       ]
     },
@@ -205,7 +205,7 @@ export const engines = {
         { value: 'it', type: 1, label: 'イタリア語' },
       ],
       transModel: [
-        { value: 'ollama', label: 'Ollama ローカルモデル' },
+        { value: 'ollama', label: 'Ollama モデルまたは OpenAI 互換モデル' },
         { value: 'google', label: 'Google API 呼び出し' },
       ]
     },
@@ -220,7 +220,7 @@ export const engines = {
         { value: 'ko', type: 0, label: '韓国語' },
       ],
       transModel: [
-        { value: 'ollama', label: 'Ollama ローカルモデル' },
+        { value: 'ollama', label: 'Ollama モデルまたは OpenAI 互換モデル' },
         { value: 'google', label: 'Google API 呼び出し' },
       ]
     }
