@@ -1,6 +1,6 @@
 # Auto Caption ユーザーマニュアル
 
-対応バージョン：v1.0.0
+対応バージョン：v1.1.0
 
 この文書は大規模モデルを使用して翻訳されていますので、内容に正確でない部分があるかもしれません。
 
@@ -40,6 +40,10 @@ macOS プラットフォームでオーディオ出力を取得するには追�
 
 - [API KEY の取得（中国語）](https://help.aliyun.com/zh/model-studio/get-api-key)
 - [環境変数を通じて API Key を設定（中国語）](https://help.aliyun.com/zh/model-studio/configure-api-key-through-environment-variables)
+
+## GLM エンジン使用前の準備
+
+まずAPI KEYを取得する必要があります。参考：[クイックスタート](https://docs.bigmodel.cn/en/guide/start/quick-start)。
 
 ## Voskエンジン使用前の準備
 

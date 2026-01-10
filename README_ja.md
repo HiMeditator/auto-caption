@@ -3,7 +3,7 @@
     <h1 align="center">auto-caption</h1>
     <p>Auto Caption はクロスプラットフォームのリアルタイム字幕表示ソフトウェアです。</p>
     <p>
-      <a href="https://github.com/HiMeditator/auto-caption/releases"><img src="https://img.shields.io/badge/release-1.0.0-blue"></a>
+      <a href="https://github.com/HiMeditator/auto-caption/releases"><img src="https://img.shields.io/badge/release-1.1.0-blue"></a>
       <a href="https://github.com/HiMeditator/auto-caption/issues"><img src="https://img.shields.io/github/issues/HiMeditator/auto-caption?color=orange"></a>
       <img src="https://img.shields.io/github/languages/top/HiMeditator/auto-caption?color=royalblue">
       <img src="https://img.shields.io/github/repo-size/HiMeditator/auto-caption?color=green">
@@ -14,7 +14,7 @@
         | <a href="./README_en.md">English</a>
         | <b>日本語</b> |
     </p>
-    <p><i>v1.0.0 バージョンがリリースされ、SOSV ローカル字幕モデルが追加されました。現在の機能は基本的に完了しており、今後の開発計画はありません...</i></p>
+    <p><i>v1.1.0 バージョンがリリースされました。GLM-ASR クラウド字幕モデルと OpenAI 互換モデル翻訳が追加されました...</i></p>
 </div>
 
 ![](./assets/media/main_ja.png)
@@ -38,14 +38,16 @@ SOSV モデルダウンロード: [Shepra-ONNX SenseVoice Model](https://github.
 ## ✨ 特徴
 
 - 音声出力またはマイク入力からの字幕生成
-- ローカルのOllamaモデルまたはクラウドベースのGoogle翻訳APIを呼び出して翻訳をサポート
+- ローカルのOllamaモデル、クラウド上のOpenAI互換モデル、またはクラウド上のGoogle翻訳APIを呼び出して翻訳を行うことをサポートしています
 - クロスプラットフォーム（Windows、macOS、Linux）、多言語インターフェース（中国語、英語、日本語）対応
 - 豊富な字幕スタイル設定（フォント、フォントサイズ、フォント太さ、フォント色、背景色など）
-- 柔軟な字幕エンジン選択（阿里云Gummyクラウドモデル、ローカルVoskモデル、ローカルSOSVモデル、または独自にモデルを開発可能）
+- 柔軟な字幕エンジン選択（阿里云Gummyクラウドモデル、GLM-ASRクラウドモデル、ローカルVoskモデル、ローカルSOSVモデル、または独自にモデルを開発可能）
 - 多言語認識と翻訳（下記「⚙️ 字幕エンジン説明」参照）
 - 字幕記録表示とエクスポート（`.srt` および `.json` 形式のエクスポートに対応）
 
 ## 📖 基本使い方
+
+> ⚠️ 注意：現在、Windowsプラットフォームのソフトウェアの最新バージョンのみがメンテナンスされており、他のプラットフォームの最終バージョンはv1.0.0のままです。
 
 このソフトウェアは Windows、macOS、Linux プラットフォームに対応しています。テスト済みのプラットフォーム情報は以下の通りです：
 
@@ -61,14 +63,15 @@ macOS および Linux プラットフォームでシステムオーディオ出�
 
 ソフトウェアをダウンロードした後、自分のニーズに応じて対応するモデルを選択し、モデルを設定する必要があります。
 
-|                                                              | 認識効果 | デプロイタイプ    | 対応言語   | 翻訳       | 備考                                                       |
-| ------------------------------------------------------------ | -------- | ----------------- | ---------- | ---------- | ---------------------------------------------------------- |
-| [Gummy](https://help.aliyun.com/zh/model-studio/gummy-speech-recognition-translation) | 良好😊    | クラウド / 阿里云 | 10種       | 内蔵翻訳   | 有料、0.54CNY / 時間                                       |
-| [Vosk](https://alphacephei.com/vosk)                         | 不良😞    | ローカル / CPU    | 30種以上   | 追加設定必要 | 対応言語が非常に多い                                       |
-| [SOSV](https://k2-fsa.github.io/sherpa/onnx/sense-voice/index.html) | 一般😐    | ローカル / CPU    | 5種        | 追加設定必要 | モデルは一つのみ                                           |
-| 自前開発                                                     | 🤔        | カスタム          | カスタム   | カスタム   | [ドキュメント](./docs/engine-manual/zh.md)に従ってPythonで自前開発 |
+|                                                              | 正確性 | 実時間性 | デプロイタイプ | 対応言語 | 翻訳 | 備考 |
+| ------------------------------------------------------------ | -------- | --------- | -------------- | -------- | ---- | ---- |
+| [Gummy](https://help.aliyun.com/zh/model-studio/gummy-speech-recognition-translation) | とても良い😊 | とても良い😊 | クラウド / アリババクラウド | 10言語 | 内蔵翻訳 | 有料、0.54元/時間 |
+| [glm-asr-2512](https://docs.bigmodel.cn/cn/guide/models/sound-and-video/glm-asr-2512) | とても良い😊 | 悪い😞 | クラウド / Zhipu AI | 4言語 | 追加設定が必要 | 有料、約0.72元/時間 |
+| [Vosk](https://alphacephei.com/vosk) | 悪い😞 | とても良い😊 | ローカル / CPU | 30言語以上 | 追加設定が必要 | 多くの言語に対応 |
+| [SOSV](https://k2-fsa.github.io/sherpa/onnx/sense-voice/index.html) | 普通😐 | 普通😐 | ローカル / CPU | 5言語 | 追加設定が必要 | 1つのモデルのみ |
+| 自分で開発 | 🤔 | 🤔 | カスタム | カスタム | カスタム | [ドキュメント](./docs/engine-manual/ja.md)に従ってPythonを使用して自分で開発 |
 
-VoskまたはSOSVモデルを使用する場合、独自の翻訳モデルも設定する必要があります。
+Gummyモデル以外を選択した場合、独自の翻訳モデルを設定する必要があります。
 
 ### 翻訳モデルの設定
 
@@ -80,7 +83,18 @@ VoskまたはSOSVモデルを使用する場合、独自の翻訳モデルも設
 
 > 注意：パラメータ数が多すぎるモデルを使用すると、リソース消費と翻訳遅延が大きくなります。1B未満のパラメータ数のモデルを使用することを推奨します。例：`qwen2.5:0.5b`、`qwen3:0.6b`。
 
-このモデルを使用する前に、ローカルマシンに[Ollama](https://ollama.com/)ソフトウェアがインストールされ、必要な大規模言語モデルがダウンロードされていることを確認してください。必要な大規模モデル名を設定の`Ollama`フィールドに追加するだけでOKです。
+このモデルを使用する前に、ローカルマシンに[Ollama](https://ollama.com/)ソフトウェアがインストールされており、必要な大規模言語モデルをダウンロード済みであることを確認してください。設定で呼び出す必要がある大規模モデル名を「モデル名」フィールドに入力し、「Base URL」フィールドが空であることを確認してください。
+
+#### OpenAI互換モデル
+
+ローカルのOllamaモデルの翻訳効果が良くないと感じる場合や、ローカルにOllamaモデルをインストールしたくない場合は、クラウド上のOpenAI互換モデルを使用できます。
+
+いくつかのモデルプロバイダの「Base URL」：
+- OpenAI: https://api.openai.com/v1
+- DeepSeek: https://api.deepseek.com
+- アリババクラウド: https://dashscope.aliyuncs.com/compatible-mode/v1
+
+API Keyは対応するモデルプロバイダから取得する必要があります。
 
 #### Google翻訳API
 
@@ -96,6 +110,12 @@ VoskまたはSOSVモデルを使用する場合、独自の翻訳モデルも設
 
 - [API KEYの取得](https://help.aliyun.com/zh/model-studio/get-api-key)
 - [環境変数へのAPI Keyの設定](https://help.aliyun.com/zh/model-studio/configure-api-key-through-environment-variables)
+
+### GLM-ASR モデルの使用
+
+使用前に、Zhipu AI プラットフォームから API キーを取得し、それをソフトウェアの設定に追加する必要があります。
+
+API キーの取得についてはこちらをご覧ください：[クイックスタート](https://docs.bigmodel.cn/ja/guide/start/quick-start)。
 
 ### Voskモデルの使用
 
@@ -134,7 +154,7 @@ python main.py \
 
 ## ⚙️ 字幕エンジン説明
 
-現在、ソフトウェアには3つの字幕エンジンが搭載されており、新しいエンジンが計画されています。それらの詳細情報は以下の通りです。
+現在、ソフトウェアには4つの字幕エンジンが搭載されており、新しいエンジンが計画されています。それらの詳細情報は以下の通りです。
 
 ### Gummy 字幕エンジン（クラウド）
 
@@ -161,6 +181,10 @@ $$
 
 また、エンジンはオーディオストームを取得したときのみデータをアップロードするため、実際のアップロードレートはさらに小さくなる可能性があります。モデル結果の返信トラフィック消費量は小さく、ここでは考慮していません。
 
+### GLM-ASR 字幕エンジン（クラウド）
+
+https://docs.bigmodel.cn/ja/guide/models/sound-and-video/glm-asr-2512
+
 ### Vosk字幕エンジン（ローカル）
 
 [vosk-api](https://github.com/alphacep/vosk-api)をベースに開発。この字幕エンジンの利点は選択可能な言語モデルが非常に多く（30言語以上）、欠点は認識効果が比較的悪く、生成内容に句読点がないことです。
@@ -168,16 +192,6 @@ $$
 ### SOSV 字幕エンジン（ローカル）
 
 [SOSV](https://github.com/HiMeditator/auto-caption/releases/tag/sosv-model)は統合パッケージで、主に[Shepra-ONNX SenseVoice](https://k2-fsa.github.io/sherpa/onnx/sense-voice/index.html)をベースにし、エンドポイント検出モデルと句読点復元モデルを追加しています。このモデルが認識をサポートする言語は：英語、中国語、日本語、韓国語、広東語です。
-
-### 新規計画字幕エンジン
-
-以下は候補モデルであり、モデルの性能と統合の容易さに基づいて選択されます。
-
-- [faster-whisper](https://github.com/SYSTRAN/faster-whisper)
-- [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx)
-- [SenseVoice](https://github.com/FunAudioLLM/SenseVoice)
-- [FunASR](https://github.com/modelscope/FunASR)
-- [WhisperLiveKit](https://github.com/QuentinFuxa/WhisperLiveKit)
 
 ## 🚀 プロジェクト実行
 

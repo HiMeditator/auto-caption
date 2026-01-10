@@ -185,7 +185,7 @@ def main_glm(a: int, c: int, url: str, model: str, key: str, s: str, t: str, tm:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Convert system audio stream to text')
     # all
-    parser.add_argument('-e', '--caption_engine', default='gummy', help='Caption engine: gummy or vosk or sosv')
+    parser.add_argument('-e', '--caption_engine', default='gummy', help='Caption engine: gummy, glm, vosk or sosv')
     parser.add_argument('-a', '--audio_type', type=int, default=0, help='Audio stream source: 0 for output, 1 for input')
     parser.add_argument('-c', '--chunk_rate', type=int, default=10, help='Number of audio stream chunks collected per second')
     parser.add_argument('-p', '--port', type=int, default=0, help='The port to run the server on, 0 for no server')
@@ -193,7 +193,7 @@ if __name__ == "__main__":
     parser.add_argument('-t', '--target_language', default='none', help='Target language code, "none" for no translation')
     parser.add_argument('-r', '--record', type=int, default=0, help='Whether to record the audio, 0 for no recording, 1 for recording')
     parser.add_argument('-rp', '--record_path', default='', help='Path to save the recorded audio')
-    # gummy and sosv
+    # gummy and sosv and glm
     parser.add_argument('-s', '--source_language', default='auto', help='Source language code')
     # gummy only
     parser.add_argument('-k', '--api_key', default='', help='API KEY for Gummy model')

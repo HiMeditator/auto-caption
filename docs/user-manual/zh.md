@@ -1,6 +1,6 @@
 # Auto Caption 用户手册
 
-对应版本：v1.0.0
+对应版本：v1.1.0
 
 ## 软件简介
 
@@ -38,6 +38,10 @@ Auto Caption 是一个跨平台的字幕显示软件，能够实时获取系统�
 
 - [获取 API KEY](https://help.aliyun.com/zh/model-studio/get-api-key)
 - [将 API Key 配置到环境变量](https://help.aliyun.com/zh/model-studio/configure-api-key-through-environment-variables)
+
+## GLM 引擎使用前准备
+
+需要先获取 API KEY，参考：[Quick Start](https://docs.bigmodel.cn/en/guide/start/quick-start)。
 
 ## Vosk 引擎使用前准备
 
@@ -145,7 +149,7 @@ sudo yum install pulseaudio pavucontrol
 
 #### `-e , --caption_engine`
 
-需要选择的字幕引擎模型，目前有三个可用，分别为：`gummy, vosk, sosv`。
+需要选择的字幕引擎模型，目前有四个可用，分别为：`gummy, glm, vosk, sosv`。
 
 该项的默认值为 `gummy`。
 
@@ -197,11 +201,13 @@ sudo yum install pulseaudio pavucontrol
 
 但是指定源语言能在一定程度上提高识别准确率，可用使用上面的语言代码指定源语言。
 
-该项仅适用于 Gummy 和 SOSV 模型。
+该项适用于 Gummy、GLM 和 SOSV 模型。
 
 其中 Gummy 模型可用使用上述全部的语言，在加上粤语（`yue`）。
 
-而 SOSV 模型支持指定的语言有：英语、中文、日语、韩语、粤语。
+GLM 模型支持指定的语言有：英语、中文、日语、韩语。
+
+SOSV 模型支持指定的语言有：英语、中文、日语、韩语、粤语。
 
 #### `-k, --api_key`
 
@@ -210,6 +216,18 @@ sudo yum install pulseaudio pavucontrol
 该项默认值为空。
 
 该项仅适用于 Gummy 模型。
+
+#### `-gkey, --glm_api_key`
+
+指定 `glm` 模型需要使用的 API KEY，默认为空。
+
+#### `-gmodel, --glm_model`
+
+指定 `glm` 模型需要使用的模型名称，默认为 `glm-asr-2512`。
+
+#### `-gurl, --glm_url`
+
+指定 `glm` 模型需要使用的 API URL，默认值为：`https://open.bigmodel.cn/api/paas/v4/audio/transcriptions`。
 
 #### `-tm, --translation_model`
 
@@ -224,13 +242,23 @@ sudo yum install pulseaudio pavucontrol
 
 #### `-omn, --ollama_name`
 
-指定需要调用进行翻译的 Ollama 模型。该项默认值为空。
+指定要使用的翻译模型名称，可以是 Ollama 本地模型，也可以是 OpenAI API 兼容的云端模型。若未填写 Base URL 字段，则默认调用本地 Ollama 服务，否则会通过 Python OpenAI 库调用该地址指向的 API 服务。
 
-建议使用参数量小于 1B 的模型，比如： `qwen2.5:0.5b`, `qwen3:0.6b`。
+如果使用 Ollama 模型，建议使用参数量小于 1B 的模型，比如： `qwen2.5:0.5b`, `qwen3:0.6b`。需要在 Ollama 中下载了对应的模型才能正常使用。
 
-用户需要在 Ollama 中下载了对应的模型才能正常使用。
+默认值为空，适用于除了 Gummy 外的其他模型。
 
-该项仅适用于 Vosk 和 SOSV 模型。
+#### `-ourl, --ollama_url`
+
+调用 OpenAI API 的基础请求地址，如果不填写则调用本地默认端口的 Ollama 模型。
+
+默认值为空，适用于除了 Gummy 外的其他模型。
+
+#### `-okey, --ollama_api_key`
+
+指定调用 OpenAI 兼容模型的 API KEY。
+
+默认值为空，适用于除了 Gummy 外的其他模型。
 
 #### `-vosk, --vosk_model`
 

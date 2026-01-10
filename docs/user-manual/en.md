@@ -1,6 +1,6 @@
 # Auto Caption User Manual
 
-Corresponding Version: v1.0.0
+Corresponding Version: v1.1.0
 
 **Note: Due to limited personal resources, the English and Japanese documentation files for this project (except for the README document) will no longer be maintained. The content of this document may not be consistent with the latest version of the project. If you are willing to help with translation, please submit relevant Pull Requests.**
 
@@ -40,6 +40,11 @@ Alibaba Cloud provides detailed tutorials for this part, which can be referenced
 
 - [Obtaining API KEY (Chinese)](https://help.aliyun.com/zh/model-studio/get-api-key)
 - [Configuring API Key through Environment Variables (Chinese)](https://help.aliyun.com/zh/model-studio/configure-api-key-through-environment-variables)
+
+
+## Preparation for GLM Engine
+
+You need to obtain an API KEY first, refer to: [Quick Start](https://docs.bigmodel.cn/en/guide/start/quick-start).
 
 ## Preparation for Using Vosk Engine
 
@@ -147,7 +152,7 @@ The following parameter descriptions only include necessary parameters.
 
 #### `-e , --caption_engine`
 
-The caption engine model to select, currently three options are available: `gummy, vosk, sosv`.
+The caption engine model to select, currently three options are available: `gummy, glm, vosk, sosv`.
 
 The default value is `gummy`.
 
@@ -199,9 +204,11 @@ Source language for recognition. Default value is `auto`, meaning no specific so
 
 Specifying the source language can improve recognition accuracy to some extent. You can specify the source language using the language codes above.
 
-This only applies to Gummy and SOSV models.
+This applies to Gummy, GLM and SOSV models.
 
 The Gummy model can use all the languages mentioned above, plus Cantonese (`yue`).
+
+The GLM model supports specifying the following languages: English, Chinese, Japanese, Korean.
 
 The SOSV model supports specifying the following languages: English, Chinese, Japanese, Korean, and Cantonese.
 
@@ -212,6 +219,18 @@ Specify the Alibaba Cloud API KEY required for the `Gummy` model.
 Default value is empty.
 
 This only applies to the Gummy model.
+
+#### `-gkey, --glm_api_key`  
+
+Specifies the API KEY required for the `glm` model. The default value is empty.  
+
+#### `-gmodel, --glm_model`  
+
+Specifies the model name to be used for the `glm` model. The default value is `glm-asr-2512`.  
+
+#### `-gurl, --glm_url`  
+
+Specifies the API URL required for the `glm` model. The default value is: `https://open.bigmodel.cn/api/paas/v4/audio/transcriptions`.  
 
 #### `-tm, --translation_model`
 
@@ -226,13 +245,23 @@ This only applies to Vosk and SOSV models.
 
 #### `-omn, --ollama_name`
 
-Specify the Ollama model to call for translation. Default value is empty.
+Specifies the name of the translation model to be used, which can be either a local Ollama model or a cloud model compatible with the OpenAI API. If the Base URL field is not filled in, the local Ollama service will be called by default; otherwise, the API service at the specified address will be invoked via the Python OpenAI library.  
 
-It's recommended to use models with less than 1B parameters, such as: `qwen2.5:0.5b`, `qwen3:0.6b`.
+If using an Ollama model, it is recommended to use a model with fewer than 1B parameters, such as `qwen2.5:0.5b` or `qwen3:0.6b`. The corresponding model must be downloaded in Ollama for normal use.  
 
-Users need to download the corresponding model in Ollama to use it properly.
+The default value is empty and applies to models other than Gummy.  
 
-This only applies to Vosk and SOSV models.
+#### `-ourl, --ollama_url`
+
+The base request URL for calling the OpenAI API. If left blank, the local Ollama model on the default port will be called.  
+
+The default value is empty and applies to models other than Gummy.  
+
+#### `-okey, --ollama_api_key`
+
+Specifies the API KEY for calling OpenAI-compatible models.  
+
+The default value is empty and applies to models other than Gummy.  
 
 #### `-vosk, --vosk_model`
 
