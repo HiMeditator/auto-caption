@@ -8,7 +8,14 @@ __pycache__
 .venv
 test.py
 engine/build
+engine/dist
+engine/.venv
+engine/__pycache__
+engine/portaudio
+package-lock.json
+engine/pyinstaller_cache
 engine/models
 engine/notebook
 .repomap
 .virtualme
+engine/main.spec

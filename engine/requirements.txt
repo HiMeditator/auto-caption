@@ -8,3 +8,5 @@ pyaudiowpatch; sys_platform == 'win32'
 googletrans
 ollama
 sherpa_onnx
+requests
+openai

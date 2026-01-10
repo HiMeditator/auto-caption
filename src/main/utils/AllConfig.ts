@@ -6,7 +6,7 @@ import { Log } from './Log'
 import { app, BrowserWindow } from 'electron'
 import * as path from 'path'
 import * as fs from 'fs'
-import os from 'os'
+import * as os from 'os'
 
 interface CaptionTranslation {
   time_s: string,
@@ -44,13 +44,18 @@ const defaultControls: Controls = {
   sourceLang: 'en',
   targetLang: 'zh',
   transModel: 'ollama',
-  ollamaName: '',
+  ollamaName: 'qwen2.5:0.5b',
+  ollamaUrl: 'http://localhost:11434',
+  ollamaApiKey: '',
   engine: 'gummy',
   audio: 0,
   engineEnabled: false,
   API_KEY: '',
   voskModelPath: '',
   sosvModelPath: '',
+  glmUrl: 'https://open.bigmodel.cn/api/paas/v4/audio/transcriptions',
+  glmModel: 'glm-asr-2512',
+  glmApiKey: '',
   recordingPath: getDesktopPath(),
   translation: true,
   recording: false,
