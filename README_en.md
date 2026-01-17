@@ -35,6 +35,10 @@ SOSV Model Download: [Shepra-ONNX SenseVoice Model](https://github.com/HiMeditat
 
 [Changelog](./docs/CHANGELOG.md)
 
+## 👁️‍🗨️ Preview
+
+https://github.com/user-attachments/assets/9c188d78-9520-4397-bacf-4c8fdcc54874
+
 ## ✨ Features
 
 - Generate captions from audio output or microphone input

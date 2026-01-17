@@ -35,6 +35,10 @@ SOSV 模型下载：[ Shepra-ONNX SenseVoice Model](https://github.com/HiMeditat
 
 [更新日志](./docs/CHANGELOG.md)
 
+## 👁️‍🗨️ 预览
+
+https://github.com/user-attachments/assets/9c188d78-9520-4397-bacf-4c8fdcc54874
+
 ## ✨ 特性
 
 - 生成音频输出或麦克风输入的字幕

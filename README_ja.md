@@ -35,6 +35,10 @@ SOSV モデルダウンロード: [Shepra-ONNX SenseVoice Model](https://github.
 
 [更新履歴](./docs/CHANGELOG.md)
 
+## 👁️‍🗨️ プレビュー
+
+https://github.com/user-attachments/assets/9c188d78-9520-4397-bacf-4c8fdcc54874
+
 ## ✨ 特徴
 
 - 音声出力またはマイク入力からの字幕生成
