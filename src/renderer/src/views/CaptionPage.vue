@@ -61,7 +61,11 @@
       </template>
     </div>
 
-    <div class="title-bar" :style="{color: captionStyle.fontColor}">
+    <div class="title-bar"
+      :style="{color: captionStyle.fontColor}"
+      @mouseenter="onTitleBarEnter()"
+      @mouseleave="onTitleBarLeave()"
+    >
       <div class="option-item" @click="closeCaptionWindow">
         <CloseOutlined />
       </div>
@@ -96,7 +100,7 @@ const captionLog = useCaptionLogStore();
 const { captionData } = storeToRefs(captionLog);
 const caption = ref();
 const windowHeight = ref(100);
-const pinned = ref(true);
+const pinned = ref(false);
 
 onMounted(() => {
   const resizeObserver = new ResizeObserver(entries => {
@@ -114,7 +118,7 @@ onMounted(() => {
 
 function pinCaptionWindow() {
   pinned.value = !pinned.value;
-  window.electron.ipcRenderer.send('caption.pin.set', pinned.value)
+  window.electron.ipcRenderer.send('caption.mouseEvents.ignore', pinned.value)
 }
 
 function openControlWindow() {
@@ -123,6 +127,18 @@ function openControlWindow() {
 
 function closeCaptionWindow() {
   window.electron.ipcRenderer.send('caption.window.close')
+}
+
+function onTitleBarEnter() {
+  if(pinned.value) {
+    window.electron.ipcRenderer.send('caption.mouseEvents.ignore', false)
+  }
+}
+
+function onTitleBarLeave() {
+  if(pinned.value) {
+    window.electron.ipcRenderer.send('caption.mouseEvents.ignore', true)
+  }
 }
 </script>
 

@@ -145,7 +145,7 @@ export default {
       "projLink": "プロジェクトリンク",
       "manual": "ユーザーマニュアル",
       "engineDoc": "字幕エンジンマニュアル",
-      "date": "2026 年 1 月 10 日"
+      "date": "2026 年 1 月 31 日"
     }
   },
   log: {

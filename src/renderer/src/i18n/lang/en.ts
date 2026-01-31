@@ -146,7 +146,7 @@ export default {
       "projLink": "Project Link",
       "manual": "User Manual",
       "engineDoc": "Caption Engine Manual",
-      "date": "January 10th, 2026"
+      "date": "January 31, 2026"
     }
   },
   log: {

@@ -77,10 +77,9 @@ class CaptionWindow {
       }
     })
 
-    ipcMain.on('caption.pin.set', (_, pinned) => {
+    ipcMain.on('caption.mouseEvents.ignore', (_, ignore: boolean) => {
       if(this.window){
-        if(pinned) this.window.setAlwaysOnTop(true, 'screen-saver')
-        else this.window.setAlwaysOnTop(false)
+        this.window.setIgnoreMouseEvents(ignore, { forward: ignore })
       }
     })
   }

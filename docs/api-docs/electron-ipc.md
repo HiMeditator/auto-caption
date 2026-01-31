@@ -202,9 +202,9 @@
 
 **数据类型：** `number`
 
-### `caption.pin.set`
+### `caption.mouseEvents.ignore`
 
-**介绍：** 是否将窗口置顶
+**介绍：** 是否设置鼠标穿透
 
 **发起方：** 前端字幕窗口
 

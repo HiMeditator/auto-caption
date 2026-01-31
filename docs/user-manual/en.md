@@ -1,6 +1,6 @@
 # Auto Caption User Manual
 
-Corresponding Version: v1.1.0
+Corresponding Version: v1.1.1
 
 **Note: Due to limited personal resources, the English and Japanese documentation files for this project (except for the README document) will no longer be maintained. The content of this document may not be consistent with the latest version of the project. If you are willing to help with translation, please submit relevant Pull Requests.**
 
@@ -116,7 +116,7 @@ After completing all configurations, click the "Start Caption Engine" button on 
 
 ### Adjusting the Caption Display Window
 
-The following image shows the caption display window, which displays the latest captions in real-time. The three buttons in the upper right corner of the window have the following functions: pin the window to the front, open the caption control window, and close the caption display window. The width of the window can be adjusted by moving the mouse to the left or right edge of the window and dragging the mouse.
+The following image shows the caption display window, which displays the latest captions in real-time. The functions of the three buttons in the upper right corner of the window are: to close the caption display window, to open the caption control window, and to enable mouse pass-through. The width of the window can be adjusted by moving the mouse to the left or right edge of the window and dragging the mouse.
 
 ![](../img/01.png)
 
