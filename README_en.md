@@ -68,7 +68,7 @@ After downloading the software, you need to select the corresponding model accor
 
 |                                                              | Accuracy | Real-time | Deployment Type | Supported Languages | Translation | Notes |
 | ------------------------------------------------------------ | -------- | --------- | --------------- | ------------------- | ----------- | ----- |
-| [Gummy](https://help.aliyun.com/zh/model-studio/gummy-speech-recognition-translation) | Very good 😊 | Very good 😊 | Cloud / Alibaba Cloud | 10 languages | Built-in translation | Paid, 0.54 CNY/hour |
+| [Gummy](https://help.aliyun.com/zh/model-studio/gummy-speech-recognition-translation) | Very good 😊 | Very good 😊 | Cloud / Alibaba Cloud | 10 languages | Built-in translation | Paid, recognition 0.54 CNY/hour, recognition + translation 1.08 CNY/hour |
 | [glm-asr-2512](https://docs.bigmodel.cn/cn/guide/models/sound-and-video/glm-asr-2512) | Very good 😊 | Poor 😞 | Cloud / Zhipu AI | 4 languages | Requires additional configuration | Paid, approximately 0.72 CNY/hour |
 | [Vosk](https://alphacephei.com/vosk) | Poor 😞 | Very good 😊 | Local / CPU | Over 30 languages | Requires additional configuration | Supports many languages |
 | [SOSV](https://k2-fsa.github.io/sherpa/onnx/sense-voice/index.html) | Average 😐 | Average 😐 | Local / CPU | 5 languages | Requires additional configuration | Only one model |

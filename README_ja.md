@@ -69,7 +69,7 @@ macOS および Linux プラットフォームでシステムオーディオ出�
 
 |                                                              | 正確性 | 実時間性 | デプロイタイプ | 対応言語 | 翻訳 | 備考 |
 | ------------------------------------------------------------ | -------- | --------- | -------------- | -------- | ---- | ---- |
-| [Gummy](https://help.aliyun.com/zh/model-studio/gummy-speech-recognition-translation) | とても良い😊 | とても良い😊 | クラウド / アリババクラウド | 10言語 | 内蔵翻訳 | 有料、0.54元/時間 |
+| [Gummy](https://help.aliyun.com/zh/model-studio/gummy-speech-recognition-translation) | とても良い😊 | とても良い😊 | クラウド / アリババクラウド | 10言語 | 内蔵翻訳 | 有料、音声認識 0.54 CNY/時間、音声認識＋翻訳 1.08 CNY/時間 |
 | [glm-asr-2512](https://docs.bigmodel.cn/cn/guide/models/sound-and-video/glm-asr-2512) | とても良い😊 | 悪い😞 | クラウド / Zhipu AI | 4言語 | 追加設定が必要 | 有料、約0.72元/時間 |
 | [Vosk](https://alphacephei.com/vosk) | 悪い😞 | とても良い😊 | ローカル / CPU | 30言語以上 | 追加設定が必要 | 多くの言語に対応 |
 | [SOSV](https://k2-fsa.github.io/sherpa/onnx/sense-voice/index.html) | 普通😐 | 普通😐 | ローカル / CPU | 5言語 | 追加設定が必要 | 1つのモデルのみ |

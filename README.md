@@ -67,7 +67,7 @@ macOS 平台和 Linux 平台获取系统音频输出需要进行额外设置，�
 
 |                                                              | 准确率 | 实时性 | 部署类型          | 支持语言   | 翻译       | 备注                                                       |
 | ------------------------------------------------------------ | -------- | ------------- | ---------- | ---------- | ---------------------------------------------------------- | ---------------------------------------------------------- |
-| [Gummy](https://help.aliyun.com/zh/model-studio/gummy-speech-recognition-translation) | 很好😊    | 很好😊 | 云端 / 阿里云 | 10 种      | 自带翻译   | 收费，0.54CNY / 小时                                       |
+| [Gummy](https://help.aliyun.com/zh/model-studio/gummy-speech-recognition-translation) | 很好😊    | 很好😊 | 云端 / 阿里云 | 10 种      | 自带翻译   | 收费，识别0.54CNY / 小时，识别+翻译1.08CNY/小时           |
 | [glm-asr-2512](https://docs.bigmodel.cn/cn/guide/models/sound-and-video/glm-asr-2512) | 很好😊 | 较差😞 | 云端 / 智谱 AI | 4 种 | 需额外配置 | 收费，约 0.72CNY / 小时 |
 | [Vosk](https://alphacephei.com/vosk)                         | 较差😞    | 很好😊 | 本地 / CPU    | 超过 30 种 | 需额外配置 | 支持的语言非常多                                           |
 | [SOSV](https://k2-fsa.github.io/sherpa/onnx/sense-voice/index.html) | 一般😐    | 一般😐 | 本地 / CPU    | 5 种       | 需额外配置 | 仅有一个模型                                               |
