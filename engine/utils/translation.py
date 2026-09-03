@@ -1,4 +1,4 @@
-from ollama import chat, Client
+from ollama import chat
 from ollama import ChatResponse
 try:
     from openai import OpenAI
@@ -21,43 +21,14 @@ lang_map = {
     'zh-cn': 'Chinese'
 }
 
-def ollama_translate(model: str, target: str, text: str, time_s: str, url: str = '', key: str = ''):
-    content = ""
-    try:
-        if url:
-            if OpenAI:
-                client = OpenAI(base_url=url, api_key=key if key else "ollama")
-                openai_response = client.chat.completions.create(
-                    model=model,
-                    messages=[
-                        {"role": "system", "content": f"/no_think Translate the following content into {lang_map[target]}, and do not output any additional information."},
-                        {"role": "user", "content": text}
-                    ]
-                )
-                content = openai_response.choices[0].message.content or ""
-            else:
-                client = Client(host=url)
-                response: ChatResponse = client.chat(
-                    model=model,
-                    messages=[
-                        {"role": "system", "content": f"/no_think Translate the following content into {lang_map[target]}, and do not output any additional information."},
-                        {"role": "user", "content": text}
-                    ]
-                )
-                content = response.message.content or ""
-        else:
-            response: ChatResponse = chat(
-                model=model,
-                messages=[
-                    {"role": "system", "content": f"/no_think Translate the following content into {lang_map[target]}, and do not output any additional information."},
-                    {"role": "user", "content": text}
-                ]
-            )
-            content = response.message.content or ""
-    except Exception as e:
-        stdout_cmd("warn", f"Translation failed: {str(e)}")
-        return
+def _translation_messages(target: str, text: str):
+    return [
+        {"role": "system", "content": f"/no_think Translate the following content into {lang_map[target]}, and do not output any additional information."},
+        {"role": "user", "content": text}
+    ]
 
+
+def _output_translation(content: str, text: str, time_s: str):
     if content.startswith('<think>'):
         index = content.find('</think>')
         if index != -1:
@@ -69,7 +40,37 @@ def ollama_translate(model: str, target: str, text: str, time_s: str, url: str =
         "translation": content.strip()
     })
 
-def google_translate(model: str, target: str, text: str, time_s: str):
+
+def ollama_translate(model: str, target: str, text: str, time_s: str, base_url: str = '', api_key: str = ''):
+    content = ""
+    try:
+        response: ChatResponse = chat(model=model, messages=_translation_messages(target, text))
+        content = response.message.content or ""
+    except Exception as e:
+        stdout_cmd("warn", f"Ollama translation failed: {str(e)}")
+        return
+
+    _output_translation(content, text, time_s)
+
+
+def openai_translate(model: str, target: str, text: str, time_s: str, base_url: str = '', api_key: str = ''):
+    if OpenAI is None:
+        stdout_cmd("warn", "OpenAI translation failed: the openai package is not installed")
+        return
+    try:
+        client = OpenAI(base_url=base_url, api_key=api_key or "not-required")
+        response = client.chat.completions.create(
+            model=model,
+            messages=_translation_messages(target, text)
+        )
+        content = response.choices[0].message.content or ""
+    except Exception as e:
+        stdout_cmd("warn", f"OpenAI-compatible translation failed: {str(e)}")
+        return
+
+    _output_translation(content, text, time_s)
+
+def google_translate(model: str, target: str, text: str, time_s: str, base_url: str = '', api_key: str = ''):
     translator = Translator()
     try:
         res = asyncio.run(translator.translate(text, dest=target))
@@ -79,5 +80,13 @@ def google_translate(model: str, target: str, text: str, time_s: str):
             "text": text,
             "translation": res.text
         })
-    except Exception as e:
+    except Exception:
         stdout_cmd("warn", f"Google translation request failed, please check your network connection...")
+
+
+def get_translation_function(provider: str):
+    return {
+        'ollama': ollama_translate,
+        'openai': openai_translate,
+        'google': google_translate
+    }[provider]

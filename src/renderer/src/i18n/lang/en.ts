@@ -29,8 +29,8 @@ export default {
     "styleChange": "Caption Style Changed",
     "styleInfo": "Caption style changes have been saved and applied.",
     "engineStartTimeout": "Caption engine startup timeout, automatically force stopped",
-    "ollamaNameNull": "'Ollama' Field is Empty",
-    "ollamaNameNullNote": "When selecting Ollama model as the translation model, the 'Ollama' field cannot be empty and must be filled with the name of a locally configured Ollama model."
+    "translationConfigMissing": "Incomplete Translation Service Configuration",
+    "translationConfigMissingNote": "Enter the model name required by the selected translation service. OpenAI-compatible services also require a Base URL."
   },
   general: {
     "title": "General Settings",
@@ -49,11 +49,12 @@ export default {
     "cancelChange": "Cancel Changes",
     "sourceLang": "Source",
     "transLang": "Translation",
-    "transModel": "Model",
+    "translationProvider": "Translation Service",
     "modelName": "Model Name",
-    "modelNameNote": "Please enter the translation model name you wish to use, which can be either a local Ollama model or an OpenAI API compatible cloud model. If the Base URL field is left blank, the local Ollama service will be called by default; otherwise, the API service at the specified address will be called via the Python OpenAI library.",
-    "baseURL": "The base request URL for calling OpenAI API. If left empty, the local default port Ollama model will be used.",
-    "apiKey": "The API KEY required for the model corresponding to OpenAI API.",
+    "ollamaModelNote": "Enter the name of a model installed in the local Ollama instance. Ollama uses its default local service address.",
+    "openaiModelNote": "Enter the model name provided by the OpenAI-compatible service.",
+    "baseURL": "The base URL of the OpenAI-compatible service, for example https://api.openai.com/v1.",
+    "apiKey": "The API key required by the OpenAI-compatible service.",
     "captionEngine": "Engine",
     "audioType": "Audio Type",
     "systemOutput": "System Audio Output (Speaker)",

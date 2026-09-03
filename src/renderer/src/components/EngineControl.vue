@@ -30,18 +30,18 @@
         :options="tLangList"
       ></a-select>
     </div>
-    <div class="input-item" v-if="transModel">
-      <span class="input-label">{{ $t('engine.transModel') }}</span>
+    <div class="input-item" v-if="translationProviders.length">
+      <span class="input-label">{{ $t('engine.translationProvider') }}</span>
       <a-select
         class="input-area"
-        v-model:value="currentTransModel"
-        :options="transModel"
+        v-model:value="currentTranslationProvider"
+        :options="translationProviders"
       ></a-select>
     </div>
-    <div class="input-item" v-if="transModel && currentTransModel === 'ollama'">
+    <div class="input-item" v-if="translationProviders.length && currentTranslationProvider === 'ollama'">
       <a-popover placement="right">
         <template #content>
-          <p class="label-hover-info">{{ $t('engine.modelNameNote') }}</p>
+          <p class="label-hover-info">{{ $t('engine.ollamaModelNote') }}</p>
         </template>
         <span class="input-label info-label"
           :style="{color: uiColor}"
@@ -49,10 +49,24 @@
       </a-popover>
       <a-input
         class="input-area"
-        v-model:value="currentOllamaName"
+        v-model:value="currentOllamaModel"
       ></a-input>
     </div>
-    <div class="input-item" v-if="transModel && currentTransModel === 'ollama'">
+    <div class="input-item" v-if="translationProviders.length && currentTranslationProvider === 'openai'">
+      <a-popover placement="right">
+        <template #content>
+          <p class="label-hover-info">{{ $t('engine.openaiModelNote') }}</p>
+        </template>
+        <span class="input-label info-label"
+          :style="{color: uiColor}"
+        >{{ $t('engine.modelName') }}</span>
+      </a-popover>
+      <a-input
+        class="input-area"
+        v-model:value="currentOpenaiModel"
+      ></a-input>
+    </div>
+    <div class="input-item" v-if="translationProviders.length && currentTranslationProvider === 'openai'">
       <a-popover placement="right">
         <template #content>
           <p class="label-hover-info">{{ $t('engine.baseURL') }}</p>
@@ -63,11 +77,11 @@
       </a-popover>
       <a-input
         class="input-area"
-        v-model:value="currentOllamaUrl"
-        placeholder="http://localhost:11434"
+        v-model:value="currentOpenaiBaseUrl"
+        placeholder="https://api.openai.com/v1"
       ></a-input>
     </div>
-    <div class="input-item" v-if="transModel && currentTransModel === 'ollama'">
+    <div class="input-item" v-if="translationProviders.length && currentTranslationProvider === 'openai'">
       <a-popover placement="right">
         <template #content>
           <p class="label-hover-info">{{ $t('engine.apiKey') }}</p>
@@ -79,7 +93,7 @@
       <a-input
           class="input-area"
           type="password"
-          v-model:value="currentOllamaApiKey"
+          v-model:value="currentOpenaiApiKey"
       />
     </div>
     <div class="input-item" v-if="currentEngine === 'glm'">
@@ -166,7 +180,7 @@
         <a-input
           class="input-area"
           type="password"
-          v-model:value="currentAPI_KEY"
+          v-model:value="currentGummyApiKey"
         />
       </div>
       <div class="input-item">
@@ -301,11 +315,12 @@ const currentEngine = ref<string>('gummy')
 const currentAudio = ref<0 | 1>(0)
 const currentTranslation = ref<boolean>(true)
 const currentRecording = ref<boolean>(false)
-const currentTransModel = ref('ollama')
-const currentOllamaName = ref('')
-const currentOllamaUrl = ref('')
-const currentOllamaApiKey = ref('')
-const currentAPI_KEY = ref<string>('')
+const currentTranslationProvider = ref<'ollama' | 'openai' | 'google'>('ollama')
+const currentOllamaModel = ref('')
+const currentOpenaiModel = ref('')
+const currentOpenaiBaseUrl = ref('https://api.openai.com/v1')
+const currentOpenaiApiKey = ref('')
+const currentGummyApiKey = ref<string>('')
 const currentVoskModelPath = ref<string>('')
 const currentSosvModelPath = ref<string>('')
 const currentGlmUrl = ref<string>('')
@@ -335,10 +350,10 @@ const tLangList = computed(() => {
   return []
 })
 
-const transModel = computed(() => {
+const translationProviders = computed(() => {
   for(let item of captionEngine.value){
     if(item.value === currentEngine.value) {
-      return item.transModel
+      return item.translationProviders ?? []
     }
   }
   return []
@@ -346,12 +361,14 @@ const transModel = computed(() => {
 
 function applyChange(){
   if(
-    currentTranslation.value && transModel.value &&
-    currentTransModel.value === 'ollama' && !currentOllamaName.value.trim()
+    currentTranslation.value && translationProviders.value.length &&
+    ((currentTranslationProvider.value === 'ollama' && !currentOllamaModel.value.trim()) ||
+      (currentTranslationProvider.value === 'openai' &&
+        (!currentOpenaiModel.value.trim() || !currentOpenaiBaseUrl.value.trim())))
   ) {
     notification.open({
-      message: t('noti.ollamaNameNull'),
-      description: t('noti.ollamaNameNullNote'),
+      message: t('noti.translationConfigMissing'),
+      description: t('noti.translationConfigMissingNote'),
       duration: null,
       icon: () => h(ExclamationCircleOutlined, { style: 'color: #ff4d4f' })
     })
@@ -360,15 +377,16 @@ function applyChange(){
 
   engineControl.sourceLang = currentSourceLang.value
   engineControl.targetLang = currentTargetLang.value
-  engineControl.transModel = currentTransModel.value
-  engineControl.ollamaName = currentOllamaName.value
+  engineControl.translationProvider = currentTranslationProvider.value
+  engineControl.ollamaModel = currentOllamaModel.value
   engineControl.engine = currentEngine.value
-  engineControl.ollamaUrl = currentOllamaUrl.value ?? "http://localhost:11434"
-  engineControl.ollamaApiKey = currentOllamaApiKey.value
+  engineControl.openaiModel = currentOpenaiModel.value
+  engineControl.openaiBaseUrl = currentOpenaiBaseUrl.value || "https://api.openai.com/v1"
+  engineControl.openaiApiKey = currentOpenaiApiKey.value
   engineControl.audio = currentAudio.value
   engineControl.translation = currentTranslation.value
   engineControl.recording = currentRecording.value
-  engineControl.API_KEY = currentAPI_KEY.value
+  engineControl.gummyApiKey = currentGummyApiKey.value
   engineControl.voskModelPath = currentVoskModelPath.value
   engineControl.sosvModelPath = currentSosvModelPath.value
   engineControl.glmUrl = currentGlmUrl.value ?? "https://open.bigmodel.cn/api/paas/v4/audio/transcriptions"
@@ -392,15 +410,16 @@ function applyChange(){
 function cancelChange(){
   currentSourceLang.value = engineControl.sourceLang
   currentTargetLang.value = engineControl.targetLang
-  currentTransModel.value = engineControl.transModel
-  currentOllamaName.value = engineControl.ollamaName
-  currentOllamaUrl.value = engineControl.ollamaUrl
-  currentOllamaApiKey.value = engineControl.ollamaApiKey
+  currentTranslationProvider.value = engineControl.translationProvider
+  currentOllamaModel.value = engineControl.ollamaModel
+  currentOpenaiModel.value = engineControl.openaiModel
+  currentOpenaiBaseUrl.value = engineControl.openaiBaseUrl
+  currentOpenaiApiKey.value = engineControl.openaiApiKey
   currentEngine.value = engineControl.engine
   currentAudio.value = engineControl.audio
   currentTranslation.value = engineControl.translation
   currentRecording.value = engineControl.recording
-  currentAPI_KEY.value = engineControl.API_KEY
+  currentGummyApiKey.value = engineControl.gummyApiKey
   currentVoskModelPath.value = engineControl.voskModelPath
   currentSosvModelPath.value = engineControl.sosvModelPath
   currentGlmUrl.value = engineControl.glmUrl

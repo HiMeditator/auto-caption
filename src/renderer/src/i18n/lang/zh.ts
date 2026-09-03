@@ -29,8 +29,8 @@ export default {
     "styleChange": "字幕样式已修改",
     "styleInfo": "字幕样式修改已经保存并生效",
     "engineStartTimeout": "字幕引擎启动超时，已自动强制停止",
-    "ollamaNameNull": "Ollama 字段为空",
-    "ollamaNameNullNote": "选择 Ollama 模型作为翻译模型时，Ollama 字段不能为空，需要填写本地已经配置好的 Ollama 模型的名称。"
+    "translationConfigMissing": "翻译服务配置不完整",
+    "translationConfigMissingNote": "请填写所选翻译服务所需的模型名称；OpenAI 兼容服务还必须填写 Base URL。"
   },
   general: {
     "title": "通用设置",
@@ -49,11 +49,12 @@ export default {
     "cancelChange": "取消更改",
     "sourceLang": "源语言",
     "transLang": "翻译语言",
-    "transModel": "翻译模型",
+    "translationProvider": "翻译服务",
     "modelName": "模型名称",
-    "modelNameNote": "请输入要使用的翻译模型名称，可以是 Ollama 本地模型，也可以是 OpenAI API 兼容的云端模型。若未填写 Base URL 字段，则默认调用本地 Ollama 服务，否则会通过 Python OpenAI 库调用该地址指向的 API 服务。",
-    "baseURL": "调用 OpenAI API 的基础请求地址，如果不填写则调用本地默认端口的 Ollama 模型。",
-    "apiKey": "调用 OpenAI API 对应的模型需要使用的 API KEY。",
+    "ollamaModelNote": "请输入已在本地 Ollama 中安装的模型名称。Ollama 使用本机默认服务地址。",
+    "openaiModelNote": "请输入 OpenAI API 兼容服务提供的模型名称。",
+    "baseURL": "OpenAI API 兼容服务的基础请求地址，例如 https://api.openai.com/v1。",
+    "apiKey": "OpenAI API 兼容服务所需的 API Key。",
     "captionEngine": "字幕引擎",
     "audioType": "音频类型",
     "systemOutput": "系统音频输出（扬声器）",

@@ -164,7 +164,7 @@ if __name__ == "__main__":
     # gummy専用
     parser.add_argument('-s', '--source_language', default='en', help='ソース言語コード')
     parser.add_argument('-t', '--target_language', default='zh', help='ターゲット言語コード')
-    parser.add_argument('-k', '--api_key', default='', help='GummyモデルのAPI KEY')
+    parser.add_argument('--gummy_api_key', default='', help='GummyモデルのAPI KEY')
     # vosk専用
     parser.add_argument('-m', '--model_path', default='', help='voskモデルのパス')
 ```
@@ -172,7 +172,7 @@ if __name__ == "__main__":
 たとえば、このプロジェクトの字幕エンジンでGummyモデルを使用し、原文を日本語、翻訳を中国語に指定し、システムオーディオ出力の字幕を取得し、毎回0.1秒のオーディオデータをキャプチャする場合、コマンドラインパラメータは以下のようになります：
 
 ```bash
-python main.py -e gummy -s ja -t zh -a 0 -c 10 -k <dashscope-api-key>
+python main.py -e gummy -s ja -t zh -a 0 -c 10 --gummy_api_key <dashscope-api-key>
 ```
 
 ## その他

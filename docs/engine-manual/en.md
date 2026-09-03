@@ -144,10 +144,11 @@ Some speech-to-text models do not provide translation. If needed, an additional 
 Example:
 
 ```python
-from utils import google_translate, ollama_translate
+from utils import google_translate, ollama_translate, openai_translate
 text = "This is a translation test."
 google_translate("", "en", text, "time_s")
 ollama_translate("qwen3:0.6b", "en", text, "time_s")
+openai_translate("gpt-4.1-mini", "en", text, "time_s", "https://api.openai.com/v1", "<api-key>")
 ```
 
 ### Caption Data Transmission
@@ -187,10 +188,12 @@ if __name__ == "__main__":
     # gummy and sosv
     parser.add_argument('-s', '--source_language', default='auto', help='Source language code')
     # gummy only
-    parser.add_argument('-k', '--api_key', default='', help='API KEY for Gummy model')
-    # vosk and sosv
-    parser.add_argument('-tm', '--translation_model', default='ollama', help='Model for translation: ollama or google')
-    parser.add_argument('-omn', '--ollama_name', default='', help='Ollama model name for translation')
+    parser.add_argument('--gummy_api_key', default='', help='API key for the Gummy caption engine')
+    # vosk, sosv and glm translation
+    parser.add_argument('--translation_provider', choices=['ollama', 'openai', 'google'], default='ollama', help='Translation service provider')
+    parser.add_argument('--translation_model', default='', help='Translation model name')
+    parser.add_argument('--translation_base_url', default='', help='OpenAI-compatible API base URL')
+    parser.add_argument('--translation_api_key', default='', help='OpenAI-compatible API key')
     # vosk only
     parser.add_argument('-vosk', '--vosk_model', default='', help='The path to the vosk model.')
     # sosv only
@@ -200,7 +203,7 @@ if __name__ == "__main__":
 For example, for this project's caption engine, if I want to use the Gummy model, specify the original text as Japanese, translate to Chinese, and capture captions from system audio output, with 0.1s audio data segments each time, the command line parameters would be:
 
 ```bash
-python main.py -e gummy -s ja -t zh -a 0 -c 10 -k <dashscope-api-key>
+python main.py -e gummy -s ja -t zh -a 0 -c 10 --gummy_api_key <dashscope-api-key>
 ```
 
 ## Additional Notes  
@@ -228,4 +231,4 @@ After development and testing, the caption engine must be packaged into an execu
 
 With a functional caption engine, it can be launched in the caption software window by specifying the engine's path and runtime arguments.  
 
-![](../img/02_en.png)  
+![](../img/02_en.png)

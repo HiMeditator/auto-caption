@@ -86,11 +86,11 @@ If you choose a model other than Gummy, you also need to configure your own tran
 
 > Note: Using models with too many parameters will lead to high resource consumption and translation delays. It is recommended to use models with less than 1B parameters, such as: `qwen2.5:0.5b`, `qwen3:0.6b`.
 
-Before using this model, you need to confirm that the [Ollama](https://ollama.com/) software is installed on your local machine and that you have downloaded the required large language model. Simply add the name of the large model you want to call to the `Model Name` field in the settings, and ensure that the `Base URL` field is empty.
+Before using this model, confirm that [Ollama](https://ollama.com/) is installed locally and that the required model has been downloaded. Select `Ollama Local Model` as the translation service and enter the model name; Ollama uses its default local service address.
 
 #### OpenAI Compatible Model
 
-If you feel the translation effect of the local Ollama model is not good enough, or don't want to install the Ollama model locally, then you can use cloud-based OpenAI compatible models.
+If the local Ollama model is not suitable, select `OpenAI-compatible Model` as the translation service and enter its model name, Base URL, and API key separately.
 
 Here are some model provider `Base URL`s:
 - OpenAI: https://api.openai.com/v1
@@ -146,7 +146,7 @@ For runtime parameters and detailed usage instructions, please refer to the [Use
 ```bash
 python main.py \
 -e gummy \
--k sk-******************************** \
+--gummy_api_key sk-******************************** \
 -a 0 \
 -d 1 \
 -s en \

@@ -19,15 +19,16 @@ export const useEngineControlStore = defineStore('engineControl', () => {
   const engineEnabled = ref(false)
   const sourceLang = ref<string>('en')
   const targetLang = ref<string>('zh')
-  const transModel = ref<string>('ollama')
-  const ollamaName = ref<string>('')
-  const ollamaUrl = ref<string>('')
-  const ollamaApiKey = ref<string>('')
+  const translationProvider = ref<'ollama' | 'openai' | 'google'>('ollama')
+  const ollamaModel = ref<string>('')
+  const openaiModel = ref<string>('')
+  const openaiBaseUrl = ref<string>('https://api.openai.com/v1')
+  const openaiApiKey = ref<string>('')
   const engine = ref<string>('gummy')
   const audio = ref<0 | 1>(0)
   const translation = ref<boolean>(true)
   const recording = ref<boolean>(false)
-  const API_KEY = ref<string>('')
+  const gummyApiKey = ref<string>('')
   const voskModelPath = ref<string>('')
   const sosvModelPath = ref<string>('')
   const glmUrl = ref<string>('https://open.bigmodel.cn/api/paas/v4/audio/transcriptions')
@@ -47,15 +48,16 @@ export const useEngineControlStore = defineStore('engineControl', () => {
       engineEnabled: engineEnabled.value,
       sourceLang: sourceLang.value,
       targetLang: targetLang.value,
-      transModel: transModel.value,
-      ollamaName: ollamaName.value,
-      ollamaUrl: ollamaUrl.value,
-      ollamaApiKey: ollamaApiKey.value,
+      translationProvider: translationProvider.value,
+      ollamaModel: ollamaModel.value,
+      openaiModel: openaiModel.value,
+      openaiBaseUrl: openaiBaseUrl.value,
+      openaiApiKey: openaiApiKey.value,
       engine: engine.value,
       audio: audio.value,
       translation: translation.value,
       recording: recording.value,
-      API_KEY: API_KEY.value,
+      gummyApiKey: gummyApiKey.value,
       voskModelPath: voskModelPath.value,
       sosvModelPath: sosvModelPath.value,
       glmUrl: glmUrl.value,
@@ -88,16 +90,17 @@ export const useEngineControlStore = defineStore('engineControl', () => {
     }
     sourceLang.value = controls.sourceLang
     targetLang.value = controls.targetLang
-    transModel.value = controls.transModel
-    ollamaName.value = controls.ollamaName
-    ollamaUrl.value = controls.ollamaUrl
-    ollamaApiKey.value = controls.ollamaApiKey
+    translationProvider.value = controls.translationProvider
+    ollamaModel.value = controls.ollamaModel
+    openaiModel.value = controls.openaiModel
+    openaiBaseUrl.value = controls.openaiBaseUrl
+    openaiApiKey.value = controls.openaiApiKey
     engine.value = controls.engine
     audio.value = controls.audio
     engineEnabled.value = controls.engineEnabled
     translation.value = controls.translation
     recording.value = controls.recording
-    API_KEY.value = controls.API_KEY
+    gummyApiKey.value = controls.gummyApiKey
     voskModelPath.value = controls.voskModelPath
     sosvModelPath.value = controls.sosvModelPath
     glmUrl.value = controls.glmUrl || 'https://open.bigmodel.cn/api/paas/v4/audio/transcriptions'
@@ -163,15 +166,16 @@ export const useEngineControlStore = defineStore('engineControl', () => {
     engineEnabled,      // 字幕引擎是否启用
     sourceLang,         // 源语言
     targetLang,         // 目标语言
-    transModel,         // 翻译模型
-    ollamaName,         // Ollama 模型
-    ollamaUrl,
-    ollamaApiKey,
+    translationProvider, // 翻译服务
+    ollamaModel,         // Ollama 模型
+    openaiModel,         // OpenAI 兼容模型
+    openaiBaseUrl,
+    openaiApiKey,
     engine,             // 字幕引擎
     audio,              // 选择音频
     translation,        // 是否启用翻译
     recording,          // 是否启用录音
-    API_KEY,            // API KEY
+    gummyApiKey,        // Gummy API Key
     voskModelPath,      // vosk 模型路径
     sosvModelPath,      // sosv 模型路径
     glmUrl,             // GLM API URL

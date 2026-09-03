@@ -75,25 +75,25 @@ def main_gummy(s: str, t: str, a: int, c: int, k: str, r: bool, rp: str):
     engine.stop()
 
 
-def main_vosk(a: int, c: int, vosk: str, t: str, tm: str, omn: str, ourl: str, okey: str, r: bool, rp: str):
+def main_vosk(a: int, c: int, vosk: str, t: str, translation_provider: str, translation_model: str, translation_base_url: str, translation_api_key: str, r: bool, rp: str):
     """
     Parameters:
         a: Audio source: 0 for output, 1 for input
         c: Chunk number in 1 second
         vosk: Vosk model path
         t: Target language
-        tm: Translation model type, ollama or google
-        omn: Ollama model name
-        ourl: Ollama Base URL
-        okey: Ollama API Key
+        translation_provider: Translation service: ollama, openai or google
+        translation_model: Model name used by the translation service
+        translation_base_url: OpenAI-compatible API base URL
+        translation_api_key: OpenAI-compatible API key
         r: Whether to record the audio
         rp: Path to save the recorded audio
     """
     stream = AudioStream(a, c)
     if t == 'none':
-        engine = VoskRecognizer(vosk, None, tm, omn, ourl, okey)
+        engine = VoskRecognizer(vosk, None, translation_provider, translation_model, translation_base_url, translation_api_key)
     else:
-        engine = VoskRecognizer(vosk, t, tm, omn, ourl, okey)
+        engine = VoskRecognizer(vosk, t, translation_provider, translation_model, translation_base_url, translation_api_key)
 
     engine.start()
     stream_thread = threading.Thread(
@@ -109,7 +109,7 @@ def main_vosk(a: int, c: int, vosk: str, t: str, tm: str, omn: str, ourl: str, o
     engine.stop()
 
 
-def main_sosv(a: int, c: int, sosv: str, s: str, t: str, tm: str, omn: str, ourl: str, okey: str, r: bool, rp: str):
+def main_sosv(a: int, c: int, sosv: str, s: str, t: str, translation_provider: str, translation_model: str, translation_base_url: str, translation_api_key: str, r: bool, rp: str):
     """
     Parameters:
         a: Audio source: 0 for output, 1 for input
@@ -117,18 +117,18 @@ def main_sosv(a: int, c: int, sosv: str, s: str, t: str, tm: str, omn: str, ourl
         sosv: Sherpa-ONNX SenseVoice model path
         s: Source language
         t: Target language
-        tm: Translation model type, ollama or google
-        omn: Ollama model name
-        ourl: Ollama API URL
-        okey: Ollama API Key
+        translation_provider: Translation service: ollama, openai or google
+        translation_model: Model name used by the translation service
+        translation_base_url: OpenAI-compatible API base URL
+        translation_api_key: OpenAI-compatible API key
         r: Whether to record the audio
         rp: Path to save the recorded audio
     """
     stream = AudioStream(a, c)
     if t == 'none':
-        engine = SosvRecognizer(sosv, s, None, tm, omn, ourl, okey)
+        engine = SosvRecognizer(sosv, s, None, translation_provider, translation_model, translation_base_url, translation_api_key)
     else:
-        engine = SosvRecognizer(sosv, s, t, tm, omn, ourl, okey)
+        engine = SosvRecognizer(sosv, s, t, translation_provider, translation_model, translation_base_url, translation_api_key)
 
     engine.start()
     stream_thread = threading.Thread(
@@ -144,7 +144,7 @@ def main_sosv(a: int, c: int, sosv: str, s: str, t: str, tm: str, omn: str, ourl
     engine.stop()
 
 
-def main_glm(a: int, c: int, url: str, model: str, key: str, s: str, t: str, tm: str, omn: str, ourl: str, okey: str, r: bool, rp: str):
+def main_glm(a: int, c: int, url: str, model: str, key: str, s: str, t: str, translation_provider: str, translation_model: str, translation_base_url: str, translation_api_key: str, r: bool, rp: str):
     """
     Parameters:
         a: Audio source
@@ -154,18 +154,18 @@ def main_glm(a: int, c: int, url: str, model: str, key: str, s: str, t: str, tm:
         key: GLM API Key
         s: Source language
         t: Target language
-        tm: Translation model
-        omn: Ollama model name
-        ourl: Ollama API URL
-        okey: Ollama API Key
+        translation_provider: Translation service: ollama, openai or google
+        translation_model: Model name used by the translation service
+        translation_base_url: OpenAI-compatible API base URL
+        translation_api_key: OpenAI-compatible API key
         r: Record
         rp: Record path
     """
     stream = AudioStream(a, c)
     if t == 'none':
-        engine = GlmRecognizer(url, model, key, s, None, tm, omn, ourl, okey)
+        engine = GlmRecognizer(url, model, key, s, None, translation_provider, translation_model, translation_base_url, translation_api_key)
     else:
-        engine = GlmRecognizer(url, model, key, s, t, tm, omn, ourl, okey)
+        engine = GlmRecognizer(url, model, key, s, t, translation_provider, translation_model, translation_base_url, translation_api_key)
     
     engine.start()
     stream_thread = threading.Thread(
@@ -196,12 +196,12 @@ if __name__ == "__main__":
     # gummy and sosv and glm
     parser.add_argument('-s', '--source_language', default='auto', help='Source language code')
     # gummy only
-    parser.add_argument('-k', '--api_key', default='', help='API KEY for Gummy model')
-    # vosk and sosv
-    parser.add_argument('-tm', '--translation_model', default='ollama', help='Model for translation: ollama or google')
-    parser.add_argument('-omn', '--ollama_name', default='', help='Ollama model name for translation')
-    parser.add_argument('-ourl', '--ollama_url', default='', help='Ollama API URL')
-    parser.add_argument('-okey', '--ollama_api_key', default='', help='Ollama API Key')
+    parser.add_argument('--gummy_api_key', default='', help='API key for the Gummy caption engine')
+    # vosk, sosv and glm translation
+    parser.add_argument('--translation_provider', choices=['ollama', 'openai', 'google'], default='ollama', help='Translation service provider')
+    parser.add_argument('--translation_model', default='', help='Translation model name (for Ollama or OpenAI-compatible services)')
+    parser.add_argument('--translation_base_url', default='', help='OpenAI-compatible API base URL')
+    parser.add_argument('--translation_api_key', default='', help='OpenAI-compatible API key')
     # vosk only
     parser.add_argument('-vosk', '--vosk_model', default='', help='The path to the vosk model.')
     # sosv only
@@ -212,6 +212,12 @@ if __name__ == "__main__":
     parser.add_argument('-gkey', '--glm_api_key', default='', help='GLM API Key')
 
     args = parser.parse_args()
+
+    uses_external_translation = args.caption_engine != 'gummy' and args.target_language != 'none'
+    if uses_external_translation and args.translation_provider in ('ollama', 'openai') and not args.translation_model:
+        parser.error('--translation_model is required when translation is enabled with Ollama or OpenAI')
+    if uses_external_translation and args.translation_provider == 'openai' and not args.translation_base_url:
+        parser.error('--translation_base_url is required when translation is enabled with OpenAI')
 
     if args.port != 0:
         threading.Thread(target=start_server, args=(args.port,), daemon=True).start()
@@ -225,7 +231,7 @@ if __name__ == "__main__":
             args.target_language,
             int(args.audio_type),
             int(args.chunk_rate),
-            args.api_key,
+            args.gummy_api_key,
             bool(int(args.record)),
             args.record_path
         )
@@ -235,10 +241,10 @@ if __name__ == "__main__":
             int(args.chunk_rate),
             args.vosk_model,
             args.target_language,
+            args.translation_provider,
             args.translation_model,
-            args.ollama_name,
-            args.ollama_url,
-            args.ollama_api_key,
+            args.translation_base_url,
+            args.translation_api_key,
             bool(int(args.record)),
             args.record_path
         )
@@ -249,10 +255,10 @@ if __name__ == "__main__":
             args.sosv_model,
             args.source_language,
             args.target_language,
+            args.translation_provider,
             args.translation_model,
-            args.ollama_name,
-            args.ollama_url,
-            args.ollama_api_key,
+            args.translation_base_url,
+            args.translation_api_key,
             bool(int(args.record)),
             args.record_path
         )
@@ -265,10 +271,10 @@ if __name__ == "__main__":
             args.glm_api_key,
             args.source_language,
             args.target_language,
+            args.translation_provider,
             args.translation_model,
-            args.ollama_name,
-            args.ollama_url,
-            args.ollama_api_key,
+            args.translation_base_url,
+            args.translation_api_key,
             bool(int(args.record)),
             args.record_path
         )

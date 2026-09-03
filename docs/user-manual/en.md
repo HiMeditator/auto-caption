@@ -212,7 +212,7 @@ The GLM model supports specifying the following languages: English, Chinese, Jap
 
 The SOSV model supports specifying the following languages: English, Chinese, Japanese, Korean, and Cantonese.
 
-#### `-k, --api_key`
+#### `--gummy_api_key`
 
 Specify the Alibaba Cloud API KEY required for the `Gummy` model.
 
@@ -232,34 +232,35 @@ Specifies the model name to be used for the `glm` model. The default value is `g
 
 Specifies the API URL required for the `glm` model. The default value is: `https://open.bigmodel.cn/api/paas/v4/audio/transcriptions`.  
 
-#### `-tm, --translation_model`
+#### `--translation_provider`
 
-Specify the translation method for Vosk and SOSV models. Default is `ollama`.
+Specifies the translation service used by the Vosk, SOSV, and GLM caption engines. The default is `ollama`.
 
 Supported values are:
 
 - `ollama` Use local Ollama model for translation. Users need to install Ollama software and corresponding models
+- `openai` Use an OpenAI API-compatible translation service
 - `google` Use Google Translate API for translation. No additional configuration needed, but requires network access to Google
 
-This only applies to Vosk and SOSV models.
+This only applies to caption engines without built-in translation.
 
-#### `-omn, --ollama_name`
+#### `--translation_model`
 
-Specifies the name of the translation model to be used, which can be either a local Ollama model or a cloud model compatible with the OpenAI API. If the Base URL field is not filled in, the local Ollama service will be called by default; otherwise, the API service at the specified address will be invoked via the Python OpenAI library.  
+Specifies the model name used by Ollama or an OpenAI-compatible service. Google Translate does not use this option.
 
 If using an Ollama model, it is recommended to use a model with fewer than 1B parameters, such as `qwen2.5:0.5b` or `qwen3:0.6b`. The corresponding model must be downloaded in Ollama for normal use.  
 
 The default value is empty and applies to models other than Gummy.  
 
-#### `-ourl, --ollama_url`
+#### `--translation_base_url`
 
-The base request URL for calling the OpenAI API. If left blank, the local Ollama model on the default port will be called.  
+The base URL of the OpenAI-compatible service, such as `https://api.openai.com/v1`. Used only with `--translation_provider openai`.
 
 The default value is empty and applies to models other than Gummy.  
 
-#### `-okey, --ollama_api_key`
+#### `--translation_api_key`
 
-Specifies the API KEY for calling OpenAI-compatible models.  
+Specifies the API key for the OpenAI-compatible service. Used only with `--translation_provider openai`.
 
 The default value is empty and applies to models other than Gummy.  
 
@@ -290,7 +291,7 @@ For example, to use the Gummy model, specify audio type as system audio output, 
 ```bash
 python main.py \
 -e gummy \
--k sk-******************************** \
+--gummy_api_key sk-******************************** \
 -a 0 \
 -d 1 \
 -s en \
@@ -306,6 +307,21 @@ python main.py \
 -a 0 \
 -d 1 \
 -t en \
+--translation_provider ollama \
+--translation_model qwen3:0.6b
+```
+
+To use an OpenAI-compatible service instead, specify the service type, model, and Base URL explicitly:
+
+```bash
+python main.py \
+-e vosk \
+-vosk D:\Projects\auto-caption\engine\models\vosk-model-small-cn-0.22 \
+-t en \
+--translation_provider openai \
+--translation_model gpt-4.1-mini \
+--translation_base_url https://api.openai.com/v1 \
+--translation_api_key sk-********************************
 ```
 
 To specify the SOSV model, audio type as microphone, automatically select source language, and no translation:

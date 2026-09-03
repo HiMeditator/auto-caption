@@ -85,11 +85,11 @@ macOS 平台和 Linux 平台获取系统音频输出需要进行额外设置，�
 
 > 注意：使用参数量过大的模型会导致资源消耗和翻译延迟较大。建议使用参数量小于 1B 的模型，比如： `qwen2.5:0.5b`, `qwen3:0.6b`。
 
-使用该模型之前你需要确定本机安装了 [Ollama](https://ollama.com/) 软件，并已经下载了需要的大语言模型。只需要将需要调用的大模型名称添加到设置中的 `模型名称` 字段中，并保证 `Base URL` 字段为空。
+使用该模型之前你需要确定本机安装了 [Ollama](https://ollama.com/) 软件，并已经下载了需要的大语言模型。在“翻译服务”中选择 `Ollama 本地模型`，再填写模型名称即可；Ollama 会使用本机默认服务地址。
 
 #### OpenAI 兼容模型
 
-如果觉得本地 Ollama 模型的翻译效果不佳，或者不想在本地安装 Ollama 模型，那么可以使用云端的 OpenAI 兼容模型。
+如果觉得本地 Ollama 模型的翻译效果不佳，或者不想在本地安装 Ollama 模型，那么可以在“翻译服务”中选择 `OpenAI 兼容模型`，并分别填写模型名称、Base URL 和 API Key。
 
 以下是一些模型提供商的 `Base URL`：
 - OpenAI: https://api.openai.com/v1
@@ -145,7 +145,7 @@ API KEY 获取相关链接：[快速开始](https://docs.bigmodel.cn/cn/guide/st
 ```bash
 python main.py \
 -e gummy \
--k sk-******************************** \
+--gummy_api_key sk-******************************** \
 -a 0 \
 -d 1 \
 -s en \

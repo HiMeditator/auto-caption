@@ -29,8 +29,8 @@ export default {
     "styleChange": "字幕のスタイルが変更されました",
     "styleInfo": "字幕のスタイル変更が保存され、適用されました",
     "engineStartTimeout": "字幕エンジンの起動がタイムアウトしました。自動的に強制停止しました",
-    "ollamaNameNull": "Ollama フィールドが空です",
-    "ollamaNameNullNote": "Ollama モデルを翻訳モデルとして選択する場合、Ollama フィールドは空にできません。ローカルで設定された Ollama モデルの名前を入力してください。"
+    "translationConfigMissing": "翻訳サービスの設定が不完全です",
+    "translationConfigMissingNote": "選択した翻訳サービスのモデル名を入力してください。OpenAI 互換サービスでは Base URL も必要です。"
   },
   general: {
     "title": "一般設定",
@@ -49,11 +49,12 @@ export default {
     "cancelChange": "変更をキャンセル",
     "sourceLang": "ソース言語",
     "transLang": "翻訳言語",
-    "transModel": "翻訳モデル",
+    "translationProvider": "翻訳サービス",
     "modelName": "モデル名",
-    "modelNameNote": "使用する翻訳モデル名を入力してください。Ollama のローカルモデルでも OpenAI API 互換のクラウドモデルでも可能です。Base URL フィールドが未入力の場合、デフォルトでローカルの Ollama サービスが呼び出され、それ以外の場合は Python OpenAI ライブラリ経由で指定されたアドレスの API サービスが呼び出されます。",
-    "baseURL": "OpenAI API を呼び出すための基本リクエスト URL です。未記入の場合、ローカルのデフォルトポートの Ollama モデルが呼び出されます。",
-    "apiKey": "OpenAI API に対応するモデルを使用するために必要な API キーです。",
+    "ollamaModelNote": "ローカルの Ollama にインストール済みのモデル名を入力してください。Ollama はデフォルトのローカルサービスを使用します。",
+    "openaiModelNote": "OpenAI API 互換サービスが提供するモデル名を入力してください。",
+    "baseURL": "OpenAI API 互換サービスの Base URL（例：https://api.openai.com/v1）です。",
+    "apiKey": "OpenAI API 互換サービスに必要な API キーです。",
     "captionEngine": "エンジン",
     "audioType": "オーディオ",
     "systemOutput": "システムオーディオ出力（スピーカー）",

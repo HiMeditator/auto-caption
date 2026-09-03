@@ -44,14 +44,15 @@ const defaultStyles: Styles = {
 const defaultControls: Controls = {
   sourceLang: 'en',
   targetLang: 'zh',
-  transModel: 'ollama',
-  ollamaName: 'qwen2.5:0.5b',
-  ollamaUrl: 'http://localhost:11434',
-  ollamaApiKey: '',
+  translationProvider: 'ollama',
+  ollamaModel: 'qwen2.5:0.5b',
+  openaiModel: '',
+  openaiBaseUrl: 'https://api.openai.com/v1',
+  openaiApiKey: '',
   engine: 'gummy',
   audio: 0,
   engineEnabled: false,
-  API_KEY: '',
+  gummyApiKey: '',
   voskModelPath: '',
   sosvModelPath: '',
   glmUrl: 'https://open.bigmodel.cn/api/paas/v4/audio/transcriptions',
@@ -145,10 +146,34 @@ class AllConfig {
   }
 
   public setControls(args: Object) {
+    const legacy = args as Record<string, unknown>
+    const migratedArgs: Record<string, unknown> = { ...legacy }
+    if(!('translationProvider' in legacy) && typeof legacy.transModel === 'string') {
+      const legacyUrl = typeof legacy.ollamaUrl === 'string' ? legacy.ollamaUrl : ''
+      const usesOpenAI = Boolean(legacyUrl && !/^https?:\/\/(localhost|127\.0\.0\.1):11434\/?$/i.test(legacyUrl))
+      migratedArgs.translationProvider = legacy.transModel === 'ollama' && usesOpenAI
+        ? 'openai'
+        : legacy.transModel
+    }
+    if(!('ollamaModel' in legacy) && typeof legacy.ollamaName === 'string') {
+      migratedArgs.ollamaModel = legacy.ollamaName
+    }
+    if(!('openaiModel' in legacy) && migratedArgs.translationProvider === 'openai' && typeof legacy.ollamaName === 'string') {
+      migratedArgs.openaiModel = legacy.ollamaName
+    }
+    if(!('openaiBaseUrl' in legacy) && migratedArgs.translationProvider === 'openai' && typeof legacy.ollamaUrl === 'string' && legacy.ollamaUrl) {
+      migratedArgs.openaiBaseUrl = legacy.ollamaUrl
+    }
+    if(!('openaiApiKey' in legacy) && typeof legacy.ollamaApiKey === 'string') {
+      migratedArgs.openaiApiKey = legacy.ollamaApiKey
+    }
+    if(!('gummyApiKey' in legacy) && typeof legacy.API_KEY === 'string') {
+      migratedArgs.gummyApiKey = legacy.API_KEY
+    }
     const engineEnabled = this.controls.engineEnabled
     for(let key in this.controls){
-      if(key in args) {
-        this.controls[key] = args[key]
+      if(key in migratedArgs) {
+        this.controls[key] = migratedArgs[key]
       }
     }
     this.controls.engineEnabled = engineEnabled
@@ -157,7 +182,7 @@ class AllConfig {
 
   public sendControls(window: BrowserWindow, info = true) {
     window.webContents.send('control.controls.set', this.controls)
-    if(info) Log.info(`Send Controls to #${window.id}:`, this.controls)
+    if(info) Log.info(`Send Controls to #${window.id}:`, passwordMaskingForObject(this.controls))
   }
 
   public updateCaptionLog(log: CaptionItem) {

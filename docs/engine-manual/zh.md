@@ -144,10 +144,11 @@ while True:
 样例：
 
 ```python
-from utils import google_translate, ollama_translate
+from utils import google_translate, ollama_translate, openai_translate
 text = "这是一个翻译测试。"
 google_translate("", "en", text, "time_s")
 ollama_translate("qwen3:0.6b", "en", text, "time_s")
+openai_translate("gpt-4.1-mini", "en", text, "time_s", "https://api.openai.com/v1", "<api-key>")
 ```
 
 ### 字幕数据发送
@@ -187,10 +188,12 @@ if __name__ == "__main__":
     # gummy and sosv
     parser.add_argument('-s', '--source_language', default='auto', help='Source language code')
     # gummy only
-    parser.add_argument('-k', '--api_key', default='', help='API KEY for Gummy model')
-    # vosk and sosv
-    parser.add_argument('-tm', '--translation_model', default='ollama', help='Model for translation: ollama or google')
-    parser.add_argument('-omn', '--ollama_name', default='', help='Ollama model name for translation')
+    parser.add_argument('--gummy_api_key', default='', help='API key for the Gummy caption engine')
+    # vosk, sosv and glm translation
+    parser.add_argument('--translation_provider', choices=['ollama', 'openai', 'google'], default='ollama', help='Translation service provider')
+    parser.add_argument('--translation_model', default='', help='Translation model name')
+    parser.add_argument('--translation_base_url', default='', help='OpenAI-compatible API base URL')
+    parser.add_argument('--translation_api_key', default='', help='OpenAI-compatible API key')
     # vosk only
     parser.add_argument('-vosk', '--vosk_model', default='', help='The path to the vosk model.')
     # sosv only
@@ -200,7 +203,7 @@ if __name__ == "__main__":
 比如对于本项目的字幕引擎，我想使用 Gummy 模型，指定原文为日语，翻译为中文，获取系统音频输出的字幕，每次截取 0.1s 的音频数据，那么命令行参数如下：
 
 ```bash
-python main.py -e gummy -s ja -t zh -a 0 -c 10 -k <dashscope-api-key>
+python main.py -e gummy -s ja -t zh -a 0 -c 10 --gummy_api_key <dashscope-api-key>
 ```
 
 ## 其他

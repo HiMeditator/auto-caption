@@ -19,6 +19,21 @@ export class CaptionEngine {
   timerID: NodeJS.Timeout | undefined
   startTimeoutID: NodeJS.Timeout | undefined
 
+  private addTranslationArguments() {
+    const controls = allConfig.controls
+    this.command.push('--translation_provider', controls.translationProvider)
+    if(controls.translationProvider === 'ollama') {
+      this.command.push('--translation_model', controls.ollamaModel)
+    }
+    else if(controls.translationProvider === 'openai') {
+      this.command.push('--translation_model', controls.openaiModel)
+      this.command.push('--translation_base_url', controls.openaiBaseUrl)
+      if(controls.openaiApiKey) {
+        this.command.push('--translation_api_key', controls.openaiApiKey)
+      }
+    }
+  }
+
   private getApp(): boolean {
     if (allConfig.controls.customized) {
       Log.info('Using customized caption engine')
@@ -29,7 +44,7 @@ export class CaptionEngine {
     }
     else {
       if(allConfig.controls.engine === 'gummy' && 
-        !allConfig.controls.API_KEY && !process.env.DASHSCOPE_API_KEY
+        !allConfig.controls.gummyApiKey && !process.env.DASHSCOPE_API_KEY
       ) {
         controlWindow.sendErrorMessage(i18n('gummy.key.missing'))
         return false
@@ -79,26 +94,20 @@ export class CaptionEngine {
       if(allConfig.controls.engine === 'gummy') {
         this.command.push('-e', 'gummy')
         this.command.push('-s', allConfig.controls.sourceLang)
-        if(allConfig.controls.API_KEY) {
-          this.command.push('-k', allConfig.controls.API_KEY)
+        if(allConfig.controls.gummyApiKey) {
+          this.command.push('--gummy_api_key', allConfig.controls.gummyApiKey)
         }
       }
       else if(allConfig.controls.engine === 'vosk'){
         this.command.push('-e', 'vosk')
         this.command.push('-vosk', `"${allConfig.controls.voskModelPath}"`)
-        this.command.push('-tm', allConfig.controls.transModel)
-        this.command.push('-omn', allConfig.controls.ollamaName)
-        if(allConfig.controls.ollamaUrl) this.command.push('-ourl', allConfig.controls.ollamaUrl)
-        if(allConfig.controls.ollamaApiKey) this.command.push('-okey', allConfig.controls.ollamaApiKey)
+        this.addTranslationArguments()
       }
       else if(allConfig.controls.engine === 'sosv'){
         this.command.push('-e', 'sosv')
         this.command.push('-s', allConfig.controls.sourceLang)
         this.command.push('-sosv', `"${allConfig.controls.sosvModelPath}"`)
-        this.command.push('-tm', allConfig.controls.transModel)
-        this.command.push('-omn', allConfig.controls.ollamaName)
-        if(allConfig.controls.ollamaUrl) this.command.push('-ourl', allConfig.controls.ollamaUrl)
-        if(allConfig.controls.ollamaApiKey) this.command.push('-okey', allConfig.controls.ollamaApiKey)
+        this.addTranslationArguments()
       }
       else if(allConfig.controls.engine === 'glm'){
         this.command.push('-e', 'glm')
@@ -108,10 +117,7 @@ export class CaptionEngine {
         if(allConfig.controls.glmApiKey) {
           this.command.push('-gkey', allConfig.controls.glmApiKey)
         }
-        this.command.push('-tm', allConfig.controls.transModel)
-        this.command.push('-omn', allConfig.controls.ollamaName)
-        if(allConfig.controls.ollamaUrl) this.command.push('-ourl', allConfig.controls.ollamaUrl)
-        if(allConfig.controls.ollamaApiKey) this.command.push('-okey', allConfig.controls.ollamaApiKey)
+        this.addTranslationArguments()
       }
     }
     Log.info('Engine Path:', this.appPath)
