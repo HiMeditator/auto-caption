@@ -29,6 +29,8 @@ export const useEngineControlStore = defineStore('engineControl', () => {
   const translation = ref<boolean>(true)
   const recording = ref<boolean>(false)
   const dashscopeApiKey = ref<string>('')
+  const dashscopeWorkspaceId = ref('')
+  const dashscopeRegion = ref<'cn-beijing' | 'ap-southeast-1'>('cn-beijing')
   const voskModelPath = ref<string>('')
   const sosvModelPath = ref<string>('')
   const glmUrl = ref<string>('https://open.bigmodel.cn/api/paas/v4/audio/transcriptions')
@@ -58,6 +60,8 @@ export const useEngineControlStore = defineStore('engineControl', () => {
       translation: translation.value,
       recording: recording.value,
       dashscopeApiKey: dashscopeApiKey.value,
+      dashscopeWorkspaceId: dashscopeWorkspaceId.value,
+      dashscopeRegion: dashscopeRegion.value,
       voskModelPath: voskModelPath.value,
       sosvModelPath: sosvModelPath.value,
       glmUrl: glmUrl.value,
@@ -101,6 +105,8 @@ export const useEngineControlStore = defineStore('engineControl', () => {
     translation.value = controls.translation
     recording.value = controls.recording
     dashscopeApiKey.value = controls.dashscopeApiKey
+    dashscopeWorkspaceId.value = controls.dashscopeWorkspaceId
+    dashscopeRegion.value = controls.dashscopeRegion
     voskModelPath.value = controls.voskModelPath
     sosvModelPath.value = controls.sosvModelPath
     glmUrl.value = controls.glmUrl || 'https://open.bigmodel.cn/api/paas/v4/audio/transcriptions'
@@ -175,7 +181,9 @@ export const useEngineControlStore = defineStore('engineControl', () => {
     audio,              // 选择音频
     translation,        // 是否启用翻译
     recording,          // 是否启用录音
-    dashscopeApiKey,        // Paraformer API Key
+    dashscopeWorkspaceId,
+    dashscopeRegion,
+    dashscopeApiKey,        // Alibaba Cloud API Key
     voskModelPath,      // vosk 模型路径
     sosvModelPath,      // sosv 模型路径
     glmUrl,             // GLM API URL

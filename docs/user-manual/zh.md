@@ -32,6 +32,16 @@ Auto Caption 是一个跨平台的字幕显示软件，能够实时获取系统�
 
 默认引擎为阿里云 `paraformer-realtime-v2`，通过 DashScope Recognition SDK 双向流式识别。上传音频为 16kHz、16bit、单声道 PCM；支持中文、英文、日语、韩语、德语、法语、俄语及粤语，`auto` 不指定语言提示。模型不提供内置翻译；开启翻译后需配置 Ollama、OpenAI 兼容服务或 Google 翻译，完整句子返回后异步翻译。设置中的阿里云 API Key 或 `DASHSCOPE_API_KEY` 环境变量用于鉴权（所有平台）；CLI 参数为 `--dashscope_api_key`。当前使用北京地域默认端点，API Key 必须匹配该地域。旧 Gummy 引擎选项和 API Key 自动迁移，旧西班牙语/意大利语源语言改为自动检测；旧自定义命令需手动更新。详见[阿里云官方 SDK 文档](https://help.aliyun.com/zh/model-studio/paraformer-real-time-speech-recognition-python-sdk)。
 
+## Qwen LiveTranslate
+
+Qwen LiveTranslate 使用 `qwen3.8-livetranslate-flash-realtime`，在同一个 WebSocket 会话中流式返回原文和译文，无需配置外部翻译服务。默认仍为 Paraformer。选择此引擎后填写业务空间 ID、地域（北京或新加坡），并在更多设置中填写该业务空间和地域的阿里云 API Key；也可使用 `DASHSCOPE_WORKSPACE_ID` 和 `DASHSCOPE_API_KEY` 环境变量。源语言自动检测，界面提供中、英、日、韩、德、法、俄、西、意作为翻译目标语言。音频上传为 16kHz、16bit、单声道 PCM，仅输出文字，不播放翻译语音。关闭翻译仅隐藏译文，服务端仍执行翻译；只需要识别时建议选择 Paraformer。
+
+[API / WebSocket](https://help.aliyun.com/zh/model-studio/qwen3-5-livetranslate-flash-realtime)
+
+```bash
+python main.py -e livetranslate -t zh --dashscope_api_key <api-key> --dashscope_workspace_id <workspace-id> --dashscope_region cn-beijing
+```
+
 ## GLM 引擎使用前准备
 
 需要先获取 API KEY，参考：[Quick Start](https://docs.bigmodel.cn/en/guide/start/quick-start)。
@@ -116,7 +126,7 @@ sudo yum install pulseaudio pavucontrol
 
 ## 字幕引擎
 
-字幕引擎选项按 Paraformer、GLM-ASR、Vosk、SOSV 排列，云端模型在前。本地模型标注运行位置：`本地 / CPU / Vosk`、`本地 / CPU / SOSV`。
+字幕引擎选项按 Paraformer、Qwen LiveTranslate、GLM-ASR、Vosk、SOSV 排列，云端模型在前。本地模型标注运行位置：`本地 / CPU / Vosk`、`本地 / CPU / SOSV`。
 
 所谓的字幕引擎实际上是一个子程序，它会实时获取系统音频输入（录音）或输出（播放声音）的流式数据，并调用音频转文字的模型生成对应音频的字幕。生成的字幕通过转换为字符串的 JSON 数据，并通过标准输出传递给主程序。主程序读取字幕数据，处理后显示在窗口上。
 
@@ -144,7 +154,7 @@ sudo yum install pulseaudio pavucontrol
 
 #### `-e , --caption_engine`
 
-需要选择的字幕引擎模型，目前有四个可用，分别为：`paraformer, glm, vosk, sosv`。
+需要选择的字幕引擎模型，目前有五个可用，分别为：`paraformer, livetranslate, glm, vosk, sosv`。
 
 该项的默认值为 `paraformer`。
 
@@ -248,13 +258,13 @@ SOSV 模型支持指定的语言有：英语、中文、日语、韩语、粤语
 
 OpenAI API 兼容服务的基础请求地址，例如 `https://api.openai.com/v1`。仅当 `--translation_provider openai` 时使用。
 
-默认值为空，适用于所有字幕引擎。
+默认值为空，适用于 Paraformer、GLM、Vosk 和 SOSV。
 
 #### `--translation_api_key`
 
 指定调用 OpenAI API 兼容服务的 API Key。仅当 `--translation_provider openai` 时使用。
 
-默认值为空，适用于所有字幕引擎。
+默认值为空，适用于 Paraformer、GLM、Vosk 和 SOSV。
 
 #### `-vosk, --vosk_model`
 
@@ -341,3 +351,5 @@ python main.py \
 然后再字幕引擎可执行文件所在目录打开终端，执行命令进行运行字幕引擎。
 
 只需要将上述指令中的 `python main.py` 替换为可执行文件名称即可（比如：`engine-win.exe`）。
+
+LiveTranslate CLI：`--dashscope_workspace_id` 指定业务空间 ID（空值时读取环境变量），`--dashscope_region` 指定地域，默认为 `cn-beijing`，也支持 `ap-southeast-1`。`--dashscope_api_key` 与 Paraformer 共用。`-s` 不用于该模型；`-t none` 仅隐藏译文。外部翻译参数不用于 LiveTranslate。

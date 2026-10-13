@@ -1,5 +1,6 @@
 export default {
-  "paraformer.key.missing": "API KEY が設定されておらず、DASHSCOPE_API_KEY 環境変数も検出されていません。Paraformer エンジンを使用するには、Alibaba Cloud Bailian プラットフォームから API KEY を取得し、設定に追加するか、ローカルの環境変数に設定する必要があります。",
+  "dashscope.key.missing": "アリババクラウドのエンジンには、詳細設定または DASHSCOPE_API_KEY 環境変数で API Key を指定してください。",
+  "livetranslate.workspace.missing": "Qwen LiveTranslate には、設定または DASHSCOPE_WORKSPACE_ID 環境変数で業務スペース ID を指定してください。",
   "platform.unsupported": "サポートされていないプラットフォーム: ",
   "engine.start.error": "字幕エンジンの起動に失敗しました: ",
   "engine.output.parse.error": "字幕エンジンの出力を JSON オブジェクトとして解析できませんでした: ",

@@ -5,7 +5,7 @@
 Auto Caption 是跨平台的实时字幕显示软件，可识别系统音频输出或麦克风输入，支持字幕翻译、样式设置、字幕记录和导出。
 
 - 桌面端：Electron + TypeScript，使用 electron-vite 构建；界面使用 Vue 3、Ant Design Vue、Pinia、Vue Router 和 vue-i18n。
-- 字幕引擎：Python，包含 Paraformer、GLM-ASR、Vosk 和 SOSV 识别实现，以及 Ollama、OpenAI 兼容服务和 Google 翻译支持。
+- 字幕引擎：Python，包含 Paraformer、Qwen LiveTranslate、GLM-ASR、Vosk 和 SOSV 识别实现，以及 Ollama、OpenAI 兼容服务和 Google 翻译支持。
 - 通信：渲染进程通过 Electron IPC 与主进程交互；主进程启动 Python 子进程，引擎通过标准输出发送逐行 JSON 消息，主进程通过 TCP Socket 向引擎发送命令。
 
 ## 项目结构

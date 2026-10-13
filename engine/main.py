@@ -6,6 +6,7 @@ from utils import stdout, stdout_cmd, change_caption_display
 from utils import shared_data, start_server
 from utils import merge_chunk_channels, resample_chunk_mono
 from audio2text import ParaformerRecognizer
+from audio2text import LiveTranslateRecognizer
 from audio2text import VoskRecognizer
 from audio2text import SosvRecognizer
 from audio2text import GlmRecognizer
@@ -74,6 +75,24 @@ def main_paraformer(s: str, t: str, a: int, c: int, k: str, translation_provider
     except KeyboardInterrupt:
         shared_data.status = 'stopped'
         stdout("Keyboard interrupt detected. Exiting...")
+    except Exception as error:
+        engine.fail(str(error))
+    finally:
+        engine.stop()
+
+
+def main_livetranslate(a, c, t, key, workspace_id, region, record, record_path):
+    engine = LiveTranslateRecognizer(None if t == 'none' else t, key, workspace_id, region)
+    stream = AudioStream(a, c)
+    try:
+        engine.start()
+        if engine.failed:
+            return
+        threading.Thread(target=audio_recording,
+                         args=(stream, True, record, record_path), daemon=True).start()
+        engine.translate()
+    except KeyboardInterrupt:
+        shared_data.status = 'stop'
     except Exception as error:
         engine.fail(str(error))
     finally:
@@ -190,7 +209,7 @@ def main_glm(a: int, c: int, url: str, model: str, key: str, s: str, t: str, tra
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Convert system audio stream to text')
     # all
-    parser.add_argument('-e', '--caption_engine', default='paraformer', choices=['paraformer', 'glm', 'vosk', 'sosv'], help='Caption engine: paraformer, glm, vosk or sosv')
+    parser.add_argument('-e', '--caption_engine', default='paraformer', choices=['paraformer', 'livetranslate', 'glm', 'vosk', 'sosv'], help='Caption engine: paraformer, livetranslate, glm, vosk or sosv')
     parser.add_argument('-a', '--audio_type', type=int, default=0, help='Audio stream source: 0 for output, 1 for input')
     parser.add_argument('-c', '--chunk_rate', type=int, default=10, help='Number of audio stream chunks collected per second')
     parser.add_argument('-p', '--port', type=int, default=0, help='The port to run the server on, 0 for no server')
@@ -201,7 +220,9 @@ if __name__ == "__main__":
     # paraformer and sosv and glm
     parser.add_argument('-s', '--source_language', default='auto', help='Source language code')
     # paraformer only
-    parser.add_argument('--dashscope_api_key', default='', help='API key for the Paraformer caption engine')
+    parser.add_argument('--dashscope_api_key', default='', help='API key for Alibaba Cloud caption engines')
+    parser.add_argument('--dashscope_workspace_id', default='', help='LiveTranslate workspace ID (or DASHSCOPE_WORKSPACE_ID)')
+    parser.add_argument('--dashscope_region', choices=['cn-beijing', 'ap-southeast-1'], default='cn-beijing', help='LiveTranslate API region')
     # all engines: external translation
     parser.add_argument('--translation_provider', choices=['ollama', 'openai', 'google'], default='ollama', help='Translation service provider')
     parser.add_argument('--translation_model', default='', help='Translation model name (for Ollama or OpenAI-compatible services)')
@@ -218,7 +239,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    uses_external_translation = args.target_language != 'none'
+    uses_external_translation = args.caption_engine != 'livetranslate' and args.target_language != 'none'
     if uses_external_translation and args.translation_provider in ('ollama', 'openai') and not args.translation_model:
         parser.error('--translation_model is required when translation is enabled with Ollama or OpenAI')
     if uses_external_translation and args.translation_provider == 'openai' and not args.translation_base_url:
@@ -230,7 +251,11 @@ if __name__ == "__main__":
     if args.display_caption == '1':
         change_caption_display(True)
 
-    if args.caption_engine == 'paraformer':
+    if args.caption_engine == 'livetranslate':
+        main_livetranslate(args.audio_type, args.chunk_rate, args.target_language,
+                          args.dashscope_api_key, args.dashscope_workspace_id,
+                          args.dashscope_region, bool(args.record), args.record_path)
+    elif args.caption_engine == 'paraformer':
         main_paraformer(
             args.source_language,
             args.target_language,

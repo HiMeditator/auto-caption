@@ -369,3 +369,5 @@
 **数据类型：** `CaptionItem[]`
 
 旧配置的 `engine: "gummy"` 自动迁移为 `"paraformer"`，`gummyApiKey`（或更早的 `API_KEY`）迁移为 `dashscopeApiKey`。新的显式密钥优先。Paraformer 使用外部翻译服务，与其他引擎共享翻译配置。
+
+LiveTranslate 配置：`engine: "livetranslate"`，`dashscopeWorkspaceId: string`（默认空），`dashscopeRegion: "cn-beijing" | "ap-southeast-1"`（默认北京）。与 Paraformer 共用 `dashscopeApiKey`。使用内置翻译，不使用外部翻译配置；源语言自动检测。

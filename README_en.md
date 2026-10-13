@@ -69,12 +69,13 @@ After downloading the software, you need to select the corresponding model accor
 |                                                              | Accuracy | Real-time | Deployment Type | Supported Languages | Translation | Notes |
 | ------------------------------------------------------------ | -------- | --------- | --------------- | ------------------- | ----------- | ----- |
 | [Paraformer Realtime v2](https://help.aliyun.com/zh/model-studio/paraformer-real-time-speech-recognition-python-sdk) | Streaming ASR | External translation | Cloud / Alibaba Cloud | 8 languages including Cantonese | Ollama / OpenAI-compatible / Google | Current Alibaba Cloud pricing |
+| [Qwen LiveTranslate 3.8](https://help.aliyun.com/zh/model-studio/qwen3-5-livetranslate-flash-realtime) | Streaming ASR | Streaming translation | Cloud / Alibaba Cloud | Auto detection | Built-in translation | API Key + workspace ID; official pricing |
 | [glm-asr-2512](https://docs.bigmodel.cn/cn/guide/models/sound-and-video/glm-asr-2512) | Very good 😊 | Poor 😞 | Cloud / Zhipu AI | 4 languages | Requires additional configuration | Paid, approximately 0.72 CNY/hour |
 | [Vosk](https://alphacephei.com/vosk) | Poor 😞 | Very good 😊 | Local / CPU | Over 30 languages | Requires additional configuration | Supports many languages |
 | [SOSV](https://k2-fsa.github.io/sherpa/onnx/sense-voice/index.html) | Average 😐 | Average 😐 | Local / CPU | 5 languages | Requires additional configuration | Only one model |
 | Self-developed | 🤔 | 🤔 | Custom | Custom | Custom | Develop your own using Python according to the [documentation](./docs/engine-manual/en.md) |
 
-All caption engines require an external translation service when translation is enabled.
+Qwen LiveTranslate includes translation; other caption engines require an external translation service when translation is enabled.
 
 ### Configuring Translation Models
 
@@ -104,6 +105,16 @@ The API Key needs to be obtained from the corresponding model provider.
 > Note: Google Translate API is not available in some regions.
 
 No configuration required, just connect to the internet to use.
+
+### Qwen LiveTranslate
+
+Qwen LiveTranslate uses `qwen3.8-livetranslate-flash-realtime` to stream source transcripts and translated text in one WebSocket session, with no external translation service. Paraformer remains the default. Select this engine, enter the workspace ID and region (Beijing or Singapore), and enter an Alibaba Cloud API Key for that workspace and region in More Settings. Alternatively, use `DASHSCOPE_WORKSPACE_ID` and `DASHSCOPE_API_KEY`. The source language is detected automatically. The UI offers Chinese, English, Japanese, Korean, German, French, Russian, Spanish and Italian as target languages. Audio is uploaded as 16kHz, 16-bit mono PCM. Only text is returned; translated speech is not played. Disabling translation only hides the translation, while the service still translates. Use Paraformer for recognition only.
+
+[API / WebSocket](https://help.aliyun.com/zh/model-studio/qwen3-5-livetranslate-flash-realtime)
+
+```bash
+python main.py -e livetranslate -t zh --dashscope_api_key <api-key> --dashscope_workspace_id <workspace-id> --dashscope_region cn-beijing
+```
 
 ### Paraformer Realtime v2
 
@@ -154,7 +165,7 @@ python main.py \
 
 ## ⚙️ Built-in Subtitle Engines
 
-Currently, the software comes with 4 caption engines, with new engines under development. Their detailed information is as follows.
+Currently, the software comes with 5 caption engines, with new engines under development. Their detailed information is as follows.
 
 ### Paraformer Realtime v2
 

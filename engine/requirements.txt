@@ -1,4 +1,5 @@
 dashscope>=1.23.1
+websocket-client>=1.8.0
 numpy
 resampy
 vosk

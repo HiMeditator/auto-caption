@@ -34,6 +34,16 @@ The software is built using Electron, so the software size is inevitably large.
 
 The default engine is Alibaba Cloud `paraformer-realtime-v2`, using the DashScope Recognition SDK for duplex streaming ASR. Audio is uploaded as 16kHz, 16-bit mono PCM. Supported source languages are Chinese, English, Japanese, Korean, German, French, Russian and Cantonese; `auto` sends no language hint. There is no built-in translation: configure Ollama, an OpenAI-compatible service or Google Translate to translate finalized sentences asynchronously. Set the Alibaba Cloud API Key in settings or the `DASHSCOPE_API_KEY` environment variable on any platform; the CLI option is `--dashscope_api_key`. The current endpoint is the default Beijing endpoint and requires a matching regional API Key. Old Gummy selections and API Keys migrate automatically; old Spanish/Italian source selections switch to auto detection. Update old custom commands manually. See the [official SDK documentation](https://help.aliyun.com/zh/model-studio/paraformer-real-time-speech-recognition-python-sdk).
 
+## Qwen LiveTranslate
+
+Qwen LiveTranslate uses `qwen3.8-livetranslate-flash-realtime` to stream source transcripts and translated text in one WebSocket session, with no external translation service. Paraformer remains the default. Select this engine, enter the workspace ID and region (Beijing or Singapore), and enter an Alibaba Cloud API Key for that workspace and region in More Settings. Alternatively, use `DASHSCOPE_WORKSPACE_ID` and `DASHSCOPE_API_KEY`. The source language is detected automatically. The UI offers Chinese, English, Japanese, Korean, German, French, Russian, Spanish and Italian as target languages. Audio is uploaded as 16kHz, 16-bit mono PCM. Only text is returned; translated speech is not played. Disabling translation only hides the translation, while the service still translates. Use Paraformer for recognition only.
+
+[API / WebSocket](https://help.aliyun.com/zh/model-studio/qwen3-5-livetranslate-flash-realtime)
+
+```bash
+python main.py -e livetranslate -t zh --dashscope_api_key <api-key> --dashscope_workspace_id <workspace-id> --dashscope_region cn-beijing
+```
+
 ## Preparation for GLM Engine
 
 You need to obtain an API KEY first, refer to: [Quick Start](https://docs.bigmodel.cn/en/guide/start/quick-start).
@@ -118,11 +128,11 @@ In the caption control window, you can see the records of all collected captions
 
 ## Caption Engine
 
-Caption engine options appear in the order Paraformer, GLM-ASR, Vosk, SOSV, with cloud models first. Local models show their execution device: `Local / CPU / Vosk` and `Local / CPU / SOSV`.
+Caption engine options appear in the order Paraformer, Qwen LiveTranslate, GLM-ASR, Vosk, SOSV, with cloud models first. Local models show their execution device: `Local / CPU / Vosk` and `Local / CPU / SOSV`.
 
 The so-called caption engine is essentially a subprogram that captures real-time streaming data from system audio input (recording) or output (playback), and invokes speech-to-text models to generate corresponding captions. The generated captions are converted into JSON-formatted strings and passed to the main program through standard output. The main program reads the caption data, processes it, and displays it in the window.
 
-The software provides two default caption engines. If you need other caption engines, you can invoke them by enabling the custom engine option (other engines need to be specifically developed for this software). The engine path refers to the location of the custom caption engine on your computer, while the engine command represents the runtime parameters of the custom caption engine, which should be configured according to the rules of that particular caption engine.
+The software provides five built-in caption engines. If you need other caption engines, you can invoke them by enabling the custom engine option (other engines need to be specifically developed for this software). The engine path refers to the location of the custom caption engine on your computer, while the engine command represents the runtime parameters of the custom caption engine, which should be configured according to the rules of that particular caption engine.
 
 ![](../img/02_en.png)
 
@@ -146,7 +156,7 @@ The following parameter descriptions only include necessary parameters.
 
 #### `-e , --caption_engine`
 
-The caption engine model to select, currently four options are available: `paraformer, glm, vosk, sosv`.
+The caption engine model to select, currently five options are available: `paraformer, livetranslate, glm, vosk, sosv`.
 
 The default value is `paraformer`.
 
@@ -244,19 +254,19 @@ Specifies the model name used by Ollama or an OpenAI-compatible service. Google 
 
 If using an Ollama model, it is recommended to use a model with fewer than 1B parameters, such as `qwen2.5:0.5b` or `qwen3:0.6b`. The corresponding model must be downloaded in Ollama for normal use.  
 
-The default value is empty and applies to all caption engines.
+The default value is empty and applies to Paraformer, GLM, Vosk and SOSV.
 
 #### `--translation_base_url`
 
 The base URL of the OpenAI-compatible service, such as `https://api.openai.com/v1`. Used only with `--translation_provider openai`.
 
-The default value is empty and applies to all caption engines.
+The default value is empty and applies to Paraformer, GLM, Vosk and SOSV.
 
 #### `--translation_api_key`
 
 Specifies the API key for the OpenAI-compatible service. Used only with `--translation_provider openai`.
 
-The default value is empty and applies to all caption engines.
+The default value is empty and applies to Paraformer, GLM, Vosk and SOSV.
 
 #### `-vosk, --vosk_model`
 
@@ -343,3 +353,5 @@ First, download the executable file for your platform from [GitHub Releases](htt
 Then open a terminal in the directory containing the caption engine executable file and execute commands to run the caption engine.
 
 Simply replace `python main.py` in the above commands with the executable file name (for example: `engine-win.exe`).
+
+LiveTranslate CLI: `--dashscope_workspace_id` specifies the workspace ID (falls back to the environment variable); `--dashscope_region` defaults to `cn-beijing`, also supporting `ap-southeast-1`. `--dashscope_api_key` is shared with Paraformer. `-s` is unused; `-t none` only hides translated text. External translation options do not apply to LiveTranslate.

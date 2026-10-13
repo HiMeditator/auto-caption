@@ -68,12 +68,13 @@ macOS 平台和 Linux 平台获取系统音频输出需要进行额外设置，�
 |                                                              | 准确率 | 实时性 | 部署类型          | 支持语言   | 翻译       | 备注                                                       |
 | ------------------------------------------------------------ | -------- | ------------- | ---------- | ---------- | ---------------------------------------------------------- | ---------------------------------------------------------- |
 | [Paraformer Realtime v2](https://help.aliyun.com/zh/model-studio/paraformer-real-time-speech-recognition-python-sdk) | 流式识别 | 外部翻译 | 云端 / 阿里云 | 8 种语言（含粤语） | Ollama / OpenAI 兼容 / Google | 按阿里云当前价格计费 |
+| [Qwen LiveTranslate 3.8](https://help.aliyun.com/zh/model-studio/qwen3-5-livetranslate-flash-realtime) | 流式识别 | 流式翻译 | 云端 / 阿里云 | 自动检测 | 自带翻译 | API Key + 业务空间 ID，按官方价格计费 |
 | [glm-asr-2512](https://docs.bigmodel.cn/cn/guide/models/sound-and-video/glm-asr-2512) | 很好😊 | 较差😞 | 云端 / 智谱 AI | 4 种 | 需额外配置 | 收费，约 0.72CNY / 小时 |
 | [Vosk](https://alphacephei.com/vosk)                         | 较差😞    | 很好😊 | 本地 / CPU    | 超过 30 种 | 需额外配置 | 支持的语言非常多                                           |
 | [SOSV](https://k2-fsa.github.io/sherpa/onnx/sense-voice/index.html) | 一般😐    | 一般😐 | 本地 / CPU    | 5 种       | 需额外配置 | 仅有一个模型                                               |
 | 自己开发                                                     | 🤔        | 🤔      | 自定义        | 自定义     | 自定义     | 根据[文档](./docs/engine-manual/zh.md)使用 Python 自己开发 |
 
-所有字幕引擎开启翻译时均需要配置翻译服务。
+Qwen LiveTranslate 自带翻译；其他字幕引擎开启翻译时需要配置翻译服务。
 
 ### 配置翻译模型
 
@@ -103,6 +104,16 @@ API Key 需要在对应的模型提供商处获取。
 > 注意：Google 翻译 API 在无法访问国际网络的地区无法使用。
 
 无需任何配置，联网即可使用。
+
+### Qwen LiveTranslate
+
+Qwen LiveTranslate 使用 `qwen3.8-livetranslate-flash-realtime`，在同一个 WebSocket 会话中流式返回原文和译文，无需配置外部翻译服务。默认仍为 Paraformer。选择此引擎后填写业务空间 ID、地域（北京或新加坡），并在更多设置中填写该业务空间和地域的阿里云 API Key；也可使用 `DASHSCOPE_WORKSPACE_ID` 和 `DASHSCOPE_API_KEY` 环境变量。源语言自动检测，界面提供中、英、日、韩、德、法、俄、西、意作为翻译目标语言。音频上传为 16kHz、16bit、单声道 PCM，仅输出文字，不播放翻译语音。关闭翻译仅隐藏译文，服务端仍执行翻译；只需要识别时建议选择 Paraformer。
+
+[API / WebSocket](https://help.aliyun.com/zh/model-studio/qwen3-5-livetranslate-flash-realtime)
+
+```bash
+python main.py -e livetranslate -t zh --dashscope_api_key <api-key> --dashscope_workspace_id <workspace-id> --dashscope_region cn-beijing
+```
 
 ### Paraformer Realtime v2
 
@@ -153,7 +164,7 @@ python main.py \
 
 ## ⚙️ 自带字幕引擎说明
 
-目前软件自带 4 个字幕引擎。它们的详细信息如下。
+目前软件自带 5 个字幕引擎。它们的详细信息如下。
 
 ### Paraformer Realtime v2
 

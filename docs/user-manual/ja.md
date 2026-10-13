@@ -34,6 +34,16 @@ macOS プラットフォームでオーディオ出力を取得するには追�
 
 デフォルトエンジンはアリババクラウドの `paraformer-realtime-v2` です。DashScope Recognition SDK の双方向ストリーミング認識を使用し、16kHz・16bit・モノラル PCM を送信します。中国語、英語、日本語、韓国語、ドイツ語、フランス語、ロシア語、広東語に対応し、`auto` は言語ヒントを指定しません。内蔵翻訳はありません。翻訳を有効にする場合は Ollama、OpenAI 互換サービス、Google 翻訳を設定してください。確定した文を非同期で翻訳します。設定または全プラットフォームで利用できる `DASHSCOPE_API_KEY` 環境変数に API Key を指定します。CLI は `--dashscope_api_key` を使用します。現在は北京リージョンのデフォルト接続先を使用するため、同リージョンの API Key が必要です。旧 Gummy の選択と API Key は自動移行し、スペイン語・イタリア語の入力言語は自動検出に変更します。旧カスタムコマンドは手動で更新してください。[公式 SDK ドキュメント](https://help.aliyun.com/zh/model-studio/paraformer-real-time-speech-recognition-python-sdk)を参照してください。
 
+## Qwen LiveTranslate
+
+Qwen LiveTranslate は `qwen3.8-livetranslate-flash-realtime` を使用し、1つの WebSocket セッションで原文と訳文をストリーミング出力します。外部翻訳サービスは不要です。デフォルトは Paraformer のままです。このエンジンを選択し、業務スペース ID とリージョン（北京・シンガポール）を設定し、詳細設定で同じ業務スペース・リージョンの API Key を入力してください。`DASHSCOPE_WORKSPACE_ID` と `DASHSCOPE_API_KEY` 環境変数も利用できます。入力言語は自動検出します。UI の翻訳先は中国語・英語・日本語・韓国語・ドイツ語・フランス語・ロシア語・スペイン語・イタリア語です。16kHz・16bit・モノラル PCM を送信し、文字のみを出力します。翻訳音声は再生しません。翻訳を無効にしても訳文を非表示にするだけで、サービスは翻訳を実行します。認識のみが必要な場合は Paraformer を選択してください。
+
+[API / WebSocket](https://help.aliyun.com/zh/model-studio/qwen3-5-livetranslate-flash-realtime)
+
+```bash
+python main.py -e livetranslate -t zh --dashscope_api_key <api-key> --dashscope_workspace_id <workspace-id> --dashscope_region cn-beijing
+```
+
 ## GLM エンジン使用前の準備
 
 まずAPI KEYを取得する必要があります。参考：[クイックスタート](https://docs.bigmodel.cn/en/guide/start/quick-start)。
@@ -119,7 +129,7 @@ sudo yum install pulseaudio pavucontrol
 
 ## 字幕エンジン
 
-字幕エンジンは Paraformer、GLM-ASR、Vosk、SOSV の順に表示し、クラウドモデルを先に並べます。ローカルモデルには実行デバイスを表示します：`ローカル / CPU / Vosk`、`ローカル / CPU / SOSV`。
+字幕エンジンは Paraformer、Qwen LiveTranslate、GLM-ASR、Vosk、SOSV の順に表示し、クラウドモデルを先に並べます。ローカルモデルには実行デバイスを表示します：`ローカル / CPU / Vosk`、`ローカル / CPU / SOSV`。
 
 字幕エンジンとは、システムのオーディオ入力（録音）または出力（再生音）のストリーミングデータをリアルタイムで取得し、音声テキスト変換モデルを呼び出して対応する字幕を生成するサブプログラムです。生成された字幕は JSON 形式の文字列に変換され、標準出力を通じてメインプログラムに渡されます。メインプログラムは字幕データを読み取り、処理した後、ウィンドウに表示します。
 
@@ -130,3 +140,5 @@ sudo yum install pulseaudio pavucontrol
 カスタム字幕エンジンを使用する場合、前の字幕エンジンの設定はすべて無効になります。カスタム字幕エンジンの設定は完全にエンジンコマンドによって行われます。
 
 開発者の方で、カスタム字幕エンジンを開発したい場合は、[字幕エンジン説明文書](../engine-manual/ja.md)をご覧ください。
+
+LiveTranslate CLI：`--dashscope_workspace_id` は業務スペース ID（省略時は環境変数）、`--dashscope_region` はリージョン（既定値 `cn-beijing`、`ap-southeast-1` も対応）です。`--dashscope_api_key` は Paraformer と共通です。`-s` は使用せず、`-t none` は訳文の非表示のみです。外部翻訳パラメータは使用しません。

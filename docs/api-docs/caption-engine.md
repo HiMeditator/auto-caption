@@ -139,3 +139,7 @@ Paraformer、Vosk、SOSV 和 GLM 引擎使用外部翻译服务时会发送此�
 要求引擎停止当前任务。Python 服务忽略 `content`，将 `shared_data.status` 设为 `stop` 并关闭客户端连接，由引擎和音频采集循环根据共享状态退出。客户端断开连接或接收、解码、JSON 解析发生异常时，也会将状态设为 `stop`；通信异常会输出到 stderr。
 
 当前服务直接对单次 `recv(4096)` 的结果调用 `json.loads()`，没有消息长度或分隔符，也没有处理跨次接收的拆包和一次接收中的多条消息。现有业务只发送单个小型停止命令，但 TCP 不保证消息与接收数据块一一对应，即使单条命令也可能被拆分；扩展为连续命令时需先完善双方的消息分帧逻辑。
+
+## Qwen LiveTranslate 消息适配
+
+`caption` 可包含可选布尔字段 `update_by_time`（默认 false）。LiveTranslate 发送 true，主进程按 `time_s` 更新已有记录，即使下一句已经开始；未匹配则追加。该标记不改变 IPC 通道。原文片段累加、最终原文覆盖，通过同一消息项保留 index 和 time_s；译文片段和完整译文通过 `translation` 按 time_s 更新。服务端 `conversation.item.created.previous_item_id` 用于关联原文和译文，译文先到时缓存。关闭翻译后不发送译文。停止时发送 `session.finish`，最多等待 2.5 秒接收 `session.finished`，超时记录警告并关闭连接，最后一段结果可能不完整。

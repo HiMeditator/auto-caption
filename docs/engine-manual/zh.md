@@ -134,6 +134,7 @@ while True:
 完整的字幕引擎实例如下：
 
 - [paraformer.py](../../engine/audio2text/paraformer.py)
+- [livetranslate.py](../../engine/audio2text/livetranslate.py)
 - [vosk.py](../../engine/audio2text/vosk.py)
 - [sosv.py](../../engine/audio2text/sosv.py)
 
@@ -178,7 +179,7 @@ export interface CaptionItem {
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Convert system audio stream to text')
     # all
-    parser.add_argument('-e', '--caption_engine', default='paraformer', help='Caption engine: paraformer, glm, vosk or sosv')
+    parser.add_argument('-e', '--caption_engine', default='paraformer', help='Caption engine: paraformer, livetranslate, glm, vosk or sosv')
     parser.add_argument('-a', '--audio_type', default=0, help='Audio stream source: 0 for output, 1 for input')
     parser.add_argument('-c', '--chunk_rate', default=10, help='Number of audio stream chunks collected per second')
     parser.add_argument('-p', '--port', default=0, help='The port to run the server on, 0 for no server')
@@ -234,3 +235,13 @@ python main.py -e paraformer -s ja -t zh -a 0 -c 10 --dashscope_api_key <dashsco
 ![](../img/02_zh.png)
 
 默认引擎为阿里云 `paraformer-realtime-v2`，通过 DashScope Recognition SDK 双向流式识别。上传音频为 16kHz、16bit、单声道 PCM；支持中文、英文、日语、韩语、德语、法语、俄语及粤语，`auto` 不指定语言提示。模型不提供内置翻译；开启翻译后需配置 Ollama、OpenAI 兼容服务或 Google 翻译，完整句子返回后异步翻译。设置中的阿里云 API Key 或 `DASHSCOPE_API_KEY` 环境变量用于鉴权（所有平台）；CLI 参数为 `--dashscope_api_key`。当前使用北京地域默认端点，API Key 必须匹配该地域。旧 Gummy 引擎选项和 API Key 自动迁移，旧西班牙语/意大利语源语言改为自动检测；旧自定义命令需手动更新。详见[阿里云官方 SDK 文档](https://help.aliyun.com/zh/model-studio/paraformer-real-time-speech-recognition-python-sdk)。
+
+## Qwen LiveTranslate
+
+Qwen LiveTranslate 使用 `qwen3.8-livetranslate-flash-realtime`，在同一个 WebSocket 会话中流式返回原文和译文，无需配置外部翻译服务。默认仍为 Paraformer。选择此引擎后填写业务空间 ID、地域（北京或新加坡），并在更多设置中填写该业务空间和地域的阿里云 API Key；也可使用 `DASHSCOPE_WORKSPACE_ID` 和 `DASHSCOPE_API_KEY` 环境变量。源语言自动检测，界面提供中、英、日、韩、德、法、俄、西、意作为翻译目标语言。音频上传为 16kHz、16bit、单声道 PCM，仅输出文字，不播放翻译语音。关闭翻译仅隐藏译文，服务端仍执行翻译；只需要识别时建议选择 Paraformer。
+
+[API / WebSocket](https://help.aliyun.com/zh/model-studio/qwen3-5-livetranslate-flash-realtime)
+
+```bash
+python main.py -e livetranslate -t zh --dashscope_api_key <api-key> --dashscope_workspace_id <workspace-id> --dashscope_region cn-beijing
+```

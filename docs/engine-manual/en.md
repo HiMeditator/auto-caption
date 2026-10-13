@@ -134,6 +134,7 @@ It is recommended to encapsulate this as a class, implementing four methods:
 Complete caption engine examples:
 
 - [paraformer.py](../../engine/audio2text/paraformer.py)
+- [livetranslate.py](../../engine/audio2text/livetranslate.py)
 - [vosk.py](../../engine/audio2text/vosk.py)
 - [sosv.py](../../engine/audio2text/sosv.py)
 
@@ -178,7 +179,7 @@ Custom caption engine settings provide command line parameter specification, so 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Convert system audio stream to text')
     # all
-    parser.add_argument('-e', '--caption_engine', default='paraformer', help='Caption engine: paraformer, glm, vosk or sosv')
+    parser.add_argument('-e', '--caption_engine', default='paraformer', help='Caption engine: paraformer, livetranslate, glm, vosk or sosv')
     parser.add_argument('-a', '--audio_type', default=0, help='Audio stream source: 0 for output, 1 for input')
     parser.add_argument('-c', '--chunk_rate', default=10, help='Number of audio stream chunks collected per second')
     parser.add_argument('-p', '--port', default=0, help='The port to run the server on, 0 for no server')
@@ -234,3 +235,13 @@ With a functional caption engine, it can be launched in the caption software win
 ![](../img/02_en.png)
 
 The default engine is Alibaba Cloud `paraformer-realtime-v2`, using the DashScope Recognition SDK for duplex streaming ASR. Audio is uploaded as 16kHz, 16-bit mono PCM. Supported source languages are Chinese, English, Japanese, Korean, German, French, Russian and Cantonese; `auto` sends no language hint. There is no built-in translation: configure Ollama, an OpenAI-compatible service or Google Translate to translate finalized sentences asynchronously. Set the Alibaba Cloud API Key in settings or the `DASHSCOPE_API_KEY` environment variable on any platform; the CLI option is `--dashscope_api_key`. The current endpoint is the default Beijing endpoint and requires a matching regional API Key. Old Gummy selections and API Keys migrate automatically; old Spanish/Italian source selections switch to auto detection. Update old custom commands manually. See the [official SDK documentation](https://help.aliyun.com/zh/model-studio/paraformer-real-time-speech-recognition-python-sdk).
+
+## Qwen LiveTranslate
+
+Qwen LiveTranslate uses `qwen3.8-livetranslate-flash-realtime` to stream source transcripts and translated text in one WebSocket session, with no external translation service. Paraformer remains the default. Select this engine, enter the workspace ID and region (Beijing or Singapore), and enter an Alibaba Cloud API Key for that workspace and region in More Settings. Alternatively, use `DASHSCOPE_WORKSPACE_ID` and `DASHSCOPE_API_KEY`. The source language is detected automatically. The UI offers Chinese, English, Japanese, Korean, German, French, Russian, Spanish and Italian as target languages. Audio is uploaded as 16kHz, 16-bit mono PCM. Only text is returned; translated speech is not played. Disabling translation only hides the translation, while the service still translates. Use Paraformer for recognition only.
+
+[API / WebSocket](https://help.aliyun.com/zh/model-studio/qwen3-5-livetranslate-flash-realtime)
+
+```bash
+python main.py -e livetranslate -t zh --dashscope_api_key <api-key> --dashscope_workspace_id <workspace-id> --dashscope_region cn-beijing
+```

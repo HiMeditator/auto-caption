@@ -16,6 +16,8 @@ export interface Controls {
   translation: boolean,
   recording: boolean,
   dashscopeApiKey: string,
+  dashscopeWorkspaceId: string,
+  dashscopeRegion: 'cn-beijing' | 'ap-southeast-1',
   voskModelPath: string,
   sosvModelPath: string,
   glmUrl: string,

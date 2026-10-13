@@ -190,9 +190,13 @@
 
 ## 未发布
 
+- 主进程和渲染进程 TypeScript 配置显式使用 `bundler` 模块解析，修复继承的 `node10` 解析方式弃用提示
+
 - 字幕引擎选项将云端模型排列在本地模型之前，并为 Vosk、SOSV 标注 CPU 运行位置
 
 ### 引擎更新
+
+- 新增 Qwen LiveTranslate 3.8 实时引擎，支持内置流式翻译、业务空间和地域设置，并处理原文与译文交错返回
 
 - 移除已下架的 Gummy 引擎，默认改为阿里云 Paraformer Realtime v2，支持实时识别及外部翻译
 - 自动迁移旧 Gummy 引擎和 API Key 配置；CLI 密钥参数改为 `--dashscope_api_key`

@@ -16,7 +16,7 @@
     <div class="input-item">
       <span class="input-label">{{ $t('engine.sourceLang') }}</span>
       <a-select
-        :disabled="currentEngine === 'vosk'"
+        :disabled="currentEngine === 'vosk' || currentEngine === 'livetranslate'"
         class="input-area"
         v-model:value="currentSourceLang"
         :options="sLangList"
@@ -29,6 +29,18 @@
         v-model:value="currentTargetLang"
         :options="tLangList"
       ></a-select>
+    </div>
+    <p v-if="currentEngine === 'livetranslate'">{{ $t('engine.liveTranslateNote') }}</p>
+    <div class="input-item" v-if="currentEngine === 'livetranslate'">
+      <span class="input-label">{{ $t('engine.workspaceId') }}</span>
+      <a-input class="input-area" v-model:value="currentDashscopeWorkspaceId" />
+    </div>
+    <div class="input-item" v-if="currentEngine === 'livetranslate'">
+      <span class="input-label">{{ $t('engine.dashscopeRegion') }}</span>
+      <a-select class="input-area" v-model:value="currentDashscopeRegion" :options="[
+        { value: 'cn-beijing', label: $t('engine.regionBeijing') },
+        { value: 'ap-southeast-1', label: $t('engine.regionSingapore') }
+      ]" />
     </div>
     <div class="input-item" v-if="translationProviders.length">
       <span class="input-label">{{ $t('engine.translationProvider') }}</span>
@@ -321,6 +333,8 @@ const currentOpenaiModel = ref('')
 const currentOpenaiBaseUrl = ref('https://api.openai.com/v1')
 const currentOpenaiApiKey = ref('')
 const currentDashscopeApiKey = ref<string>('')
+const currentDashscopeWorkspaceId = ref('')
+const currentDashscopeRegion = ref<'cn-beijing' | 'ap-southeast-1'>('cn-beijing')
 const currentVoskModelPath = ref<string>('')
 const currentSosvModelPath = ref<string>('')
 const currentGlmUrl = ref<string>('')
@@ -387,6 +401,8 @@ function applyChange(){
   engineControl.translation = currentTranslation.value
   engineControl.recording = currentRecording.value
   engineControl.dashscopeApiKey = currentDashscopeApiKey.value
+  engineControl.dashscopeWorkspaceId = currentDashscopeWorkspaceId.value
+  engineControl.dashscopeRegion = currentDashscopeRegion.value
   engineControl.voskModelPath = currentVoskModelPath.value
   engineControl.sosvModelPath = currentSosvModelPath.value
   engineControl.glmUrl = currentGlmUrl.value ?? "https://open.bigmodel.cn/api/paas/v4/audio/transcriptions"
@@ -420,6 +436,8 @@ function cancelChange(){
   currentTranslation.value = engineControl.translation
   currentRecording.value = engineControl.recording
   currentDashscopeApiKey.value = engineControl.dashscopeApiKey
+  currentDashscopeWorkspaceId.value = engineControl.dashscopeWorkspaceId
+  currentDashscopeRegion.value = engineControl.dashscopeRegion
   currentVoskModelPath.value = engineControl.voskModelPath
   currentSosvModelPath.value = engineControl.sosvModelPath
   currentGlmUrl.value = engineControl.glmUrl

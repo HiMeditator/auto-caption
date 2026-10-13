@@ -43,10 +43,16 @@ export class CaptionEngine {
       this.command.push('-p', this.port.toString())
     }
     else {
-      if(allConfig.controls.engine === 'paraformer' &&
+      if(['paraformer', 'livetranslate'].includes(allConfig.controls.engine) &&
         !allConfig.controls.dashscopeApiKey && !process.env.DASHSCOPE_API_KEY
       ) {
-        controlWindow.sendErrorMessage(i18n('paraformer.key.missing'))
+        controlWindow.sendErrorMessage(i18n('dashscope.key.missing'))
+        return false
+      }
+      if(allConfig.controls.engine === 'livetranslate' &&
+        !allConfig.controls.dashscopeWorkspaceId && !process.env.DASHSCOPE_WORKSPACE_ID
+      ) {
+        controlWindow.sendErrorMessage(i18n('livetranslate.workspace.missing'))
         return false
       }
       this.command = []
@@ -91,13 +97,20 @@ export class CaptionEngine {
         allConfig.controls.targetLang : 'none'
       )
 
-      if(allConfig.controls.engine === 'paraformer') {
-        this.command.push('-e', 'paraformer')
+      if(['paraformer', 'livetranslate'].includes(allConfig.controls.engine)) {
+        this.command.push('-e', allConfig.controls.engine)
         this.command.push('-s', allConfig.controls.sourceLang)
         if(allConfig.controls.dashscopeApiKey) {
           this.command.push('--dashscope_api_key', allConfig.controls.dashscopeApiKey)
         }
-        this.addTranslationArguments()
+        if(allConfig.controls.engine === 'livetranslate') {
+          this.command.push('--dashscope_region', allConfig.controls.dashscopeRegion)
+          if(allConfig.controls.dashscopeWorkspaceId) {
+            this.command.push('--dashscope_workspace_id', allConfig.controls.dashscopeWorkspaceId)
+          }
+        } else {
+          this.addTranslationArguments()
+        }
       }
       else if(allConfig.controls.engine === 'vosk'){
         this.command.push('-e', 'vosk')
@@ -278,7 +291,7 @@ function handleEngineData(data: any) {
     }
   }
   else if(data.command === 'caption') {
-    allConfig.updateCaptionLog(data);
+    allConfig.updateCaptionLog(data, data.update_by_time === true);
   }
   else if(data.command === 'translation') {
     allConfig.updateCaptionTranslation(data);

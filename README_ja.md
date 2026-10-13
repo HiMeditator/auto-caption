@@ -70,12 +70,13 @@ macOS および Linux プラットフォームでシステムオーディオ出�
 |                                                              | 正確性 | 実時間性 | デプロイタイプ | 対応言語 | 翻訳 | 備考 |
 | ------------------------------------------------------------ | -------- | --------- | -------------- | -------- | ---- | ---- |
 | [Paraformer Realtime v2](https://help.aliyun.com/zh/model-studio/paraformer-real-time-speech-recognition-python-sdk) | ストリーミング認識 | 外部翻訳 | クラウド / アリババクラウド | 広東語を含む8言語 | Ollama / OpenAI 互換 / Google | アリババクラウドの現行料金 |
+| [Qwen LiveTranslate 3.8](https://help.aliyun.com/zh/model-studio/qwen3-5-livetranslate-flash-realtime) | ストリーミング認識 | ストリーミング翻訳 | クラウド / アリババクラウド | 自動検出 | 内蔵翻訳 | API Key + 業務スペース ID、公式料金 |
 | [glm-asr-2512](https://docs.bigmodel.cn/cn/guide/models/sound-and-video/glm-asr-2512) | とても良い😊 | 悪い😞 | クラウド / Zhipu AI | 4言語 | 追加設定が必要 | 有料、約0.72元/時間 |
 | [Vosk](https://alphacephei.com/vosk) | 悪い😞 | とても良い😊 | ローカル / CPU | 30言語以上 | 追加設定が必要 | 多くの言語に対応 |
 | [SOSV](https://k2-fsa.github.io/sherpa/onnx/sense-voice/index.html) | 普通😐 | 普通😐 | ローカル / CPU | 5言語 | 追加設定が必要 | 1つのモデルのみ |
 | 自分で開発 | 🤔 | 🤔 | カスタム | カスタム | カスタム | [ドキュメント](./docs/engine-manual/ja.md)に従ってPythonを使用して自分で開発 |
 
-すべての字幕エンジンで翻訳を有効にする場合、外部翻訳サービスの設定が必要です。
+Qwen LiveTranslate は内蔵翻訳を使用し、他の字幕エンジンでは外部翻訳サービスの設定が必要です。
 
 ### 翻訳モデルの設定
 
@@ -105,6 +106,16 @@ API Keyは対応するモデルプロバイダから取得する必要があり�
 > 注意：Google翻訳APIは一部の地域では使用できません。
 
 設定不要で、ネット接続があれば使用できます。
+
+### Qwen LiveTranslate
+
+Qwen LiveTranslate は `qwen3.8-livetranslate-flash-realtime` を使用し、1つの WebSocket セッションで原文と訳文をストリーミング出力します。外部翻訳サービスは不要です。デフォルトは Paraformer のままです。このエンジンを選択し、業務スペース ID とリージョン（北京・シンガポール）を設定し、詳細設定で同じ業務スペース・リージョンの API Key を入力してください。`DASHSCOPE_WORKSPACE_ID` と `DASHSCOPE_API_KEY` 環境変数も利用できます。入力言語は自動検出します。UI の翻訳先は中国語・英語・日本語・韓国語・ドイツ語・フランス語・ロシア語・スペイン語・イタリア語です。16kHz・16bit・モノラル PCM を送信し、文字のみを出力します。翻訳音声は再生しません。翻訳を無効にしても訳文を非表示にするだけで、サービスは翻訳を実行します。認識のみが必要な場合は Paraformer を選択してください。
+
+[API / WebSocket](https://help.aliyun.com/zh/model-studio/qwen3-5-livetranslate-flash-realtime)
+
+```bash
+python main.py -e livetranslate -t zh --dashscope_api_key <api-key> --dashscope_workspace_id <workspace-id> --dashscope_region cn-beijing
+```
 
 ### Paraformer Realtime v2
 
@@ -155,7 +166,7 @@ python main.py \
 
 ## ⚙️ 字幕エンジン説明
 
-現在、ソフトウェアには4つの字幕エンジンが搭載されており、新しいエンジンが計画されています。それらの詳細情報は以下の通りです。
+現在、ソフトウェアには5つの字幕エンジンが搭載されており、新しいエンジンが計画されています。それらの詳細情報は以下の通りです。
 
 ### Paraformer Realtime v2
 

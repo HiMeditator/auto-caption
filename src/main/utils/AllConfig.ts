@@ -53,6 +53,8 @@ const defaultControls: Controls = {
   audio: 0,
   engineEnabled: false,
   dashscopeApiKey: '',
+  dashscopeWorkspaceId: '',
+  dashscopeRegion: 'cn-beijing',
   voskModelPath: '',
   sosvModelPath: '',
   glmUrl: 'https://open.bigmodel.cn/api/paas/v4/audio/transcriptions',
@@ -190,7 +192,19 @@ class AllConfig {
     if(info) Log.info(`Send Controls to #${window.id}:`, passwordMaskingForObject(this.controls))
   }
 
-  public updateCaptionLog(log: CaptionItem) {
+  public updateCaptionLog(log: CaptionItem, matchByTime = false) {
+    // Source transcription can finish after the next speech segment has started.
+    const existingIndex = matchByTime
+      ? this.captionLog.findLastIndex(item => item.time_s === log.time_s)
+      : -1
+    if(existingIndex >= 0) {
+      log.index = this.captionLog[existingIndex].index
+      this.captionLog.splice(existingIndex, 1, log)
+      for(const window of BrowserWindow.getAllWindows()) {
+        this.sendCaptionLog(window, 'upd', existingIndex)
+      }
+      return
+    }
     let command: 'add' | 'upd' = 'add'
     if(
       this.captionLog.length &&
