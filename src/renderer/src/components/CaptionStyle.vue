@@ -188,6 +188,16 @@
         textShadow: currentTextShadow ? `${currentOffsetX}px ${currentOffsetY}px ${currentBlur}px ${currentTextShadowColor}` : 'none'
       }"
     >
+      <button
+        type="button"
+        class="preview-close"
+        :style="{color: currentFontColor}"
+        :aria-label="$t('style.closePreview')"
+        :title="$t('style.closePreview')"
+        @click="closePreview"
+      >
+        <CloseOutlined aria-hidden="true" />
+      </button>
       <template v-if="captionData.length">
         <template
           v-for="val in revArr[Math.min(currentLineNumber, captionData.length)]"
@@ -251,6 +261,7 @@ import { storeToRefs } from 'pinia'
 import { notification } from 'ant-design-vue'
 import { useI18n } from 'vue-i18n'
 import { useCaptionLogStore } from '@renderer/stores/captionLog';
+import { CloseOutlined } from '@ant-design/icons-vue'
 
 const revArr = {
   1: [1],
@@ -286,6 +297,15 @@ const currentOffsetX = ref<number>(2)
 const currentOffsetY = ref<number>(2)
 const currentBlur = ref<number>(0)
 const currentTextShadowColor = ref<string>('#ffffff')
+
+function closePreview() {
+  currentPreview.value = false
+  notification.open({
+    placement: 'topLeft',
+    message: t('noti.previewClosed'),
+    description: t('noti.previewClosedInfo')
+  })
+}
 
 function addOpicityToColor(color: string, opicity: number) {
   const opicityValue = Math.round(opicity * 255 / 100);
@@ -381,7 +401,7 @@ watch(changeSignal, (val) => {
   width: 60%;
   text-align: center;
   position: absolute;
-  padding: 10px;
+  padding: 10px 42px 10px 10px;
   border-radius: 10px;
   left: 64%;
   transform: translateX(-50%);
@@ -392,6 +412,27 @@ watch(changeSignal, (val) => {
   text-align: center;
   margin: 0;
   line-height: 1.6em;
+}
+
+.preview-close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-size: inherit;
+  text-shadow: none;
+  cursor: pointer;
+}
+
+.preview-close:hover {
+  background-color: #2221;
 }
 
 .left-ellipsis {

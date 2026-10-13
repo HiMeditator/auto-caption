@@ -5,6 +5,10 @@
       <a @click="applyChange">{{ $t('engine.applyChange') }}</a> |
       <a @click="cancelChange">{{ $t('engine.cancelChange') }}</a>
     </template>
+    <p
+      class="engine-description"
+      :style="descriptionStyle"
+    >{{ $t(`engine.descriptions.${currentEngine}`) }}</p>
     <div class="input-item">
       <span class="input-label">{{ $t('engine.captionEngine') }}</span>
       <a-select
@@ -22,91 +26,30 @@
         :options="sLangList"
       ></a-select>
     </div>
-    <div class="input-item">
-      <span class="input-label">{{ $t('engine.transLang') }}</span>
-      <a-select
-        class="input-area"
-        v-model:value="currentTargetLang"
-        :options="tLangList"
-      ></a-select>
-    </div>
-    <p v-if="currentEngine === 'livetranslate'">{{ $t('engine.liveTranslateNote') }}</p>
     <div class="input-item" v-if="currentEngine === 'livetranslate'">
-      <span class="input-label">{{ $t('engine.workspaceId') }}</span>
+      <a-popover placement="right">
+        <template #content>
+          <p class="label-hover-info">{{ $t('engine.workspaceIdInfo') }}</p>
+        </template>
+        <span class="input-label info-label"
+          :style="{color: uiColor}"
+        >{{ $t('engine.workspaceId') }}</span>
+      </a-popover>
       <a-input class="input-area" v-model:value="currentDashscopeWorkspaceId" />
     </div>
     <div class="input-item" v-if="currentEngine === 'livetranslate'">
-      <span class="input-label">{{ $t('engine.dashscopeRegion') }}</span>
+      <a-popover placement="right">
+        <template #content>
+          <p class="label-hover-info">{{ $t('engine.dashscopeRegionInfo') }}</p>
+        </template>
+        <span class="input-label info-label"
+          :style="{color: uiColor}"
+        >{{ $t('engine.dashscopeRegion') }}</span>
+      </a-popover>
       <a-select class="input-area" v-model:value="currentDashscopeRegion" :options="[
         { value: 'cn-beijing', label: $t('engine.regionBeijing') },
         { value: 'ap-southeast-1', label: $t('engine.regionSingapore') }
       ]" />
-    </div>
-    <div class="input-item" v-if="translationProviders.length">
-      <span class="input-label">{{ $t('engine.translationProvider') }}</span>
-      <a-select
-        class="input-area"
-        v-model:value="currentTranslationProvider"
-        :options="translationProviders"
-      ></a-select>
-    </div>
-    <div class="input-item" v-if="translationProviders.length && currentTranslationProvider === 'ollama'">
-      <a-popover placement="right">
-        <template #content>
-          <p class="label-hover-info">{{ $t('engine.ollamaModelNote') }}</p>
-        </template>
-        <span class="input-label info-label"
-          :style="{color: uiColor}"
-        >{{ $t('engine.modelName') }}</span>
-      </a-popover>
-      <a-input
-        class="input-area"
-        v-model:value="currentOllamaModel"
-      ></a-input>
-    </div>
-    <div class="input-item" v-if="translationProviders.length && currentTranslationProvider === 'openai'">
-      <a-popover placement="right">
-        <template #content>
-          <p class="label-hover-info">{{ $t('engine.openaiModelNote') }}</p>
-        </template>
-        <span class="input-label info-label"
-          :style="{color: uiColor}"
-        >{{ $t('engine.modelName') }}</span>
-      </a-popover>
-      <a-input
-        class="input-area"
-        v-model:value="currentOpenaiModel"
-      ></a-input>
-    </div>
-    <div class="input-item" v-if="translationProviders.length && currentTranslationProvider === 'openai'">
-      <a-popover placement="right">
-        <template #content>
-          <p class="label-hover-info">{{ $t('engine.baseURL') }}</p>
-        </template>
-        <span class="input-label info-label"
-          :style="{color: uiColor}"
-        >Base URL</span>
-      </a-popover>
-      <a-input
-        class="input-area"
-        v-model:value="currentOpenaiBaseUrl"
-        placeholder="https://api.openai.com/v1"
-      ></a-input>
-    </div>
-    <div class="input-item" v-if="translationProviders.length && currentTranslationProvider === 'openai'">
-      <a-popover placement="right">
-        <template #content>
-          <p class="label-hover-info">{{ $t('engine.apiKey') }}</p>
-        </template>
-        <span class="input-label info-label"
-          :style="{color: uiColor}"
-        >API Key</span>
-      </a-popover>
-      <a-input
-          class="input-area"
-          type="password"
-          v-model:value="currentOpenaiApiKey"
-      />
     </div>
     <div class="input-item" v-if="currentEngine === 'glm'">
       <span class="input-label">GLM API URL</span>
@@ -125,7 +68,14 @@
       ></a-input>
     </div>
     <div class="input-item">
-      <span class="input-label">{{ $t('engine.audioType') }}</span>
+      <a-popover placement="right">
+        <template #content>
+          <p class="label-hover-info">{{ $t('engine.audioTypeInfo') }}</p>
+        </template>
+        <span class="input-label info-label"
+          :style="{color: uiColor}"
+        >{{ $t('engine.audioType') }}</span>
+      </a-popover>
       <a-select
         class="input-area"
         v-model:value="currentAudio"
@@ -133,20 +83,25 @@
       ></a-select>
     </div>
     <div class="input-item">
-      <span class="input-label">{{ $t('engine.enableTranslation') }}</span>
-      <a-switch v-model:checked="currentTranslation" />
-      <span style="display:inline-block;width:10px;"></span>
-      <div style="display: inline-block;">
-        <span class="switch-label">{{ $t('engine.enableRecording') }}</span>
-        <a-switch v-model:checked="currentRecording" />
-      </div>
-    </div>
-    <div class="input-item">
-      <span class="input-label">{{ $t('engine.customEngine') }}</span>
+      <a-popover placement="right">
+        <template #content>
+          <p class="label-hover-info">{{ $t('engine.customEngineInfo') }}</p>
+        </template>
+        <span class="input-label info-label"
+          :style="{color: uiColor}"
+        >{{ $t('engine.customEngine') }}</span>
+      </a-popover>
       <a-switch v-model:checked="currentCustomized" />
       <span style="display:inline-block;width:10px;"></span>
       <div style="display: inline-block;">
-        <span class="switch-label">{{ $t('engine.showMore') }}</span>
+        <a-popover placement="right">
+          <template #content>
+            <p class="label-hover-info">{{ $t('engine.showMoreInfo') }}</p>
+          </template>
+          <span class="switch-label info-label"
+            :style="{color: uiColor}"
+          >{{ $t('engine.showMore') }}</span>
+        </a-popover>
         <a-switch v-model:checked="showMore" />
       </div>
     </div>
@@ -299,6 +254,107 @@
         />
       </div>
     </a-card>
+
+    <p class="engine-description translation-description" :style="descriptionStyle">
+      {{ $t(translationDescriptionKey) }}
+    </p>
+    <div class="input-item">
+      <a-popover placement="right">
+        <template #content>
+          <p class="label-hover-info">{{ $t(currentEngine === 'livetranslate' ? 'engine.liveTranslateTranslationInfo' : 'engine.enableTranslationInfo') }}</p>
+        </template>
+        <span class="input-label info-label"
+          :style="{color: uiColor}"
+        >{{ $t('engine.enableTranslation') }}</span>
+      </a-popover>
+      <a-switch v-model:checked="currentTranslation" />
+      <span style="display:inline-block;width:10px;"></span>
+      <div style="display: inline-block;">
+        <a-popover placement="right">
+          <template #content>
+            <p class="label-hover-info">{{ $t('engine.enableRecordingInfo') }}</p>
+          </template>
+          <span class="switch-label info-label"
+            :style="{color: uiColor}"
+          >{{ $t('engine.enableRecording') }}</span>
+        </a-popover>
+        <a-switch v-model:checked="currentRecording" />
+      </div>
+    </div>
+    <div class="input-item">
+      <span class="input-label">{{ $t('engine.transLang') }}</span>
+      <a-select
+        class="input-area"
+        v-model:value="currentTargetLang"
+        :options="tLangList"
+      ></a-select>
+    </div>
+    <div class="input-item" v-if="translationProviders.length">
+      <span class="input-label">{{ $t('engine.translationProvider') }}</span>
+      <a-select
+        class="input-area"
+        v-model:value="currentTranslationProvider"
+        :options="translationProviders"
+      ></a-select>
+    </div>
+    <div class="input-item" v-if="translationProviders.length && currentTranslationProvider === 'ollama'">
+      <a-popover placement="right">
+        <template #content>
+          <p class="label-hover-info">{{ $t('engine.ollamaModelNote') }}</p>
+        </template>
+        <span class="input-label info-label"
+          :style="{color: uiColor}"
+        >{{ $t('engine.modelName') }}</span>
+      </a-popover>
+      <a-input
+        class="input-area"
+        v-model:value="currentOllamaModel"
+      ></a-input>
+    </div>
+    <div class="input-item" v-if="translationProviders.length && currentTranslationProvider === 'openai'">
+      <a-popover placement="right">
+        <template #content>
+          <p class="label-hover-info">{{ $t('engine.openaiModelNote') }}</p>
+        </template>
+        <span class="input-label info-label"
+          :style="{color: uiColor}"
+        >{{ $t('engine.modelName') }}</span>
+      </a-popover>
+      <a-input
+        class="input-area"
+        v-model:value="currentOpenaiModel"
+      ></a-input>
+    </div>
+    <div class="input-item" v-if="translationProviders.length && currentTranslationProvider === 'openai'">
+      <a-popover placement="right">
+        <template #content>
+          <p class="label-hover-info">{{ $t('engine.baseURL') }}</p>
+        </template>
+        <span class="input-label info-label"
+          :style="{color: uiColor}"
+        >Base URL</span>
+      </a-popover>
+      <a-input
+        class="input-area"
+        v-model:value="currentOpenaiBaseUrl"
+        placeholder="https://api.openai.com/v1"
+      ></a-input>
+    </div>
+    <div class="input-item" v-if="translationProviders.length && currentTranslationProvider === 'openai'">
+      <a-popover placement="right">
+        <template #content>
+          <p class="label-hover-info">{{ $t('engine.apiKey') }}</p>
+        </template>
+        <span class="input-label info-label"
+          :style="{color: uiColor}"
+        >API Key</span>
+      </a-popover>
+      <a-input
+          class="input-area"
+          type="password"
+          v-model:value="currentOpenaiApiKey"
+      />
+    </div>
   </a-card>
   <div style="height: 20px;"></div>
 </template>
@@ -308,11 +364,12 @@ import { ref, computed, watch, h } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useGeneralSettingStore } from '@renderer/stores/generalSetting'
 import { useEngineControlStore } from '@renderer/stores/engineControl'
-import { notification } from 'ant-design-vue'
+import { notification, theme } from 'ant-design-vue'
 import { ExclamationCircleOutlined, FolderOpenOutlined ,InfoCircleOutlined } from '@ant-design/icons-vue';
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
+const { token } = theme.useToken()
 const showMore = ref(false)
 
 const engineControl = useEngineControlStore()
@@ -320,6 +377,17 @@ const { captionEngine, audioType, changeSignal } = storeToRefs(engineControl)
 
 const generalSetting = useGeneralSettingStore()
 const { uiColor } = storeToRefs(generalSetting)
+
+const descriptionStyle = computed(() => ({
+  // The generated primary palette for black is too dark for light-theme text.
+  backgroundColor: uiColor.value === '#000000'
+    ? token.value.colorFillTertiary
+    : token.value.colorPrimaryBg,
+  borderColor: uiColor.value === '#000000'
+    ? token.value.colorBorder
+    : token.value.colorPrimaryBorder,
+  color: token.value.colorText
+}))
 
 const currentSourceLang = ref('auto')
 const currentTargetLang = ref('zh')
@@ -345,6 +413,12 @@ const currentCustomized = ref<boolean>(false)
 const currentCustomizedApp = ref('')
 const currentCustomizedCommand = ref('')
 const currentStartTimeoutSeconds = ref<number>(30)
+
+const translationDescriptionKey = computed(() =>
+  currentEngine.value === 'livetranslate'
+    ? 'engine.translationDescriptions.livetranslate'
+    : `engine.translationDescriptions.${currentTranslationProvider.value}`
+)
 
 const sLangList = computed(() => {
   for(let item of captionEngine.value){
@@ -486,6 +560,15 @@ watch(currentEngine, (val) => {
 
 <style scoped>
 @import url(../assets/input.css);
+
+.engine-description {
+  margin: 10px 0;
+  padding: 10px 12px;
+  border: 1px solid;
+  border-radius: 6px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
 
 .label-hover-info {
   margin-top: 10px;

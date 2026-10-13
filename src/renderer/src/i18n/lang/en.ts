@@ -28,6 +28,8 @@ export default {
     "changeInfo": "If the caption engine is already running, you need to restart it for the changes to take effect.",
     "styleChange": "Caption Style Changed",
     "styleInfo": "Caption style changes have been saved and applied.",
+    "previewClosed": "Preview Closed",
+    "previewClosedInfo": "Turn on Preview in Caption Style Settings to show the preview again.",
     "engineStartTimeout": "Caption engine startup timeout, automatically force stopped",
     "translationConfigMissing": "Incomplete Translation Service Configuration",
     "translationConfigMissingNote": "Enter the model name required by the selected translation service. OpenAI-compatible services also require a Base URL."
@@ -50,11 +52,25 @@ export default {
     "sourceLang": "Source",
     "transLang": "Translation",
     "workspaceId": "Workspace ID",
+    "workspaceIdInfo": "The Alibaba Cloud Model Studio workspace ID used by Qwen LiveTranslate. The workspace and API Key must match the selected region. If left empty, the DASHSCOPE_WORKSPACE_ID environment variable is used.",
     "dashscopeRegion": "Alibaba Cloud region",
+    "dashscopeRegionInfo": "Select the region for the Qwen LiveTranslate service: Beijing or Singapore. The workspace ID and API Key must match this region for the service connection to work.",
     "regionBeijing": "Beijing",
     "regionSingapore": "Singapore",
-    "liveTranslateNote": "Built-in streaming translation; no external translation service needed. Source language is detected automatically. Disabling translation only hides the translation; the service still translates. Workspace and API Key must match the selected region.",
+    descriptions: {
+      "paraformer": "Alibaba Cloud real-time speech recognition for Chinese, English, Japanese, Korean, German, French, Russian and Cantonese. Requires an Alibaba Cloud API Key for Beijing. Translation requires a separately configured external service.",
+      "livetranslate": "Built-in streaming translation; no external translation service needed. Source language is detected automatically. Disabling translation only hides the translation; the service still translates. Workspace and API Key must match the selected region.",
+      "glm": "Zhipu AI cloud speech recognition uploads audio in speech segments and returns transcripts. Requires a GLM API Key, with configurable API URL and model name. Translation requires a separately configured external service.",
+      "vosk": "Offline streaming speech recognition on your local CPU. Download a model and set its path in More Settings; the selected model determines the recognition language. Translation requires a separately configured external service.",
+      "sosv": "SenseVoice speech recognition on your local CPU for Chinese, English, Japanese, Korean and Cantonese, with automatic source language detection. Download a model and set its path in More Settings. Translation requires a separately configured external service."
+    },
     "translationProvider": "Translation Service",
+    translationDescriptions: {
+      "ollama": "Translate with a local model through Ollama on this computer. Install and start Ollama, download a translation model, then enter its name. Translation runs locally.",
+      "openai": "Translate through an OpenAI-compatible API hosted in the cloud or locally. Enter the service's model name, Base URL and API Key if required by the service.",
+      "google": "Translate through Google Translate without a model name or API Key. Requires a network connection that can access Google. Recognized text is sent to Google Translate.",
+      "livetranslate": "Use Qwen LiveTranslate's built-in streaming translation with the same workspace, region and API Key as speech recognition. No external translation service is needed. Disabling translation only hides translated text; the service still translates."
+    },
     "modelName": "Model Name",
     "ollamaModelNote": "Enter the name of a model installed in the local Ollama instance. Ollama uses its default local service address.",
     "openaiModelNote": "Enter the model name provided by the OpenAI-compatible service.",
@@ -62,11 +78,16 @@ export default {
     "apiKey": "The API key required by the OpenAI-compatible service.",
     "captionEngine": "Engine",
     "audioType": "Audio Type",
+    "audioTypeInfo": "Choose the audio source for caption recognition: System Audio Output (Speaker) captures sound played by your computer; System Audio Input (Microphone) captures sound from your microphone.",
     "systemOutput": "System Audio Output (Speaker)",
     "systemInput": "System Audio Input (Microphone)",
     "enableTranslation": "Translation",
+    "enableTranslationInfo": "Translate recognized captions into the selected target language. Configure the translation service and its required parameters before enabling it. When disabled, only source captions are generated.",
+    "liveTranslateTranslationInfo": "Use Qwen LiveTranslate's built-in translation to output captions in the selected target language, without an external translation service. Disabling this option only hides translated text; the service still translates.",
     "enableRecording": "Enable Recording",
+    "enableRecordingInfo": "Record audio captured by the caption engine to a .wav file, saved when the engine stops. Set the destination folder in More Settings.",
     "showMore": "More Settings",
+    "showMoreInfo": "Show or hide settings for API Keys, local model paths, the recording folder and startup timeout. Click Apply Changes after editing these settings.",
     "apikey": "API KEY",
     "voskModelPath": "Vosk Path",
     "sosvModelPath": "SOSV Path",
@@ -81,6 +102,7 @@ export default {
     "modelDownload": "Model Download Link",
     "startTimeoutInfo": "Caption engine startup timeout duration. Engine will be forcefully stopped if startup exceeds this time. Recommended range: 10-120 seconds.",
     "customEngine": "Custom Eng",
+    "customEngineInfo": "Use a custom caption engine in place of a built-in engine. Enter its executable path and command arguments after enabling this option. Configure recognition, translation and recording through the command arguments. The engine must support this app's communication protocol.",
 
     custom: {
       "title": "Custom Caption Engine",
@@ -104,6 +126,7 @@ export default {
     "background": "Background",
     "opacity": "Opacity",
     "preview": "Preview",
+    "closePreview": "Close preview",
     "translation": "Show Translation",
     trans: {
       "title": "Translation Style Settings",

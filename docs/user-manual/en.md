@@ -112,6 +112,8 @@ sudo yum install pulseaudio pavucontrol
 
 Caption settings can be divided into three categories: general settings, caption engine settings, and caption style settings. Note that changes to general settings take effect immediately. For the other two categories, after making changes, you need to click the "Apply" option in the upper right corner of the corresponding settings module for the changes to take effect. If you click "Cancel Changes," the current modifications will not be saved and will revert to the previous state.
 
+The caption style preview has a close icon in its top-right corner, matching the caption window's button style and using the source caption text color. Clicking it immediately hides the preview and turns off the Preview switch in Caption Style Settings. A notification confirms that the preview is closed and explains how to enable it again in Caption Style Settings. Turn the switch back on to show the preview again. Apply saves this setting; Cancel restores the last saved state.
+
 ### Starting and Stopping Captions
 
 After completing all configurations, click the "Start Caption Engine" button on the interface to start the captions. If you need a separate caption display window, click the "Open Caption Window" button to activate the independent caption display window. To pause caption recognition, click the "Stop Caption Engine" button.
@@ -129,6 +131,14 @@ In the caption control window, you can see the records of all collected captions
 ## Caption Engine
 
 Caption engine options appear in the order Paraformer, Qwen LiveTranslate, GLM-ASR, Vosk, SOSV, with cloud models first. Local models show their execution device: `Local / CPU / Vosk` and `Local / CPU / SOSV`.
+
+In Caption Engine Settings, each model's description appears at the top of the model settings, explaining its recognition method, configuration requirements and translation support. The description updates immediately when you select another model. Its bordered box uses the current theme's primary color palette for its background and border, adapting to light and dark themes.
+
+When the last color option (black) is selected in the light theme, model and translation descriptions use a light gray background and gray border to keep the text readable.
+
+Model, audio, custom engine and More Settings options come first. Translation and Enable Recording share a row in the following group, followed by target language, translation service and its model name, Base URL and API Key. A translation service description between the two groups uses the same style as the model description and updates immediately when you select Ollama, an OpenAI-compatible service or Google Translate. Qwen LiveTranslate shows a built-in translation description and omits external translation service settings.
+
+Hover over the Audio Type, Enable Recording, Custom Eng, Translation or More Settings label to see its function and configuration requirements. When Qwen LiveTranslate is selected, Workspace ID and Alibaba Cloud region also provide hover help explaining that the workspace, API Key and region must match, and that an empty workspace ID falls back to the environment variable. Labels with hover help use the theme color. The translation help for Qwen LiveTranslate explains that disabling translation only hides translated text while the service still translates.
 
 The so-called caption engine is essentially a subprogram that captures real-time streaming data from system audio input (recording) or output (playback), and invokes speech-to-text models to generate corresponding captions. The generated captions are converted into JSON-formatted strings and passed to the main program through standard output. The main program reads the caption data, processes it, and displays it in the window.
 
