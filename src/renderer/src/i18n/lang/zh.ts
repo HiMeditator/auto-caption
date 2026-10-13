@@ -174,7 +174,13 @@ export default {
       "projLink": "项目链接",
       "manual": "用户手册",
       "engineDoc": "字幕引擎手册",
-      "date": "2026 年 1 月 31 日"
+      "changelog": "更新日志",
+      "changelogDesc": "查看版本更新、新增功能与修复记录",
+      "updateDate": "更新日期",
+      "projLinkDesc": "查看源代码、版本发布与问题反馈",
+      "manualDesc": "了解软件使用方法与设置说明",
+      "engineDocDesc": "了解字幕引擎与自定义引擎开发",
+      "date": "2026 年 10 月 14 日"
     }
   },
   log: {

@@ -55,7 +55,12 @@
       </a-col>
       <a-col :span="4">
         <div class="about-tag">{{ $t('status.aboutProj') }}</div>
-          <GithubOutlined class="proj-info" @click="showAbout = true"/>
+        <button
+          type="button"
+          class="proj-info"
+          :aria-label="$t('status.aboutProj')"
+          @click="showAbout = true"
+        ><GithubOutlined /></button>
       </a-col>
     </a-row>
   </div>
@@ -95,50 +100,7 @@
     >{{ $t('status.stopEngine') }}</a-button>
   </div>
 
-  <a-modal v-model:open="showAbout" :title="$t('status.about.title')" :footer="null">
-    <div class="about-modal-content">
-      <h2 class="about-title">{{ $t('status.about.proj') }}</h2>
-      <p class="about-desc">{{ $t('status.about.desc') }}</p>
-      <a-divider />
-      <div class="about-info">
-        <p><b>{{ $t('status.about.version') }}</b><a-tag color="green">v1.1.1</a-tag></p>
-        <p>
-          <b>{{ $t('status.about.author') }}</b>
-          <a
-            href="https://github.com/HiMeditator"
-            target="_blank"
-          >
-            <a-tag color="blue">HiMeditator</a-tag>
-          </a>
-        </p>
-        <p>
-          <b>{{ $t('status.about.projLink') }}</b>
-          <a href="https://github.com/HiMeditator/auto-caption" target="_blank">
-            <a-tag color="blue">GitHub | auto-caption</a-tag>
-          </a>
-        </p>
-        <p>
-          <b>{{ $t('status.about.manual') }}</b>
-          <a
-            :href="`https://github.com/HiMeditator/auto-caption/tree/main/docs/user-manual/${$t('lang')}.md`"
-            target="_blank"
-          >
-            <a-tag color="blue">GitHub | user-manual/{{ $t('lang') }}.md</a-tag>
-          </a>
-        </p>
-        <p>
-          <b>{{ $t('status.about.engineDoc') }}</b>
-          <a
-            :href="`https://github.com/HiMeditator/auto-caption/tree/main/docs/engine-manual/${$t('lang')}.md`"
-            target="_blank"
-          >
-            <a-tag color="blue">GitHub | engine-manual/{{ $t('lang') }}.md</a-tag>
-          </a>
-        </p>
-      </div>
-      <div class="about-date">{{ $t('status.about.date') }}</div>
-    </div>
-  </a-modal>
+  <AboutProject v-model:open="showAbout" />
 </template>
 
 <script setup lang="ts">
@@ -149,6 +111,7 @@ import { useCaptionLogStore } from '@renderer/stores/captionLog'
 import { useSoftwareLogStore } from '@renderer/stores/softwareLog'
 import { useEngineControlStore } from '@renderer/stores/engineControl'
 import { GithubOutlined, InfoCircleOutlined, LoadingOutlined } from '@ant-design/icons-vue'
+import AboutProject from './AboutProject.vue'
 
 const showAbout = ref(false)
 const pending = ref(false)
@@ -246,43 +209,18 @@ watch(errorSignal, () => {
 
 .proj-info {
   display: inline-block;
+  padding: 0;
+  border: 0;
+  background: transparent;
   font-size: 24px;
   cursor: pointer;
   color: var(--icon-color);
 }
 
-.about-modal-content {
-  text-align: center;
-  padding: 8px 0 0 0;
-}
-
-.about-title {
-  font-size: 1.5em;
-  font-weight: bold;
-  margin-bottom: 0.2em;
-}
-
-.about-desc {
-  color: #666;
-  margin-bottom: 0.5em;
-}
-
-.about-info {
-  text-align: left;
-  display: inline-block;
-  margin: 0 auto;
-  font-size: 1em;
-}
-
-.about-info b {
-  margin-right: 1em;
-}
-
-.about-date {
-  margin-top: 1.5em;
-  color: #aaa;
-  font-size: 0.95em;
-  text-align: right;
+.proj-info:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 4px;
+  border-radius: 4px;
 }
 
 .caption-control {

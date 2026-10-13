@@ -175,7 +175,13 @@ export default {
       "projLink": "Project Link",
       "manual": "User Manual",
       "engineDoc": "Caption Engine Manual",
-      "date": "January 31, 2026"
+      "changelog": "Changelog",
+      "changelogDesc": "Review version updates, new features and fixes",
+      "updateDate": "Updated",
+      "projLinkDesc": "Explore source code, releases and issues",
+      "manualDesc": "Learn how to use and configure the app",
+      "engineDocDesc": "Explore caption engines and custom engine development",
+      "date": "October 14, 2026"
     }
   },
   log: {

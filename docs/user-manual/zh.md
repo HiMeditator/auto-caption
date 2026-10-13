@@ -1,6 +1,6 @@
 # Auto Caption 用户手册
 
-对应版本：v1.1.1
+对应版本：v1.2.0
 
 ## 软件简介
 
@@ -19,6 +19,10 @@ Auto Caption 是一个跨平台的字幕显示软件，能够实时获取系统�
 | Kylin Server V10 SP3 | x64 | ✅ | ✅ |
 
 ![](../../assets/media/main_zh.png)
+
+### 项目关于
+
+点击主界面“项目关于”下的 GitHub 图标，打开关于窗口。窗口顶部展示软件图标，显示软件版本、更新日期和作者信息，并以两行两列的卡片布局提供项目仓库、用户手册、字幕引擎手册和更新日志入口，各链接显示完整地址。手册链接随界面语言切换，更新日志链接指向统一的更新记录，窗口配色跟随深浅主题。
 
 ### 软件缺点
 
@@ -128,7 +132,7 @@ sudo yum install pulseaudio pavucontrol
 
 ## 字幕引擎
 
-字幕引擎选项按 Paraformer、Qwen LiveTranslate、GLM-ASR、Vosk、SOSV 排列，云端模型在前。本地模型标注运行位置：`本地 / CPU / Vosk`、`本地 / CPU / SOSV`。
+字幕引擎选项按 Qwen LiveTranslate 3.8、Paraformer、GLM-ASR、Vosk、SOSV 排列，云端模型在前。本地模型标注运行位置：`本地 / CPU / Vosk`、`本地 / CPU / SOSV`。
 
 在字幕引擎设置中，每个模型的描述显示在模型设置顶部，介绍识别方式、配置要求和翻译支持。切换模型时描述立即更新；描述框带有边框，背景和边框使用当前主题色的配色，并适配明暗主题。
 

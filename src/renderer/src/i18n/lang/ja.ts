@@ -174,7 +174,13 @@ export default {
       "projLink": "プロジェクトリンク",
       "manual": "ユーザーマニュアル",
       "engineDoc": "字幕エンジンマニュアル",
-      "date": "2026 年 1 月 31 日"
+      "changelog": "更新履歴",
+      "changelogDesc": "バージョン更新・新機能・修正内容を確認",
+      "updateDate": "更新日",
+      "projLinkDesc": "ソースコード・リリース・問題報告を確認",
+      "manualDesc": "ソフトウェアの使い方と設定を確認",
+      "engineDocDesc": "字幕エンジンとカスタムエンジン開発を確認",
+      "date": "2026 年 10 月 14 日"
     }
   },
   log: {

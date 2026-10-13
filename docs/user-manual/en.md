@@ -1,6 +1,6 @@
 # Auto Caption User Manual
 
-Corresponding Version: v1.1.1
+Corresponding Version: v1.2.0
 
 **Note: Due to limited personal resources, the English and Japanese documentation files for this project (except for the README document) will no longer be maintained. The content of this document may not be consistent with the latest version of the project. If you are willing to help with translation, please submit relevant Pull Requests.**
 
@@ -21,6 +21,10 @@ The following operating system versions have been tested and confirmed to work p
 | Kylin Server V10 SP3 | x64 | ✅ | ✅ |
 
 ![](../../assets/media/main_en.png)
+
+### About Project
+
+Click the GitHub icon under “About Project” on the main screen to open the About window. It displays the app icon at the top, the software version, update date and author, with a two-by-two grid of cards linking to the project repository, user manual, caption engine manual and changelog. Each link shows its full address. Manual links follow the interface language, the changelog links to the shared update history, and the window follows the light or dark theme.
 
 ### Software Limitations
 
@@ -130,7 +134,7 @@ In the caption control window, you can see the records of all collected captions
 
 ## Caption Engine
 
-Caption engine options appear in the order Paraformer, Qwen LiveTranslate, GLM-ASR, Vosk, SOSV, with cloud models first. Local models show their execution device: `Local / CPU / Vosk` and `Local / CPU / SOSV`.
+Caption engine options appear in the order Qwen LiveTranslate 3.8, Paraformer, GLM-ASR, Vosk, SOSV, with cloud models first. Local models show their execution device: `Local / CPU / Vosk` and `Local / CPU / SOSV`.
 
 In Caption Engine Settings, each model's description appears at the top of the model settings, explaining its recognition method, configuration requirements and translation support. The description updates immediately when you select another model. Its bordered box uses the current theme's primary color palette for its background and border, adapting to light and dark themes.
 
