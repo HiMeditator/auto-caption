@@ -68,7 +68,7 @@ export default {
     "recordingPath": "保存路径",
     "startTimeout": "启动超时",
     "seconds": "秒",
-    "apikeyInfo": "Gummy 字幕引擎需要的 API KEY，需要在阿里云百炼平台获取。详细信息见项目用户手册。",
+    "apikeyInfo": "Paraformer 字幕引擎需要的 API KEY，需要在阿里云百炼平台获取。详细信息见项目用户手册。",
     "glmApikeyInfo": "GLM 字幕引擎需要的 API KEY，需要在智谱 AI 平台获取。",
     "voskModelPathInfo": "Vosk 字幕引擎需要的模型的文件夹路径，需要提前下载需要的模型到本地。信息详情见项目用户手册。",
     "sosvModelPathInfo": "SOSV 字幕引擎需要的模型的文件夹路径，需要提前下载需要的模型到本地。信息详情见项目用户手册。",

@@ -133,7 +133,7 @@ while True:
 
 完整的字幕引擎实例如下：
 
-- [gummy.py](../../engine/audio2text/gummy.py)
+- [paraformer.py](../../engine/audio2text/paraformer.py)
 - [vosk.py](../../engine/audio2text/vosk.py)
 - [sosv.py](../../engine/audio2text/sosv.py)
 
@@ -178,18 +178,18 @@ export interface CaptionItem {
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Convert system audio stream to text')
     # all
-    parser.add_argument('-e', '--caption_engine', default='gummy', help='Caption engine: gummy or vosk')
+    parser.add_argument('-e', '--caption_engine', default='paraformer', help='Caption engine: paraformer, glm, vosk or sosv')
     parser.add_argument('-a', '--audio_type', default=0, help='Audio stream source: 0 for output, 1 for input')
     parser.add_argument('-c', '--chunk_rate', default=10, help='Number of audio stream chunks collected per second')
     parser.add_argument('-p', '--port', default=0, help='The port to run the server on, 0 for no server')
     parser.add_argument('-t', '--target_language', default='zh', help='Target language code, "none" for no translation')
     parser.add_argument('-r', '--record', default=0, help='Whether to record the audio, 0 for no recording, 1 for recording')
     parser.add_argument('-rp', '--record_path', default='', help='Path to save the recorded audio')
-    # gummy and sosv
+    # paraformer and sosv
     parser.add_argument('-s', '--source_language', default='auto', help='Source language code')
-    # gummy only
-    parser.add_argument('--gummy_api_key', default='', help='API key for the Gummy caption engine')
-    # vosk, sosv and glm translation
+    # paraformer only
+    parser.add_argument('--dashscope_api_key', default='', help='API key for the Paraformer caption engine')
+    # all engines: external translation
     parser.add_argument('--translation_provider', choices=['ollama', 'openai', 'google'], default='ollama', help='Translation service provider')
     parser.add_argument('--translation_model', default='', help='Translation model name')
     parser.add_argument('--translation_base_url', default='', help='OpenAI-compatible API base URL')
@@ -200,10 +200,10 @@ if __name__ == "__main__":
     parser.add_argument('-sosv', '--sosv_model', default=None, help='The SenseVoice model path')
 ```
 
-比如对于本项目的字幕引擎，我想使用 Gummy 模型，指定原文为日语，翻译为中文，获取系统音频输出的字幕，每次截取 0.1s 的音频数据，那么命令行参数如下：
+比如对于本项目的字幕引擎，我想使用 Paraformer 模型，指定原文为日语，翻译为中文，获取系统音频输出的字幕，每次截取 0.1s 的音频数据，那么命令行参数如下：
 
 ```bash
-python main.py -e gummy -s ja -t zh -a 0 -c 10 --gummy_api_key <dashscope-api-key>
+python main.py -e paraformer -s ja -t zh -a 0 -c 10 --dashscope_api_key <dashscope-api-key> --translation_provider ollama --translation_model qwen2.5:0.5b
 ```
 
 ## 其他
@@ -221,7 +221,7 @@ python main.py -e gummy -s ja -t zh -a 0 -c 10 --gummy_api_key <dashscope-api-ke
 除音频转文字和翻译外，其他（音频获取、音频重采样、与主进程通信）建议直接复用本项目代码。如果这样，那么需要添加的内容为：
 
 - `engine/audio2text/`：添加新的音频转文字类（文件级别）
-- `engine/main.py`：添加新参数设置、流程函数（参考 `main_gummy` 函数和 `main_vosk` 函数）
+- `engine/main.py`：添加新参数设置、流程函数（参考 `main_paraformer` 函数和 `main_vosk` 函数）
 
 ### 打包
 
@@ -232,3 +232,5 @@ python main.py -e gummy -s ja -t zh -a 0 -c 10 --gummy_api_key <dashscope-api-ke
 有了可以使用的字幕引擎，就可以在字幕软件窗口中通过指定字幕引擎的路径和字幕引擎的运行指令（参数）来启动字幕引擎了。
 
 ![](../img/02_zh.png)
+
+默认引擎为阿里云 `paraformer-realtime-v2`，通过 DashScope Recognition SDK 双向流式识别。上传音频为 16kHz、16bit、单声道 PCM；支持中文、英文、日语、韩语、德语、法语、俄语及粤语，`auto` 不指定语言提示。模型不提供内置翻译；开启翻译后需配置 Ollama、OpenAI 兼容服务或 Google 翻译，完整句子返回后异步翻译。设置中的阿里云 API Key 或 `DASHSCOPE_API_KEY` 环境变量用于鉴权（所有平台）；CLI 参数为 `--dashscope_api_key`。当前使用北京地域默认端点，API Key 必须匹配该地域。旧 Gummy 引擎选项和 API Key 自动迁移，旧西班牙语/意大利语源语言改为自动检测；旧自定义命令需手动更新。详见[阿里云官方 SDK 文档](https://help.aliyun.com/zh/model-studio/paraformer-real-time-speech-recognition-python-sdk)。

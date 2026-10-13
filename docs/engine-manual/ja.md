@@ -120,7 +120,7 @@ stream.close_stream()
 
 完全な字幕エンジンの実例：
 
-- [gummy.py](../../engine/audio2text/gummy.py)
+- [paraformer.py](../../engine/audio2text/paraformer.py)
 - [vosk.py](../../engine/audio2text/vosk.py)
 
 ### 字幕翻訳
@@ -157,22 +157,22 @@ import argparse
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='システムオーディオストリームをテキストに変換')
     # 共通
-    parser.add_argument('-e', '--caption_engine', default='gummy', help='字幕エンジン: gummyまたはvosk')
+    parser.add_argument('-e', '--caption_engine', default='paraformer', help='字幕エンジン: paraformerまたはvosk')
     parser.add_argument('-a', '--audio_type', default=0, help='オーディオストリームソース: 0は出力、1は入力')
     parser.add_argument('-c', '--chunk_rate', default=10, help='1秒あたりに収集するオーディオストリームブロックの数')
     parser.add_argument('-p', '--port', default=8080, help='サーバーを実行するポート、0はサーバーなし')
-    # gummy専用
+    # paraformer専用
     parser.add_argument('-s', '--source_language', default='en', help='ソース言語コード')
     parser.add_argument('-t', '--target_language', default='zh', help='ターゲット言語コード')
-    parser.add_argument('--gummy_api_key', default='', help='GummyモデルのAPI KEY')
+    parser.add_argument('--dashscope_api_key', default='', help='ParaformerモデルのAPI KEY')
     # vosk専用
     parser.add_argument('-m', '--model_path', default='', help='voskモデルのパス')
 ```
 
-たとえば、このプロジェクトの字幕エンジンでGummyモデルを使用し、原文を日本語、翻訳を中国語に指定し、システムオーディオ出力の字幕を取得し、毎回0.1秒のオーディオデータをキャプチャする場合、コマンドラインパラメータは以下のようになります：
+たとえば、このプロジェクトの字幕エンジンでParaformerモデルを使用し、原文を日本語、翻訳を中国語に指定し、システムオーディオ出力の字幕を取得し、毎回0.1秒のオーディオデータをキャプチャする場合、コマンドラインパラメータは以下のようになります：
 
 ```bash
-python main.py -e gummy -s ja -t zh -a 0 -c 10 --gummy_api_key <dashscope-api-key>
+python main.py -e paraformer -s ja -t zh -a 0 -c 10 --dashscope_api_key <dashscope-api-key> --translation_provider ollama --translation_model qwen2.5:0.5b
 ```
 
 ## その他
@@ -190,7 +190,7 @@ python main.py -e gummy -s ja -t zh -a 0 -c 10 --gummy_api_key <dashscope-api-ke
 オーディオから文字への変換以外は、このプロジェクトのコードを直接再利用することをお勧めします。その場合、追加する必要がある内容は：
 
 - `engine/audio2text/`：新しいオーディオから文字への変換クラスを追加（ファイルレベル）
-- `engine/main.py`：新しいパラメータ設定とプロセス関数を追加（`main_gummy`関数と`main_vosk`関数を参照）
+- `engine/main.py`：新しいパラメータ設定とプロセス関数を追加（`main_paraformer`関数と`main_vosk`関数を参照）
 
 ### パッケージ化
 
@@ -201,3 +201,5 @@ python main.py -e gummy -s ja -t zh -a 0 -c 10 --gummy_api_key <dashscope-api-ke
 使用可能な字幕エンジンを取得したら、字幕ソフトウェアウィンドウで字幕エンジンのパスと字幕エンジンの実行コマンド（パラメータ）を指定して字幕エンジンを起動できます。
 
 ![](../img/02_ja.png)
+
+デフォルトエンジンはアリババクラウドの `paraformer-realtime-v2` です。DashScope Recognition SDK の双方向ストリーミング認識を使用し、16kHz・16bit・モノラル PCM を送信します。中国語、英語、日本語、韓国語、ドイツ語、フランス語、ロシア語、広東語に対応し、`auto` は言語ヒントを指定しません。内蔵翻訳はありません。翻訳を有効にする場合は Ollama、OpenAI 互換サービス、Google 翻訳を設定してください。確定した文を非同期で翻訳します。設定または全プラットフォームで利用できる `DASHSCOPE_API_KEY` 環境変数に API Key を指定します。CLI は `--dashscope_api_key` を使用します。現在は北京リージョンのデフォルト接続先を使用するため、同リージョンの API Key が必要です。旧 Gummy の選択と API Key は自動移行し、スペイン語・イタリア語の入力言語は自動検出に変更します。旧カスタムコマンドは手動で更新してください。[公式 SDK ドキュメント](https://help.aliyun.com/zh/model-studio/paraformer-real-time-speech-recognition-python-sdk)を参照してください。

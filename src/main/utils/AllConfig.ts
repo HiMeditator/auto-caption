@@ -49,10 +49,10 @@ const defaultControls: Controls = {
   openaiModel: '',
   openaiBaseUrl: 'https://api.openai.com/v1',
   openaiApiKey: '',
-  engine: 'gummy',
+  engine: 'paraformer',
   audio: 0,
   engineEnabled: false,
-  gummyApiKey: '',
+  dashscopeApiKey: '',
   voskModelPath: '',
   sosvModelPath: '',
   glmUrl: 'https://open.bigmodel.cn/api/paas/v4/audio/transcriptions',
@@ -167,8 +167,13 @@ class AllConfig {
     if(!('openaiApiKey' in legacy) && typeof legacy.ollamaApiKey === 'string') {
       migratedArgs.openaiApiKey = legacy.ollamaApiKey
     }
-    if(!('gummyApiKey' in legacy) && typeof legacy.API_KEY === 'string') {
-      migratedArgs.gummyApiKey = legacy.API_KEY
+    if(!('dashscopeApiKey' in legacy)) {
+      if(typeof legacy.gummyApiKey === 'string') migratedArgs.dashscopeApiKey = legacy.gummyApiKey
+      else if(typeof legacy.API_KEY === 'string') migratedArgs.dashscopeApiKey = legacy.API_KEY
+    }
+    if(legacy.engine === 'gummy') {
+      migratedArgs.engine = 'paraformer'
+      if(legacy.sourceLang === 'es' || legacy.sourceLang === 'it') migratedArgs.sourceLang = 'auto'
     }
     const engineEnabled = this.controls.engineEnabled
     for(let key in this.controls){

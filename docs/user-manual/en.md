@@ -6,7 +6,7 @@ Corresponding Version: v1.1.1
 
 ## Software Introduction
 
-Auto Caption is a cross-platform caption display software that can real-time capture system audio input (recording) or output (playback) streaming data and use an audio-to-text model to generate captions for the corresponding audio. The default caption engine provided by the software (using Alibaba Cloud Gummy model) supports recognition and translation in nine languages (Chinese, English, Japanese, Korean, German, French, Russian, Spanish, Italian).
+Auto Caption is a cross-platform caption display software that can real-time capture system audio input (recording) or output (playback) streaming data and use an audio-to-text model to generate captions for the corresponding audio. The default Paraformer engine recognizes eight source languages including Cantonese, with translation provided by external services.
 
 The default caption engine currently has full functionality on Windows, macOS, and Linux platforms. Additional configuration is required to capture system audio output on macOS.
 
@@ -24,23 +24,15 @@ The following operating system versions have been tested and confirmed to work p
 
 ### Software Limitations
 
-To use the Gummy caption engine, you need to obtain an API KEY from Alibaba Cloud.
+To use the Paraformer caption engine, you need to obtain an API KEY from Alibaba Cloud.
 
 Additional configuration is required to capture audio output on macOS platform.
 
 The software is built using Electron, so the software size is inevitably large.
 
-## Preparation for Using Gummy Engine
+## Paraformer Realtime v2
 
-To use the default caption engine provided by the software (Alibaba Cloud Gummy), you need to obtain an API KEY from the Alibaba Cloud Bailian platform. Then add the API KEY to the software settings or configure it in environment variables (only Windows platform supports reading API KEY from environment variables).
-
-**The international version of Alibaba Cloud services does not provide the Gummy model, so non-Chinese users currently cannot use the default caption engine.**
-
-Alibaba Cloud provides detailed tutorials for this part, which can be referenced:
-
-- [Obtaining API KEY (Chinese)](https://help.aliyun.com/zh/model-studio/get-api-key)
-- [Configuring API Key through Environment Variables (Chinese)](https://help.aliyun.com/zh/model-studio/configure-api-key-through-environment-variables)
-
+The default engine is Alibaba Cloud `paraformer-realtime-v2`, using the DashScope Recognition SDK for duplex streaming ASR. Audio is uploaded as 16kHz, 16-bit mono PCM. Supported source languages are Chinese, English, Japanese, Korean, German, French, Russian and Cantonese; `auto` sends no language hint. There is no built-in translation: configure Ollama, an OpenAI-compatible service or Google Translate to translate finalized sentences asynchronously. Set the Alibaba Cloud API Key in settings or the `DASHSCOPE_API_KEY` environment variable on any platform; the CLI option is `--dashscope_api_key`. The current endpoint is the default Beijing endpoint and requires a matching regional API Key. Old Gummy selections and API Keys migrate automatically; old Spanish/Italian source selections switch to auto detection. Update old custom commands manually. See the [official SDK documentation](https://help.aliyun.com/zh/model-studio/paraformer-real-time-speech-recognition-python-sdk).
 
 ## Preparation for GLM Engine
 
@@ -126,6 +118,8 @@ In the caption control window, you can see the records of all collected captions
 
 ## Caption Engine
 
+Caption engine options appear in the order Paraformer, GLM-ASR, Vosk, SOSV, with cloud models first. Local models show their execution device: `Local / CPU / Vosk` and `Local / CPU / SOSV`.
+
 The so-called caption engine is essentially a subprogram that captures real-time streaming data from system audio input (recording) or output (playback), and invokes speech-to-text models to generate corresponding captions. The generated captions are converted into JSON-formatted strings and passed to the main program through standard output. The main program reads the caption data, processes it, and displays it in the window.
 
 The software provides two default caption engines. If you need other caption engines, you can invoke them by enabling the custom engine option (other engines need to be specifically developed for this software). The engine path refers to the location of the custom caption engine on your computer, while the engine command represents the runtime parameters of the custom caption engine, which should be configured according to the rules of that particular caption engine.
@@ -152,9 +146,9 @@ The following parameter descriptions only include necessary parameters.
 
 #### `-e , --caption_engine`
 
-The caption engine model to select, currently three options are available: `gummy, glm, vosk, sosv`.
+The caption engine model to select, currently four options are available: `paraformer, glm, vosk, sosv`.
 
-The default value is `gummy`.
+The default value is `paraformer`.
 
 This applies to all models.
 
@@ -204,21 +198,21 @@ Source language for recognition. Default value is `auto`, meaning no specific so
 
 Specifying the source language can improve recognition accuracy to some extent. You can specify the source language using the language codes above.
 
-This applies to Gummy, GLM and SOSV models.
+This applies to Paraformer, GLM and SOSV models.
 
-The Gummy model can use all the languages mentioned above, plus Cantonese (`yue`).
+Paraformer supports `zh, en, ja, ko, de, fr, ru, yue` and `auto`; Spanish and Italian recognition are unsupported.
 
 The GLM model supports specifying the following languages: English, Chinese, Japanese, Korean.
 
 The SOSV model supports specifying the following languages: English, Chinese, Japanese, Korean, and Cantonese.
 
-#### `--gummy_api_key`
+#### `--dashscope_api_key`
 
-Specify the Alibaba Cloud API KEY required for the `Gummy` model.
+Specify the Alibaba Cloud API KEY required for the `Paraformer` model.
 
 Default value is empty.
 
-This only applies to the Gummy model.
+This only applies to the Paraformer model.
 
 #### `-gkey, --glm_api_key`  
 
@@ -234,7 +228,7 @@ Specifies the API URL required for the `glm` model. The default value is: `https
 
 #### `--translation_provider`
 
-Specifies the translation service used by the Vosk, SOSV, and GLM caption engines. The default is `ollama`.
+Specifies the translation service used by the Paraformer, Vosk, SOSV, and GLM caption engines. The default is `ollama`.
 
 Supported values are:
 
@@ -250,19 +244,19 @@ Specifies the model name used by Ollama or an OpenAI-compatible service. Google 
 
 If using an Ollama model, it is recommended to use a model with fewer than 1B parameters, such as `qwen2.5:0.5b` or `qwen3:0.6b`. The corresponding model must be downloaded in Ollama for normal use.  
 
-The default value is empty and applies to models other than Gummy.  
+The default value is empty and applies to all caption engines.
 
 #### `--translation_base_url`
 
 The base URL of the OpenAI-compatible service, such as `https://api.openai.com/v1`. Used only with `--translation_provider openai`.
 
-The default value is empty and applies to models other than Gummy.  
+The default value is empty and applies to all caption engines.
 
 #### `--translation_api_key`
 
 Specifies the API key for the OpenAI-compatible service. Used only with `--translation_provider openai`.
 
-The default value is empty and applies to models other than Gummy.  
+The default value is empty and applies to all caption engines.
 
 #### `-vosk, --vosk_model`
 
@@ -284,14 +278,16 @@ First, download the project source code locally. The caption engine source code 
 
 After configuration, enter the `engine` directory and execute commands to run the caption engine.
 
-For example, to use the Gummy model, specify audio type as system audio output, source language as English, and target language as Chinese, execute the following command:
+For example, to use the Paraformer model, specify audio type as system audio output, source language as English, and target language as Chinese, execute the following command:
 
 > Note: For better visualization, the commands below are written on multiple lines. If execution fails, try removing backslashes and executing as a single line command.
 
 ```bash
 python main.py \
--e gummy \
---gummy_api_key sk-******************************** \
+-e paraformer \
+--dashscope_api_key sk-******************************** \
+--translation_provider ollama \
+--translation_model qwen2.5:0.5b \
 -a 0 \
 -d 1 \
 -s en \
@@ -336,7 +332,7 @@ python main.py \
 -t none
 ```
 
-Running result using the Gummy model is shown below:
+Running result using the Paraformer model is shown below:
 
 ![](../img/07.png)
 

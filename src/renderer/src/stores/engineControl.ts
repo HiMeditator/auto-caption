@@ -24,11 +24,11 @@ export const useEngineControlStore = defineStore('engineControl', () => {
   const openaiModel = ref<string>('')
   const openaiBaseUrl = ref<string>('https://api.openai.com/v1')
   const openaiApiKey = ref<string>('')
-  const engine = ref<string>('gummy')
+  const engine = ref<string>('paraformer')
   const audio = ref<0 | 1>(0)
   const translation = ref<boolean>(true)
   const recording = ref<boolean>(false)
-  const gummyApiKey = ref<string>('')
+  const dashscopeApiKey = ref<string>('')
   const voskModelPath = ref<string>('')
   const sosvModelPath = ref<string>('')
   const glmUrl = ref<string>('https://open.bigmodel.cn/api/paas/v4/audio/transcriptions')
@@ -57,7 +57,7 @@ export const useEngineControlStore = defineStore('engineControl', () => {
       audio: audio.value,
       translation: translation.value,
       recording: recording.value,
-      gummyApiKey: gummyApiKey.value,
+      dashscopeApiKey: dashscopeApiKey.value,
       voskModelPath: voskModelPath.value,
       sosvModelPath: sosvModelPath.value,
       glmUrl: glmUrl.value,
@@ -100,7 +100,7 @@ export const useEngineControlStore = defineStore('engineControl', () => {
     engineEnabled.value = controls.engineEnabled
     translation.value = controls.translation
     recording.value = controls.recording
-    gummyApiKey.value = controls.gummyApiKey
+    dashscopeApiKey.value = controls.dashscopeApiKey
     voskModelPath.value = controls.voskModelPath
     sosvModelPath.value = controls.sosvModelPath
     glmUrl.value = controls.glmUrl || 'https://open.bigmodel.cn/api/paas/v4/audio/transcriptions'
@@ -175,7 +175,7 @@ export const useEngineControlStore = defineStore('engineControl', () => {
     audio,              // 选择音频
     translation,        // 是否启用翻译
     recording,          // 是否启用录音
-    gummyApiKey,        // Gummy API Key
+    dashscopeApiKey,        // Paraformer API Key
     voskModelPath,      // vosk 模型路径
     sosvModelPath,      // sosv 模型路径
     glmUrl,             // GLM API URL

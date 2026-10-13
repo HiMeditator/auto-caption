@@ -17,7 +17,7 @@
 - `UILanguage`：`'zh' | 'en' | 'ja'`。
 - `UITheme`：`'light' | 'dark' | 'system'`；实际应用的主题为 `'light' | 'dark'`。
 - `FullConfig`：包含 `platform`、`uiLanguage`、`uiTheme`、`uiColor`、`leftBarWidth`、`styles`、`controls`、`captionLog` 和 `softwareLog`；不包含持久化的字幕窗口宽度。
-- `Controls`：字幕引擎和翻译配置，当前包括 `translationProvider`、`ollamaModel`、`openaiModel`、`openaiBaseUrl`、`openaiApiKey`、`gummyApiKey` 和 `startTimeoutSeconds` 等字段。`engineEnabled` 由主进程维护，配置变更不会覆盖该状态。
+- `Controls`：字幕引擎和翻译配置，当前包括 `translationProvider`、`ollamaModel`、`openaiModel`、`openaiBaseUrl`、`openaiApiKey`、`dashscopeApiKey` 和 `startTimeoutSeconds` 等字段。`engineEnabled` 由主进程维护，配置变更不会覆盖该状态。
 - `Styles`：字幕及翻译的显示样式；字段以源码类型定义为准。
 - `CaptionItem`：`index`、`time_s`、`time_t`、`text`、`translation`；主进程发送给界面的 `index` 是从 1 开始的记录序号。渲染进程按 `time_s` 匹配更新记录。
 - `SoftwareLogItem`：`type: 'INFO' | 'WARN' | 'ERROR'`、`index: number`、`time: string`、`text: string`。
@@ -367,3 +367,5 @@
 **接收方：** 前端
 
 **数据类型：** `CaptionItem[]`
+
+旧配置的 `engine: "gummy"` 自动迁移为 `"paraformer"`，`gummyApiKey`（或更早的 `API_KEY`）迁移为 `dashscopeApiKey`。新的显式密钥优先。Paraformer 使用外部翻译服务，与其他引擎共享翻译配置。

@@ -190,6 +190,13 @@
 
 ## 未发布
 
+- 字幕引擎选项将云端模型排列在本地模型之前，并为 Vosk、SOSV 标注 CPU 运行位置
+
+### 引擎更新
+
+- 移除已下架的 Gummy 引擎，默认改为阿里云 Paraformer Realtime v2，支持实时识别及外部翻译
+- 自动迁移旧 Gummy 引擎和 API Key 配置；CLI 密钥参数改为 `--dashscope_api_key`
+
 ### 优化体验
 
 - 将自定义翻译服务拆分为 Ollama 本地模型和 OpenAI API 兼容模型，分别保存两类服务的配置

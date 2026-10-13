@@ -43,10 +43,10 @@ export class CaptionEngine {
       this.command.push('-p', this.port.toString())
     }
     else {
-      if(allConfig.controls.engine === 'gummy' && 
-        !allConfig.controls.gummyApiKey && !process.env.DASHSCOPE_API_KEY
+      if(allConfig.controls.engine === 'paraformer' &&
+        !allConfig.controls.dashscopeApiKey && !process.env.DASHSCOPE_API_KEY
       ) {
-        controlWindow.sendErrorMessage(i18n('gummy.key.missing'))
+        controlWindow.sendErrorMessage(i18n('paraformer.key.missing'))
         return false
       }
       this.command = []
@@ -91,12 +91,13 @@ export class CaptionEngine {
         allConfig.controls.targetLang : 'none'
       )
 
-      if(allConfig.controls.engine === 'gummy') {
-        this.command.push('-e', 'gummy')
+      if(allConfig.controls.engine === 'paraformer') {
+        this.command.push('-e', 'paraformer')
         this.command.push('-s', allConfig.controls.sourceLang)
-        if(allConfig.controls.gummyApiKey) {
-          this.command.push('--gummy_api_key', allConfig.controls.gummyApiKey)
+        if(allConfig.controls.dashscopeApiKey) {
+          this.command.push('--dashscope_api_key', allConfig.controls.dashscopeApiKey)
         }
+        this.addTranslationArguments()
       }
       else if(allConfig.controls.engine === 'vosk'){
         this.command.push('-e', 'vosk')

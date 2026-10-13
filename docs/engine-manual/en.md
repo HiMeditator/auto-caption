@@ -133,7 +133,7 @@ It is recommended to encapsulate this as a class, implementing four methods:
 
 Complete caption engine examples:
 
-- [gummy.py](../../engine/audio2text/gummy.py)
+- [paraformer.py](../../engine/audio2text/paraformer.py)
 - [vosk.py](../../engine/audio2text/vosk.py)
 - [sosv.py](../../engine/audio2text/sosv.py)
 
@@ -178,18 +178,18 @@ Custom caption engine settings provide command line parameter specification, so 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Convert system audio stream to text')
     # all
-    parser.add_argument('-e', '--caption_engine', default='gummy', help='Caption engine: gummy or vosk')
+    parser.add_argument('-e', '--caption_engine', default='paraformer', help='Caption engine: paraformer, glm, vosk or sosv')
     parser.add_argument('-a', '--audio_type', default=0, help='Audio stream source: 0 for output, 1 for input')
     parser.add_argument('-c', '--chunk_rate', default=10, help='Number of audio stream chunks collected per second')
     parser.add_argument('-p', '--port', default=0, help='The port to run the server on, 0 for no server')
     parser.add_argument('-t', '--target_language', default='zh', help='Target language code, "none" for no translation')
     parser.add_argument('-r', '--record', default=0, help='Whether to record the audio, 0 for no recording, 1 for recording')
     parser.add_argument('-rp', '--record_path', default='', help='Path to save the recorded audio')
-    # gummy and sosv
+    # paraformer and sosv
     parser.add_argument('-s', '--source_language', default='auto', help='Source language code')
-    # gummy only
-    parser.add_argument('--gummy_api_key', default='', help='API key for the Gummy caption engine')
-    # vosk, sosv and glm translation
+    # paraformer only
+    parser.add_argument('--dashscope_api_key', default='', help='API key for the Paraformer caption engine')
+    # all engines: external translation
     parser.add_argument('--translation_provider', choices=['ollama', 'openai', 'google'], default='ollama', help='Translation service provider')
     parser.add_argument('--translation_model', default='', help='Translation model name')
     parser.add_argument('--translation_base_url', default='', help='OpenAI-compatible API base URL')
@@ -200,10 +200,10 @@ if __name__ == "__main__":
     parser.add_argument('-sosv', '--sosv_model', default=None, help='The SenseVoice model path')
 ```
 
-For example, for this project's caption engine, if I want to use the Gummy model, specify the original text as Japanese, translate to Chinese, and capture captions from system audio output, with 0.1s audio data segments each time, the command line parameters would be:
+For example, for this project's caption engine, if I want to use the Paraformer model, specify the original text as Japanese, translate to Chinese, and capture captions from system audio output, with 0.1s audio data segments each time, the command line parameters would be:
 
 ```bash
-python main.py -e gummy -s ja -t zh -a 0 -c 10 --gummy_api_key <dashscope-api-key>
+python main.py -e paraformer -s ja -t zh -a 0 -c 10 --dashscope_api_key <dashscope-api-key> --translation_provider ollama --translation_model qwen2.5:0.5b
 ```
 
 ## Additional Notes  
@@ -221,7 +221,7 @@ python main.py -e gummy -s ja -t zh -a 0 -c 10 --gummy_api_key <dashscope-api-ke
 Except for audio-to-text conversion and translation, other components (audio acquisition, audio resampling, and communication with the main process) are recommended to directly reuse the project's code. If this approach is taken, the content that needs to be added includes:
 
 - `engine/audio2text/`: Add a new audio-to-text class (file-level).  
-- `engine/main.py`: Add new parameter settings and workflow functions (refer to `main_gummy` and `main_vosk` functions).  
+- `engine/main.py`: Add new parameter settings and workflow functions (refer to `main_paraformer` and `main_vosk` functions).
 
 ### Packaging  
 
@@ -232,3 +232,5 @@ After development and testing, the caption engine must be packaged into an execu
 With a functional caption engine, it can be launched in the caption software window by specifying the engine's path and runtime arguments.  
 
 ![](../img/02_en.png)
+
+The default engine is Alibaba Cloud `paraformer-realtime-v2`, using the DashScope Recognition SDK for duplex streaming ASR. Audio is uploaded as 16kHz, 16-bit mono PCM. Supported source languages are Chinese, English, Japanese, Korean, German, French, Russian and Cantonese; `auto` sends no language hint. There is no built-in translation: configure Ollama, an OpenAI-compatible service or Google Translate to translate finalized sentences asynchronously. Set the Alibaba Cloud API Key in settings or the `DASHSCOPE_API_KEY` environment variable on any platform; the CLI option is `--dashscope_api_key`. The current endpoint is the default Beijing endpoint and requires a matching regional API Key. Old Gummy selections and API Keys migrate automatically; old Spanish/Italian source selections switch to auto detection. Update old custom commands manually. See the [official SDK documentation](https://help.aliyun.com/zh/model-studio/paraformer-real-time-speech-recognition-python-sdk).

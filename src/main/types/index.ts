@@ -15,7 +15,7 @@ export interface Controls {
   audio: 0 | 1,
   translation: boolean,
   recording: boolean,
-  gummyApiKey: string,
+  dashscopeApiKey: string,
   voskModelPath: string,
   sosvModelPath: string,
   glmUrl: string,

@@ -45,7 +45,7 @@ https://github.com/user-attachments/assets/9c188d78-9520-4397-bacf-4c8fdcc54874
 - 支持调用本地 Ollama 模型、云端 OpenAI 兼容模型、或云端 Google 翻译 API 进行翻译
 - 跨平台（Windows、macOS、Linux）、多界面语言（中文、英语、日语）支持
 - 丰富的字幕样式设置（字体、字体大小、字体粗细、字体颜色、背景颜色等）
-- 灵活的字幕引擎选择（阿里云 Gummy 云端模型、GLM-ASR 云端模型、本地 Vosk 模型、本地 SOSV 模型、还可以自己开发模型）
+- 灵活的字幕引擎选择（阿里云 Paraformer 云端模型、GLM-ASR 云端模型、本地 Vosk 模型、本地 SOSV 模型、还可以自己开发模型）
 - 多语言识别与翻译（见下文“⚙️ 自带字幕引擎说明”）
 - 字幕记录展示与导出（支持导出 `.srt` 和 `.json` 格式）
 
@@ -67,13 +67,13 @@ macOS 平台和 Linux 平台获取系统音频输出需要进行额外设置，�
 
 |                                                              | 准确率 | 实时性 | 部署类型          | 支持语言   | 翻译       | 备注                                                       |
 | ------------------------------------------------------------ | -------- | ------------- | ---------- | ---------- | ---------------------------------------------------------- | ---------------------------------------------------------- |
-| [Gummy](https://help.aliyun.com/zh/model-studio/gummy-speech-recognition-translation) | 很好😊    | 很好😊 | 云端 / 阿里云 | 10 种      | 自带翻译   | 收费，识别0.54CNY / 小时，识别+翻译1.08CNY/小时           |
+| [Paraformer Realtime v2](https://help.aliyun.com/zh/model-studio/paraformer-real-time-speech-recognition-python-sdk) | 流式识别 | 外部翻译 | 云端 / 阿里云 | 8 种语言（含粤语） | Ollama / OpenAI 兼容 / Google | 按阿里云当前价格计费 |
 | [glm-asr-2512](https://docs.bigmodel.cn/cn/guide/models/sound-and-video/glm-asr-2512) | 很好😊 | 较差😞 | 云端 / 智谱 AI | 4 种 | 需额外配置 | 收费，约 0.72CNY / 小时 |
 | [Vosk](https://alphacephei.com/vosk)                         | 较差😞    | 很好😊 | 本地 / CPU    | 超过 30 种 | 需额外配置 | 支持的语言非常多                                           |
 | [SOSV](https://k2-fsa.github.io/sherpa/onnx/sense-voice/index.html) | 一般😐    | 一般😐 | 本地 / CPU    | 5 种       | 需额外配置 | 仅有一个模型                                               |
 | 自己开发                                                     | 🤔        | 🤔      | 自定义        | 自定义     | 自定义     | 根据[文档](./docs/engine-manual/zh.md)使用 Python 自己开发 |
 
-如果你选择的不是 Gummy 模型，你还需要配置自己的翻译模型。
+所有字幕引擎开启翻译时均需要配置翻译服务。
 
 ### 配置翻译模型
 
@@ -104,14 +104,9 @@ API Key 需要在对应的模型提供商处获取。
 
 无需任何配置，联网即可使用。
 
-### 使用 Gummy 模型
+### Paraformer Realtime v2
 
-> 国际版的阿里云服务似乎并没有提供 Gummy 模型，因此目前非中国用户可能无法使用 Gummy 字幕引擎。
-
-如果要使用默认的 Gummy 字幕引擎（使用云端模型进行语音识别和翻译），首先需要获取阿里云百炼平台的 API KEY，然后将 API KEY 添加到软件设置中（在字幕引擎设置的更多设置中）或者配置到环境变量中（仅 Windows 平台支持读取环境变量中的 API KEY），这样才能正常使用该模型。相关教程：
-
-- [获取 API KEY](https://help.aliyun.com/zh/model-studio/get-api-key)
-- [将 API Key 配置到环境变量](https://help.aliyun.com/zh/model-studio/configure-api-key-through-environment-variables)
+默认引擎为阿里云 `paraformer-realtime-v2`，通过 DashScope Recognition SDK 双向流式识别。上传音频为 16kHz、16bit、单声道 PCM；支持中文、英文、日语、韩语、德语、法语、俄语及粤语，`auto` 不指定语言提示。模型不提供内置翻译；开启翻译后需配置 Ollama、OpenAI 兼容服务或 Google 翻译，完整句子返回后异步翻译。设置中的阿里云 API Key 或 `DASHSCOPE_API_KEY` 环境变量用于鉴权（所有平台）；CLI 参数为 `--dashscope_api_key`。当前使用北京地域默认端点，API Key 必须匹配该地域。旧 Gummy 引擎选项和 API Key 自动迁移，旧西班牙语/意大利语源语言改为自动检测；旧自定义命令需手动更新。详见[阿里云官方 SDK 文档](https://help.aliyun.com/zh/model-studio/paraformer-real-time-speech-recognition-python-sdk)。
 
 ### 使用 GLM-ASR 模型
 
@@ -144,8 +139,10 @@ API KEY 获取相关链接：[快速开始](https://docs.bigmodel.cn/cn/guide/st
 
 ```bash
 python main.py \
--e gummy \
---gummy_api_key sk-******************************** \
+-e paraformer \
+--dashscope_api_key sk-******************************** \
+--translation_provider ollama \
+--translation_model qwen2.5:0.5b \
 -a 0 \
 -d 1 \
 -s en \
@@ -158,30 +155,9 @@ python main.py \
 
 目前软件自带 4 个字幕引擎。它们的详细信息如下。
 
-### Gummy 字幕引擎（云端）
+### Paraformer Realtime v2
 
-基于通义实验室[Gummy语音翻译大模型](https://help.aliyun.com/zh/model-studio/gummy-speech-recognition-translation/)进行开发，基于[阿里云百炼](https://bailian.console.aliyun.com)的 API 进行调用该云端模型。
-
-**模型详细参数：**
-
-- 音频采样率支持：16kHz及以上
-- 音频采样位数：16bit
-- 音频通道数支持：单通道
-- 可识别语言：中文、英文、日语、韩语、德语、法语、俄语、意大利语、西班牙语
-- 支持的翻译：
-  - 中文 → 英文、日语、韩语
-  - 英文 → 中文、日语、韩语
-  - 日语、韩语、德语、法语、俄语、意大利语、西班牙语 → 中文或英文
-
-**网络流量消耗：**
-
-字幕引擎使用原生采样率（假设为 48kHz）进行采样，样本位深为 16bit，上传音频为为单通道，因此上传速率约为：
-
-$$
-48000\ \text{samples/second} \times 2\ \text{bytes/sample} \times 1\ \text{channel}  = 93.75\ \text{KB/s}
-$$
-
-而且引擎只会获取到音频流的时候才会上传数据，因此实际上传速率可能更小。模型结果回传流量消耗较小，没有纳入考虑。
+默认引擎为阿里云 `paraformer-realtime-v2`，通过 DashScope Recognition SDK 双向流式识别。上传音频为 16kHz、16bit、单声道 PCM；支持中文、英文、日语、韩语、德语、法语、俄语及粤语，`auto` 不指定语言提示。模型不提供内置翻译；开启翻译后需配置 Ollama、OpenAI 兼容服务或 Google 翻译，完整句子返回后异步翻译。设置中的阿里云 API Key 或 `DASHSCOPE_API_KEY` 环境变量用于鉴权（所有平台）；CLI 参数为 `--dashscope_api_key`。当前使用北京地域默认端点，API Key 必须匹配该地域。旧 Gummy 引擎选项和 API Key 自动迁移，旧西班牙语/意大利语源语言改为自动检测；旧自定义命令需手动更新。详见[阿里云官方 SDK 文档](https://help.aliyun.com/zh/model-studio/paraformer-real-time-speech-recognition-python-sdk)。
 
 ### GLM-ASR 字幕引擎（云端）
 

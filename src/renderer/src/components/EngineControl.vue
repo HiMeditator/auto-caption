@@ -180,7 +180,7 @@
         <a-input
           class="input-area"
           type="password"
-          v-model:value="currentGummyApiKey"
+          v-model:value="currentDashscopeApiKey"
         />
       </div>
       <div class="input-item">
@@ -311,7 +311,7 @@ const { uiColor } = storeToRefs(generalSetting)
 
 const currentSourceLang = ref('auto')
 const currentTargetLang = ref('zh')
-const currentEngine = ref<string>('gummy')
+const currentEngine = ref<string>('paraformer')
 const currentAudio = ref<0 | 1>(0)
 const currentTranslation = ref<boolean>(true)
 const currentRecording = ref<boolean>(false)
@@ -320,7 +320,7 @@ const currentOllamaModel = ref('')
 const currentOpenaiModel = ref('')
 const currentOpenaiBaseUrl = ref('https://api.openai.com/v1')
 const currentOpenaiApiKey = ref('')
-const currentGummyApiKey = ref<string>('')
+const currentDashscopeApiKey = ref<string>('')
 const currentVoskModelPath = ref<string>('')
 const currentSosvModelPath = ref<string>('')
 const currentGlmUrl = ref<string>('')
@@ -386,7 +386,7 @@ function applyChange(){
   engineControl.audio = currentAudio.value
   engineControl.translation = currentTranslation.value
   engineControl.recording = currentRecording.value
-  engineControl.gummyApiKey = currentGummyApiKey.value
+  engineControl.dashscopeApiKey = currentDashscopeApiKey.value
   engineControl.voskModelPath = currentVoskModelPath.value
   engineControl.sosvModelPath = currentSosvModelPath.value
   engineControl.glmUrl = currentGlmUrl.value ?? "https://open.bigmodel.cn/api/paas/v4/audio/transcriptions"
@@ -419,7 +419,7 @@ function cancelChange(){
   currentAudio.value = engineControl.audio
   currentTranslation.value = engineControl.translation
   currentRecording.value = engineControl.recording
-  currentGummyApiKey.value = engineControl.gummyApiKey
+  currentDashscopeApiKey.value = engineControl.dashscopeApiKey
   currentVoskModelPath.value = engineControl.voskModelPath
   currentSosvModelPath.value = engineControl.sosvModelPath
   currentGlmUrl.value = engineControl.glmUrl

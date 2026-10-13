@@ -68,7 +68,7 @@ export default {
     "recordingPath": "Save Path",
     "startTimeout": "Timeout",
     "seconds": "seconds",
-    "apikeyInfo": "API KEY required for the Gummy caption engine, which needs to be obtained from the Alibaba Cloud Bailing platform. For more details, see the project user manual.",
+    "apikeyInfo": "API KEY required for the Paraformer caption engine, which needs to be obtained from the Alibaba Cloud Bailing platform. For more details, see the project user manual.",
     "glmApikeyInfo": "API KEY required for GLM caption engine, which needs to be obtained from the Zhipu AI platform.",
     "voskModelPathInfo": "The folder path of the model required by the Vosk caption engine. You need to download the required model to your local machine in advance. For more details, see the project user manual.",
     "sosvModelPathInfo": "The folder path of the model required by the SOSV caption engine. You need to download the required model to your local machine in advance. For more details, see the project user manual.",

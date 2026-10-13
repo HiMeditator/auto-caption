@@ -45,7 +45,7 @@ https://github.com/user-attachments/assets/9c188d78-9520-4397-bacf-4c8fdcc54874
 - ローカルのOllamaモデル、クラウド上のOpenAI互換モデル、またはクラウド上のGoogle翻訳APIを呼び出して翻訳を行うことをサポートしています
 - クロスプラットフォーム（Windows、macOS、Linux）、多言語インターフェース（中国語、英語、日本語）対応
 - 豊富な字幕スタイル設定（フォント、フォントサイズ、フォント太さ、フォント色、背景色など）
-- 柔軟な字幕エンジン選択（阿里云Gummyクラウドモデル、GLM-ASRクラウドモデル、ローカルVoskモデル、ローカルSOSVモデル、または独自にモデルを開発可能）
+- 柔軟な字幕エンジン選択（阿里云Paraformerクラウドモデル、GLM-ASRクラウドモデル、ローカルVoskモデル、ローカルSOSVモデル、または独自にモデルを開発可能）
 - 多言語認識と翻訳（下記「⚙️ 字幕エンジン説明」参照）
 - 字幕記録表示とエクスポート（`.srt` および `.json` 形式のエクスポートに対応）
 
@@ -69,13 +69,13 @@ macOS および Linux プラットフォームでシステムオーディオ出�
 
 |                                                              | 正確性 | 実時間性 | デプロイタイプ | 対応言語 | 翻訳 | 備考 |
 | ------------------------------------------------------------ | -------- | --------- | -------------- | -------- | ---- | ---- |
-| [Gummy](https://help.aliyun.com/zh/model-studio/gummy-speech-recognition-translation) | とても良い😊 | とても良い😊 | クラウド / アリババクラウド | 10言語 | 内蔵翻訳 | 有料、音声認識 0.54 CNY/時間、音声認識＋翻訳 1.08 CNY/時間 |
+| [Paraformer Realtime v2](https://help.aliyun.com/zh/model-studio/paraformer-real-time-speech-recognition-python-sdk) | ストリーミング認識 | 外部翻訳 | クラウド / アリババクラウド | 広東語を含む8言語 | Ollama / OpenAI 互換 / Google | アリババクラウドの現行料金 |
 | [glm-asr-2512](https://docs.bigmodel.cn/cn/guide/models/sound-and-video/glm-asr-2512) | とても良い😊 | 悪い😞 | クラウド / Zhipu AI | 4言語 | 追加設定が必要 | 有料、約0.72元/時間 |
 | [Vosk](https://alphacephei.com/vosk) | 悪い😞 | とても良い😊 | ローカル / CPU | 30言語以上 | 追加設定が必要 | 多くの言語に対応 |
 | [SOSV](https://k2-fsa.github.io/sherpa/onnx/sense-voice/index.html) | 普通😐 | 普通😐 | ローカル / CPU | 5言語 | 追加設定が必要 | 1つのモデルのみ |
 | 自分で開発 | 🤔 | 🤔 | カスタム | カスタム | カスタム | [ドキュメント](./docs/engine-manual/ja.md)に従ってPythonを使用して自分で開発 |
 
-Gummyモデル以外を選択した場合、独自の翻訳モデルを設定する必要があります。
+すべての字幕エンジンで翻訳を有効にする場合、外部翻訳サービスの設定が必要です。
 
 ### 翻訳モデルの設定
 
@@ -106,14 +106,9 @@ API Keyは対応するモデルプロバイダから取得する必要があり�
 
 設定不要で、ネット接続があれば使用できます。
 
-### Gummyモデルの使用
+### Paraformer Realtime v2
 
-> 阿里云の国際版サービスにはGummyモデルが提供されていないため、現在中国以外のユーザーはGummy字幕エンジンを使用できない可能性があります。
-
-デフォルトのGummy字幕エンジン（クラウドモデルを使用した音声認識と翻訳）を使用するには、まず阿里云百煉プラットフォームのAPI KEYを取得し、API KEYをソフトウェア設定に追加するか環境変数に設定する必要があります（Windowsプラットフォームのみ環境変数からのAPI KEY読み取りをサポート）。関連チュートリアル：
-
-- [API KEYの取得](https://help.aliyun.com/zh/model-studio/get-api-key)
-- [環境変数へのAPI Keyの設定](https://help.aliyun.com/zh/model-studio/configure-api-key-through-environment-variables)
+デフォルトエンジンはアリババクラウドの `paraformer-realtime-v2` です。DashScope Recognition SDK の双方向ストリーミング認識を使用し、16kHz・16bit・モノラル PCM を送信します。中国語、英語、日本語、韓国語、ドイツ語、フランス語、ロシア語、広東語に対応し、`auto` は言語ヒントを指定しません。内蔵翻訳はありません。翻訳を有効にする場合は Ollama、OpenAI 互換サービス、Google 翻訳を設定してください。確定した文を非同期で翻訳します。設定または全プラットフォームで利用できる `DASHSCOPE_API_KEY` 環境変数に API Key を指定します。CLI は `--dashscope_api_key` を使用します。現在は北京リージョンのデフォルト接続先を使用するため、同リージョンの API Key が必要です。旧 Gummy の選択と API Key は自動移行し、スペイン語・イタリア語の入力言語は自動検出に変更します。旧カスタムコマンドは手動で更新してください。[公式 SDK ドキュメント](https://help.aliyun.com/zh/model-studio/paraformer-real-time-speech-recognition-python-sdk)を参照してください。
 
 ### GLM-ASR モデルの使用
 
@@ -146,8 +141,10 @@ SOSVモデルの使用方法はVoskと同じで、ダウンロードアドレス
 
 ```bash
 python main.py \
--e gummy \
---gummy_api_key sk-******************************** \
+-e paraformer \
+--dashscope_api_key sk-******************************** \
+--translation_provider ollama \
+--translation_model qwen2.5:0.5b \
 -a 0 \
 -d 1 \
 -s en \
@@ -160,30 +157,9 @@ python main.py \
 
 現在、ソフトウェアには4つの字幕エンジンが搭載されており、新しいエンジンが計画されています。それらの詳細情報は以下の通りです。
 
-### Gummy 字幕エンジン（クラウド）
+### Paraformer Realtime v2
 
-Tongyi Lab の [Gummy 音声翻訳大規模モデル](https://help.aliyun.com/zh/model-studio/gummy-speech-recognition-translation/)をベースに開発され、[Alibaba Cloud Bailian](https://bailian.console.aliyun.com) の APIを使用してこのクラウドモデルを呼び出します。
-
-**モデル詳細パラメータ：**
-
-- サポートするオーディオサンプルレート：16kHz以上
-- オーディオサンプルビット深度：16bit
-- サポートするオーディオチャンネル：モノラル
-- 認識可能な言語：中国語、英語、日本語、韓国語、ドイツ語、フランス語、ロシア語、イタリア語、スペイン語
-- サポートする翻訳：
-  - 中国語 → 英語、日本語、韓国語
-  - 英語 → 中国語、日本語、韓国語
-  - 日本語、韓国語、ドイツ語、フランス語、ロシア語、イタリア語、スペイン語 → 中国語または英語
-
-**ネットワークトラフィック消費量：**
-
-字幕エンジンはネイティブサンプルレート（48kHz と仮定）でサンプリングを行い、サンプルビット深度は 16bit、アップロードオーディオはモノラルチャンネルのため、アップロードレートは約：
-
-$$
-48000\ \text{samples/second} \times 2\ \text{bytes/sample} \times 1\ \text{channel}  = 93.75\ \text{KB/s}
-$$
-
-また、エンジンはオーディオストームを取得したときのみデータをアップロードするため、実際のアップロードレートはさらに小さくなる可能性があります。モデル結果の返信トラフィック消費量は小さく、ここでは考慮していません。
+デフォルトエンジンはアリババクラウドの `paraformer-realtime-v2` です。DashScope Recognition SDK の双方向ストリーミング認識を使用し、16kHz・16bit・モノラル PCM を送信します。中国語、英語、日本語、韓国語、ドイツ語、フランス語、ロシア語、広東語に対応し、`auto` は言語ヒントを指定しません。内蔵翻訳はありません。翻訳を有効にする場合は Ollama、OpenAI 互換サービス、Google 翻訳を設定してください。確定した文を非同期で翻訳します。設定または全プラットフォームで利用できる `DASHSCOPE_API_KEY` 環境変数に API Key を指定します。CLI は `--dashscope_api_key` を使用します。現在は北京リージョンのデフォルト接続先を使用するため、同リージョンの API Key が必要です。旧 Gummy の選択と API Key は自動移行し、スペイン語・イタリア語の入力言語は自動検出に変更します。旧カスタムコマンドは手動で更新してください。[公式 SDK ドキュメント](https://help.aliyun.com/zh/model-studio/paraformer-real-time-speech-recognition-python-sdk)を参照してください。
 
 ### GLM-ASR 字幕エンジン（クラウド）
 

@@ -4,7 +4,7 @@
 
 ## 软件简介
 
-Auto Caption 是一个跨平台的字幕显示软件，能够实时获取系统音频输入（录音）或输出（播放声音）的流式数据，并调用音频转文字的模型生成对应音频的字幕。软件提供的默认字幕引擎（使用阿里云 Gummy 模型）支持九种语言（中、英、日、韩、德、法、俄、西、意）的识别与翻译。
+Auto Caption 是一个跨平台的字幕显示软件，能够实时获取系统音频输入（录音）或输出（播放声音）的流式数据，并调用音频转文字的模型生成对应音频的字幕。默认 Paraformer 引擎支持八种源语言（含粤语），翻译通过外部服务提供。
 
 目前软件默认字幕引擎在 Windows、 macOS 和 Linux 平台下均拥有完整功能，在 macOS 要获取系统音频输出需要额外配置。
 
@@ -22,22 +22,15 @@ Auto Caption 是一个跨平台的字幕显示软件，能够实时获取系统�
 
 ### 软件缺点
 
-要使用默认的 Gummy 字幕引擎需要获取阿里云的 API KEY。
+要使用默认的 Paraformer 字幕引擎需要获取阿里云的 API KEY。
 
 在 macOS 平台获取音频输出需要额外配置。
 
 软件使用 Electron 构建，因此软件体积不可避免的较大。
 
-## Gummy 引擎使用前准备
+## Paraformer Realtime v2
 
-要使用软件提供的默认字幕引擎（阿里云 Gummy），需要从阿里云百炼平台获取 API KEY，然后将 API KEY 添加到软件设置中或者配置到环境变量中（仅 Windows 平台支持读取环境变量中的 API KEY）。
-
-**国际版的阿里云服务并没有提供 Gummy 模型，因此目前非中国用户无法使用默认字幕引擎。**
-
-这部分阿里云提供了详细的教程，可参考：
-
-- [获取 API KEY](https://help.aliyun.com/zh/model-studio/get-api-key)
-- [将 API Key 配置到环境变量](https://help.aliyun.com/zh/model-studio/configure-api-key-through-environment-variables)
+默认引擎为阿里云 `paraformer-realtime-v2`，通过 DashScope Recognition SDK 双向流式识别。上传音频为 16kHz、16bit、单声道 PCM；支持中文、英文、日语、韩语、德语、法语、俄语及粤语，`auto` 不指定语言提示。模型不提供内置翻译；开启翻译后需配置 Ollama、OpenAI 兼容服务或 Google 翻译，完整句子返回后异步翻译。设置中的阿里云 API Key 或 `DASHSCOPE_API_KEY` 环境变量用于鉴权（所有平台）；CLI 参数为 `--dashscope_api_key`。当前使用北京地域默认端点，API Key 必须匹配该地域。旧 Gummy 引擎选项和 API Key 自动迁移，旧西班牙语/意大利语源语言改为自动检测；旧自定义命令需手动更新。详见[阿里云官方 SDK 文档](https://help.aliyun.com/zh/model-studio/paraformer-real-time-speech-recognition-python-sdk)。
 
 ## GLM 引擎使用前准备
 
@@ -123,6 +116,8 @@ sudo yum install pulseaudio pavucontrol
 
 ## 字幕引擎
 
+字幕引擎选项按 Paraformer、GLM-ASR、Vosk、SOSV 排列，云端模型在前。本地模型标注运行位置：`本地 / CPU / Vosk`、`本地 / CPU / SOSV`。
+
 所谓的字幕引擎实际上是一个子程序，它会实时获取系统音频输入（录音）或输出（播放声音）的流式数据，并调用音频转文字的模型生成对应音频的字幕。生成的字幕通过转换为字符串的 JSON 数据，并通过标准输出传递给主程序。主程序读取字幕数据，处理后显示在窗口上。
 
 软件提供了两个默认的字幕引擎，如果你需要其他的字幕引擎，可以通过打开自定义引擎选项来调用其他字幕引擎（其他引擎需要针对该软件进行开发）。其中引擎路径是自定义字幕引擎在你的电脑上的路径，引擎指令是自定义字幕引擎的运行参数，这部分需要按该字幕引擎的规则进行填写。
@@ -149,9 +144,9 @@ sudo yum install pulseaudio pavucontrol
 
 #### `-e , --caption_engine`
 
-需要选择的字幕引擎模型，目前有四个可用，分别为：`gummy, glm, vosk, sosv`。
+需要选择的字幕引擎模型，目前有四个可用，分别为：`paraformer, glm, vosk, sosv`。
 
-该项的默认值为 `gummy`。
+该项的默认值为 `paraformer`。
 
 该项适用于所有模型。
 
@@ -201,21 +196,21 @@ sudo yum install pulseaudio pavucontrol
 
 但是指定源语言能在一定程度上提高识别准确率，可用使用上面的语言代码指定源语言。
 
-该项适用于 Gummy、GLM 和 SOSV 模型。
+该项适用于 Paraformer、GLM 和 SOSV 模型。
 
-其中 Gummy 模型可用使用上述全部的语言，在加上粤语（`yue`）。
+Paraformer 支持 `zh, en, ja, ko, de, fr, ru, yue` 和 `auto`，不支持西班牙语和意大利语识别。
 
 GLM 模型支持指定的语言有：英语、中文、日语、韩语。
 
 SOSV 模型支持指定的语言有：英语、中文、日语、韩语、粤语。
 
-#### `--gummy_api_key`
+#### `--dashscope_api_key`
 
-指定 `Gummy` 模型需要使用的阿里云 API KEY。
+指定 `Paraformer` 模型需要使用的阿里云 API KEY。
 
 该项默认值为空。
 
-该项仅适用于 Gummy 模型。
+该项仅适用于 Paraformer 模型。
 
 #### `-gkey, --glm_api_key`
 
@@ -231,7 +226,7 @@ SOSV 模型支持指定的语言有：英语、中文、日语、韩语、粤语
 
 #### `--translation_provider`
 
-指定 Vosk、SOSV 和 GLM 字幕引擎使用的翻译服务，默认为 `ollama`。
+指定 Paraformer、Vosk、SOSV 和 GLM 字幕引擎使用的翻译服务，默认为 `ollama`。
 
 该项支持的值有：
 
@@ -253,13 +248,13 @@ SOSV 模型支持指定的语言有：英语、中文、日语、韩语、粤语
 
 OpenAI API 兼容服务的基础请求地址，例如 `https://api.openai.com/v1`。仅当 `--translation_provider openai` 时使用。
 
-默认值为空，适用于除了 Gummy 外的其他模型。
+默认值为空，适用于所有字幕引擎。
 
 #### `--translation_api_key`
 
 指定调用 OpenAI API 兼容服务的 API Key。仅当 `--translation_provider openai` 时使用。
 
-默认值为空，适用于除了 Gummy 外的其他模型。
+默认值为空，适用于所有字幕引擎。
 
 #### `-vosk, --vosk_model`
 
@@ -281,14 +276,16 @@ OpenAI API 兼容服务的基础请求地址，例如 `https://api.openai.com/v1
 
 配置好后进入 `engine` 目录，执行命令进行运行字幕引擎。
 
-比如要使用 Gummy 模型，指定音频类型为系统音频输出，源语言为英语，翻译语言为中文，执行的命令如下：
+比如要使用 Paraformer 模型，指定音频类型为系统音频输出，源语言为英语，翻译语言为中文，执行的命令如下：
 
 > 注意：为了更直观，下面的命令写在了多行，如果执行失败，尝试去掉反斜杠，并改换单行命令执行。
 
 ```bash
 python main.py \
--e gummy \
---gummy_api_key sk-******************************** \
+-e paraformer \
+--dashscope_api_key sk-******************************** \
+--translation_provider ollama \
+--translation_model qwen2.5:0.5b \
 -a 0 \
 -d 1 \
 -s en \
@@ -333,7 +330,7 @@ python main.py \
 -t none
 ```
 
-使用 Gummy 模型的运行效果如下：
+使用 Paraformer 模型的运行效果如下：
 
 ![](../img/07.png)
 

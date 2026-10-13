@@ -45,7 +45,7 @@ https://github.com/user-attachments/assets/9c188d78-9520-4397-bacf-4c8fdcc54874
 - Supports calling local Ollama models, cloud-based OpenAI compatible models, or cloud-based Google Translate API for translation
 - Cross-platform (Windows, macOS, Linux) and multi-language interface (Chinese, English, Japanese) support
 - Rich caption style settings (font, font size, font weight, font color, background color, etc.)
-- Flexible caption engine selection (Aliyun Gummy cloud model,GLM-ASR cloud model, local Vosk model, local SOSV model, or you can develop your own model)
+- Flexible caption engine selection (Aliyun Paraformer cloud model,GLM-ASR cloud model, local Vosk model, local SOSV model, or you can develop your own model)
 - Multi-language recognition and translation (see below "⚙️ Built-in Subtitle Engines")
 - Subtitle record display and export (supports exporting `.srt` and `.json` formats)
 
@@ -68,13 +68,13 @@ After downloading the software, you need to select the corresponding model accor
 
 |                                                              | Accuracy | Real-time | Deployment Type | Supported Languages | Translation | Notes |
 | ------------------------------------------------------------ | -------- | --------- | --------------- | ------------------- | ----------- | ----- |
-| [Gummy](https://help.aliyun.com/zh/model-studio/gummy-speech-recognition-translation) | Very good 😊 | Very good 😊 | Cloud / Alibaba Cloud | 10 languages | Built-in translation | Paid, recognition 0.54 CNY/hour, recognition + translation 1.08 CNY/hour |
+| [Paraformer Realtime v2](https://help.aliyun.com/zh/model-studio/paraformer-real-time-speech-recognition-python-sdk) | Streaming ASR | External translation | Cloud / Alibaba Cloud | 8 languages including Cantonese | Ollama / OpenAI-compatible / Google | Current Alibaba Cloud pricing |
 | [glm-asr-2512](https://docs.bigmodel.cn/cn/guide/models/sound-and-video/glm-asr-2512) | Very good 😊 | Poor 😞 | Cloud / Zhipu AI | 4 languages | Requires additional configuration | Paid, approximately 0.72 CNY/hour |
 | [Vosk](https://alphacephei.com/vosk) | Poor 😞 | Very good 😊 | Local / CPU | Over 30 languages | Requires additional configuration | Supports many languages |
 | [SOSV](https://k2-fsa.github.io/sherpa/onnx/sense-voice/index.html) | Average 😐 | Average 😐 | Local / CPU | 5 languages | Requires additional configuration | Only one model |
 | Self-developed | 🤔 | 🤔 | Custom | Custom | Custom | Develop your own using Python according to the [documentation](./docs/engine-manual/en.md) |
 
-If you choose a model other than Gummy, you also need to configure your own translation model.
+All caption engines require an external translation service when translation is enabled.
 
 ### Configuring Translation Models
 
@@ -105,14 +105,9 @@ The API Key needs to be obtained from the corresponding model provider.
 
 No configuration required, just connect to the internet to use.
 
-### Using Gummy Model
+### Paraformer Realtime v2
 
-> The international version of Alibaba Cloud services does not seem to provide the Gummy model, so non-Chinese users may not be able to use the Gummy caption engine at present.
-
-To use the default Gummy caption engine (using cloud models for speech recognition and translation), you first need to obtain an API KEY from Alibaba Cloud Bailian platform, then add the API KEY to the software settings or configure it in the environment variables (only Windows platform supports reading API KEY from environment variables), so that the model can be used normally. Related tutorials:
-
-- [Get API KEY](https://help.aliyun.com/zh/model-studio/get-api-key)
-- [Configure API Key through Environment Variables](https://help.aliyun.com/zh/model-studio/configure-api-key-through-environment-variables)
+The default engine is Alibaba Cloud `paraformer-realtime-v2`, using the DashScope Recognition SDK for duplex streaming ASR. Audio is uploaded as 16kHz, 16-bit mono PCM. Supported source languages are Chinese, English, Japanese, Korean, German, French, Russian and Cantonese; `auto` sends no language hint. There is no built-in translation: configure Ollama, an OpenAI-compatible service or Google Translate to translate finalized sentences asynchronously. Set the Alibaba Cloud API Key in settings or the `DASHSCOPE_API_KEY` environment variable on any platform; the CLI option is `--dashscope_api_key`. The current endpoint is the default Beijing endpoint and requires a matching regional API Key. Old Gummy selections and API Keys migrate automatically; old Spanish/Italian source selections switch to auto detection. Update old custom commands manually. See the [official SDK documentation](https://help.aliyun.com/zh/model-studio/paraformer-real-time-speech-recognition-python-sdk).
 
 ### Using the GLM-ASR Model
 
@@ -145,8 +140,10 @@ For runtime parameters and detailed usage instructions, please refer to the [Use
 
 ```bash
 python main.py \
--e gummy \
---gummy_api_key sk-******************************** \
+-e paraformer \
+--dashscope_api_key sk-******************************** \
+--translation_provider ollama \
+--translation_model qwen2.5:0.5b \
 -a 0 \
 -d 1 \
 -s en \
@@ -159,30 +156,9 @@ python main.py \
 
 Currently, the software comes with 4 caption engines, with new engines under development. Their detailed information is as follows.
 
-### Gummy Subtitle Engine (Cloud)
+### Paraformer Realtime v2
 
-Developed based on Tongyi Lab's [Gummy Speech Translation Model](https://help.aliyun.com/zh/model-studio/gummy-speech-recognition-translation/), using [Alibaba Cloud Bailian](https://bailian.console.aliyun.com) API to call this cloud model.
-
-**Model Parameters:**
-
-- Supported audio sample rate: 16kHz and above
-- Audio sample depth: 16bit
-- Supported audio channels: Mono
-- Recognizable languages: Chinese, English, Japanese, Korean, German, French, Russian, Italian, Spanish
-- Supported translations:
-  - Chinese → English, Japanese, Korean
-  - English → Chinese, Japanese, Korean
-  - Japanese, Korean, German, French, Russian, Italian, Spanish → Chinese or English
-
-**Network Traffic Consumption:**
-
-The caption engine uses native sample rate (assumed to be 48kHz) for sampling, with 16bit sample depth and mono channel, so the upload rate is approximately:
-
-$$
-48000\ \text{samples/second} \times 2\ \text{bytes/sample} \times 1\ \text{channel}  = 93.75\ \text{KB/s}
-$$
-
-The engine only uploads data when receiving audio streams, so the actual upload rate may be lower. The return traffic consumption of model results is small and not considered here.
+The default engine is Alibaba Cloud `paraformer-realtime-v2`, using the DashScope Recognition SDK for duplex streaming ASR. Audio is uploaded as 16kHz, 16-bit mono PCM. Supported source languages are Chinese, English, Japanese, Korean, German, French, Russian and Cantonese; `auto` sends no language hint. There is no built-in translation: configure Ollama, an OpenAI-compatible service or Google Translate to translate finalized sentences asynchronously. Set the Alibaba Cloud API Key in settings or the `DASHSCOPE_API_KEY` environment variable on any platform; the CLI option is `--dashscope_api_key`. The current endpoint is the default Beijing endpoint and requires a matching regional API Key. Old Gummy selections and API Keys migrate automatically; old Spanish/Italian source selections switch to auto detection. Update old custom commands manually. See the [official SDK documentation](https://help.aliyun.com/zh/model-studio/paraformer-real-time-speech-recognition-python-sdk).
 
 ### GLM-ASR Caption Engine (Cloud)
 

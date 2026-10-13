@@ -82,7 +82,7 @@ Socket 服务开始监听，要求主进程连接该服务。主进程忽略 `co
 
 主进程从后向前查找相同 `time_s` 的字幕，只更新其 `translation` 字段，再通过 `both.captionLog.upd` 发送完整记录。未找到则忽略消息；`text` 不参与匹配，也不会覆盖原始文本。翻译结果可以对应较早的记录，不限于最后一条。
 
-Vosk、SOSV 和 GLM 引擎使用外部翻译服务时会发送此消息；Gummy 的内置翻译随 `caption.translation` 一起发送。
+Paraformer、Vosk、SOSV 和 GLM 引擎使用外部翻译服务时会发送此消息。Paraformer 在完整句子返回后触发翻译，识别片段通过相同 index 和 time_s 更新字幕。
 
 ### `print`
 
@@ -95,7 +95,7 @@ Vosk、SOSV 和 GLM 引擎使用外部翻译服务时会发送此消息；Gummy 
 ### `info`
 
 ```json
-{ "command": "info", "content": "Gummy translator started." }
+{ "command": "info", "content": "Paraformer recognizer started." }
 ```
 
 `content` 为字符串，主进程记录为 INFO 软件日志。
@@ -122,7 +122,7 @@ Vosk、SOSV 和 GLM 引擎使用外部翻译服务时会发送此消息；Gummy 
 { "command": "usage", "content": "60" }
 ```
 
-Gummy 回调关闭时发送，`content` 为累计服务返回的 `usage['duration']` 后转换成的字符串。主进程将其原样写入 INFO 软件日志（当前日志前缀为 `Engine Token Usage`），不计算费用，也不将其解析为 token 数量。具体时长单位和计费含义取决于服务返回值。
+当前内置引擎不发送此消息；保留供自定义引擎使用。主进程将 content 原样记录到 INFO 日志，不计算费用。
 
 ## TCP Socket 命令
 
