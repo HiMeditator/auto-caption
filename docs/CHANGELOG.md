@@ -7,6 +7,10 @@
 
 ### 开发维护
 
+- 补充 Release 草稿尚未创建标签时的目标提交校验，防止不同提交复用同一版本草稿；新增权限错误和草稿冲突测试
+- CI 临时移除 .npmrc 的两项镜像配置，使用默认官方源；发布构建增加打包后引擎的启动检查，避免上传无法加载依赖的引擎
+- 修正 electron-builder 下载镜像参数，使用 --config.electronDownload.mirror 避免被解析为配置文件路径
+- 新增 GitHub Actions 三平台 CI，以及主分支软件版本变更时自动构建引擎和安装包、创建标签并发布 GitHub Release 的流程；支持预发布版本、失败重跑和重复版本保护，同步三语 README
 - 新增中文字幕引擎独立 README，说明环境准备、CLI 使用、翻译配置、离线测试和打包流程，并在项目 README 中添加入口
 - uv 同步、测试和构建命令移除 `--locked`，允许根据项目配置自动维护依赖锁文件
 - 将 Python 引擎迁移到 uv，新增项目配置和 Python 版本文件，替代 requirements.txt；PyInstaller 归入开发依赖，uv.lock 在本地自动生成并由 Git 忽略

@@ -244,3 +244,13 @@ npm run build:linux
 ```
 
 These installer commands build the engine before the desktop app. Run each command on its target operating system; PyInstaller does not cross-compile the engine for another OS.
+
+### GitHub CI / CD
+
+The [workflow](./.github/workflows/ci.yml) runs ESLint, type checks, desktop builds, offline engine tests, and release detection tests on Windows, macOS, and Linux for pull requests targeting `main` and pushes to `main`. It uses Node.js 22, Python 3.12, and uv, installs PortAudio on macOS, and temporarily removes the two mirror settings from `.npmrc` to use the default official download sources. Local mirror settings remain unchanged. Packaging separately overrides the Electron mirror in `electron-builder.yml`.
+
+On a push to `main`, including a merged PR, it compares `package.json` versions before and after the entire push. A version change and successful checks on all platforms trigger x64 installers containing the Python engine: Windows NSIS `.exe`, macOS Intel `.dmg`, and Linux `.tar.gz`. Each packaged engine also undergoes a `--help` startup check. After every build succeeds, it creates a `v<version>` tag and GitHub Release with generated release notes and all three installers. Versions such as `1.3.0-rc.1` become pre-releases. Unchanged versions and initial branch creation only run CI.
+
+To release, run `npm version 1.3.0 --no-git-tag-version` with the desired version to update both `package.json` and `package-lock.json`, update the changelog, and merge into `main`. Update `engine/pyproject.toml` if the engine version also changes. No manual tag or PAT is needed: publishing uses the built-in `GITHUB_TOKEN` with `contents: write`. Repository/organization policies must allow GitHub Actions and this permission; tag rules must allow the workflow to create `v*` tags. The three `Check (...)` jobs can be required status checks for merging.
+
+Installers currently have no code signing or macOS notarization and do not include speech models. Linux users still need system audio dependencies. Actions artifacts are retained for 14 days. Use Re-run failed jobs on the original run to recover: interrupted uploads leave a draft, which becomes public only after all uploads finish. An already published release for the same commit is skipped; a tag or an untagged release draft targeting another commit fails and requires a new version. Subsequent main pushes do not cancel releases, which always target the triggering commit.

@@ -1,0 +1,218 @@
+name: CI / Release
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+# Each main push gets its own run so a later push cannot discard a version bump.
+concurrency:
+  group: ci-${{ github.event_name }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  check:
+    name: Check (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022, macos-15-intel]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: astral-sh/setup-uv@v7
+        with:
+          version: '0.12.23'
+          python-version: '3.12'
+          enable-cache: true
+          cache-dependency-glob: engine/pyproject.toml
+      - name: Install PortAudio
+        if: runner.os == 'macOS'
+        run: brew install portaudio
+      - name: Use default download sources
+        shell: bash
+        run: |
+          sed -E '/^[[:space:]]*electron(_builder_binaries)?_mirror[[:space:]]*=/d' .npmrc > .npmrc.ci
+          mv .npmrc.ci .npmrc
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+      - run: npm run engine:test
+      - name: Test release detection
+        run: uv run --project engine python -m unittest discover -s .github/scripts -v
+      - name: Test release publishing
+        run: node --test .github/scripts/test_publish_release.mjs
+
+  version:
+    name: Detect version change
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      changed: ${{ steps.version.outputs.changed }}
+      version: ${{ steps.version.outputs.version }}
+      tag: ${{ steps.version.outputs.tag }}
+      prerelease: ${{ steps.version.outputs.prerelease }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: version
+        run: python3 .github/scripts/release_version.py
+
+  package:
+    name: Package (${{ matrix.platform }})
+    needs: [check, version]
+    if: needs.version.outputs.changed == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-2022
+            platform: win
+            target: nsis
+            files: dist/*-setup.exe
+          - os: macos-15-intel
+            platform: mac
+            target: dmg
+            files: dist/*.dmg
+          - os: ubuntu-24.04
+            platform: linux
+            target: tar.gz
+            files: dist/*.tar.gz
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    env:
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: astral-sh/setup-uv@v7
+        with:
+          version: '0.12.23'
+          python-version: '3.12'
+          enable-cache: true
+          cache-dependency-glob: engine/pyproject.toml
+      - name: Install PortAudio
+        if: runner.os == 'macOS'
+        run: brew install portaudio
+      - name: Use default download sources
+        shell: bash
+        run: |
+          sed -E '/^[[:space:]]*electron(_builder_binaries)?_mirror[[:space:]]*=/d' .npmrc > .npmrc.ci
+          mv .npmrc.ci .npmrc
+      - run: npm ci
+      - run: npm run build:engine
+      - name: Smoke test packaged engine
+        shell: bash
+        run: |
+          if [ "$RUNNER_OS" = "Windows" ]; then
+            ./engine/dist/main.exe --help
+          else
+            ./engine/dist/main --help
+          fi
+      - run: npm run build
+      - name: Build installer
+        run: npx electron-builder --${{ matrix.platform }} ${{ matrix.target }} --x64 --publish never --config.electronDownload.mirror=https://github.com/electron/electron/releases/download/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ matrix.platform }}-x64
+          path: ${{ matrix.files }}
+          if-no-files-found: error
+          retention-days: 14
+
+  release:
+    name: Publish GitHub Release
+    needs: [version, package]
+    if: needs.version.outputs.changed == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    concurrency:
+      group: release-${{ needs.version.outputs.tag }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: release-*-x64
+          path: release-assets
+          merge-multiple: true
+      - name: Publish all installers together
+        uses: actions/github-script@v7
+        env:
+          RELEASE_TAG: ${{ needs.version.outputs.tag }}
+          RELEASE_PRERELEASE: ${{ needs.version.outputs.prerelease }}
+        with:
+          script: |
+            const fs = require('node:fs');
+            const path = require('node:path');
+            const { owner, repo } = context.repo;
+            const tag = process.env.RELEASE_TAG;
+            const prerelease = process.env.RELEASE_PRERELEASE === 'true';
+            const sha = context.sha;
+            const optional = async (request) => {
+              try { return (await request()).data; }
+              catch (error) { if (error.status === 404) return null; throw error; }
+            };
+            // Reject reused versions even if their tags are annotated.
+            const ref = await optional(() => github.rest.git.getRef({ owner, repo, ref: `tags/${tag}` }));
+            if (ref) {
+              let object = ref.object;
+              while (object.type === 'tag') {
+                object = (await github.rest.git.getTag({ owner, repo, tag_sha: object.sha })).data.object;
+              }
+              if (object.type !== 'commit' || object.sha !== sha) {
+                throw new Error(`${tag} already points to another commit; choose a new version.`);
+              }
+            }
+            let release = await optional(() => github.rest.repos.getReleaseByTag({ owner, repo, tag }));
+            // Draft releases can exist before their tags are created.
+            if (release && !ref && release.target_commitish !== sha) {
+              throw new Error(`${tag} has a release for another target; choose a new version.`);
+            }
+            if (release && !release.draft) {
+              core.info(`${tag} is already published for this commit.`);
+              return;
+            }
+            const directory = 'release-assets';
+            const files = fs.readdirSync(directory).sort();
+            for (const extension of ['.exe', '.dmg', '.tar.gz']) {
+              if (!files.some(file => file.endsWith(extension))) {
+                throw new Error(`Missing installer: ${extension}`);
+              }
+            }
+            if (!release) {
+              const notes = (await github.rest.repos.generateReleaseNotes({ owner, repo, tag_name: tag, target_commitish: sha })).data;
+              release = (await github.rest.repos.createRelease({ owner, repo, tag_name: tag,
+                target_commitish: sha, name: tag, body: notes.body, draft: true, prerelease })).data;
+            }
+            // A failed upload leaves a draft; rerunning replaces its partial assets.
+            const assets = await github.paginate(github.rest.repos.listReleaseAssets, {
+              owner, repo, release_id: release.id
+            });
+            for (const file of files) {
+              const existing = assets.find(asset => asset.name === file);
+              if (existing) await github.rest.repos.deleteReleaseAsset({ owner, repo, asset_id: existing.id });
+              await github.rest.repos.uploadReleaseAsset({ owner, repo, release_id: release.id,
+                name: file, data: fs.readFileSync(path.join(directory, file)),
+                headers: { 'content-type': 'application/octet-stream' } });
+            }
+            await github.rest.repos.updateRelease({ owner, repo, release_id: release.id,
+              draft: false, prerelease, make_latest: prerelease ? 'false' : 'legacy' });

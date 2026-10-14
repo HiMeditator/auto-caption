@@ -244,3 +244,13 @@ npm run build:linux
 ```
 
 以上安装包命令会先构建字幕引擎，再构建桌面端。必须在目标操作系统上构建相应的安装包；PyInstaller 不支持跨操作系统编译引擎。
+
+### GitHub CI / CD
+
+[工作流](./.github/workflows/ci.yml) 在面向 `main` 的 Pull Request 和推送到 `main` 时运行 Windows、macOS、Linux 的 ESLint、类型检查、桌面端构建、引擎离线测试和发布版本检测测试。使用 Node.js 22、Python 3.12 和 uv；macOS 自动安装 PortAudio，CI 临时移除 `.npmrc` 中的两项镜像配置，让 Electron 及打包工具使用默认官方源；本地镜像配置保持不变。打包时单独覆盖 `electron-builder.yml` 的 Electron 镜像配置。
+
+推送到 `main`（包括合并 PR）时，比较本次推送之前与之后的 `package.json` 中的 `version`。只有版本发生变化且三平台检查全部通过，才构建包含 Python 引擎的 x64 安装包：Windows NSIS `.exe`、macOS Intel `.dmg`、Linux `.tar.gz`。打包后的引擎还会执行 `--help` 启动检查；全部构建成功后创建 `v<version>` 标签及 GitHub Release，自动生成发布说明并上传三平台文件；带预发布标识的版本（如 `1.3.0-rc.1`）发布为 Pre-release。版本不变或首次创建主分支时只执行 CI。
+
+发布新版本时，运行 `npm version 1.3.0 --no-git-tag-version`（版本号按需替换）同步更新 `package.json` 和 `package-lock.json`，维护更新日志，再将变更合并到 `main`；若引擎版本也发生变化，同步修改 `engine/pyproject.toml`。不需要手动创建标签或配置 PAT，发布作业使用内置 `GITHUB_TOKEN` 的 `contents: write` 权限；仓库或组织策略需允许该权限及 GitHub Actions，标签规则也需允许工作流创建 `v*` 标签。可将三个 `Check (...)` 作业设置为主分支合并必需的状态检查。
+
+安装包目前不使用代码签名或 macOS 公证，也不包含语音模型；Linux 仍需要用户安装音频系统依赖。构建产物在 Actions 中保留 14 天。失败后可在原运行记录中选择 Re-run failed jobs：上传中断会保留草稿，重跑补齐文件后才公开；同一提交的已发布 Release 会跳过，同名标签或尚未创建标签的 Release 草稿指向不同提交时会报错，需使用新版本号。多个主分支推送不会取消正在执行的发布，发布始终对应触发推送的提交。

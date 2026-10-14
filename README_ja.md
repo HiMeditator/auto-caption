@@ -245,3 +245,13 @@ npm run build:linux
 ```
 
 これらの配布用コマンドは字幕エンジンを先に構築してからデスクトップアプリを構築します。対象の OS 上で実行してください。PyInstaller は別の OS 向けのクロスコンパイルに対応していません。
+
+### GitHub CI / CD
+
+[ワークフロー](./.github/workflows/ci.yml) は、`main` 向けの Pull Request と `main` への push で、Windows・macOS・Linux の ESLint、型チェック、デスクトップビルド、エンジンのオフラインテスト、リリース検出テストを実行します。Node.js 22、Python 3.12、uv を使用し、macOS では PortAudio を自動インストールします。CI では `.npmrc` の 2 つのミラー設定を一時的に除去し、既定の公式配布元を使用します。ローカルのミラー設定は変更しません。パッケージング時は `electron-builder.yml` の Electron ミラー設定を個別に上書きします。
+
+PR のマージを含む `main` への push では、push 全体の前後で `package.json` の `version` を比較します。バージョンが変更され、全プラットフォームのチェックに成功した場合、Python エンジンを含む x64 配布ファイル（Windows NSIS `.exe`、macOS Intel `.dmg`、Linux `.tar.gz`）をビルドします。パッケージ化したエンジンの `--help` 起動チェックも実行します。すべて成功してから `v<version>` タグと GitHub Release を作成し、自動生成したリリースノートと配布ファイルを公開します。`1.3.0-rc.1` などは Pre-release になります。バージョンが同じ場合やブランチの初回作成時は CI のみ実行します。
+
+リリースするには、希望するバージョンで `npm version 1.3.0 --no-git-tag-version` を実行して `package.json` と `package-lock.json` を更新し、更新ログを整備して `main` にマージします。エンジンのバージョンも変更する場合は `engine/pyproject.toml` を更新します。タグの手動作成や PAT は不要で、公開ジョブは組み込みの `GITHUB_TOKEN` の `contents: write` 権限を使用します。リポジトリ・組織の設定で Actions とこの権限を許可し、タグルールでワークフローによる `v*` タグ作成を許可してください。3 つの `Check (...)` ジョブをマージ必須チェックに設定できます。
+
+現在の配布ファイルにはコード署名・macOS 公証・音声モデルを含みません。Linux ではシステムの音声依存関係が別途必要です。Actions の成果物は 14 日間保存します。失敗時は元の実行の Re-run failed jobs で再実行できます。アップロード中断時は下書きを残し、すべてのファイルが揃ってから公開します。同一コミットの公開済み Release はスキップし、同名タグまたはタグ作成前の Release 下書きが別コミットを指す場合はエラーとなるため新しいバージョンを使用してください。後続の push は公開処理をキャンセルせず、タグは常に処理を開始したコミットを指します。
