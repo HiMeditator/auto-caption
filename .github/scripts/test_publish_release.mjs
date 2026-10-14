@@ -50,7 +50,8 @@ async function simulate(options = {}) {
   const fakeRequire = (name) =>
     name === 'node:fs'
       ? {
-          readdirSync: () => options.files || ['app-setup.exe', 'app.dmg', 'app.tar.gz'],
+          readdirSync: () =>
+            options.files || ['auto-caption-v1.3.0.exe', 'auto-caption-v1.3.0.tar.gz'],
           readFileSync: () => Buffer.from('installer')
         }
       : path
@@ -69,12 +70,16 @@ async function simulate(options = {}) {
   return { calls, error }
 }
 
-test('Creates draft at triggering SHA and publishes only after three uploads', async () => {
+test('Creates draft at triggering SHA and publishes Windows/Linux without a macOS installer', async () => {
   const { calls, error } = await simulate()
   assert.equal(error, undefined)
   assert.deepEqual(
     calls.map((call) => call[0]),
-    ['create', 'upload', 'upload', 'upload', 'publish']
+    ['create', 'upload', 'upload', 'publish']
+  )
+  assert.deepEqual(
+    calls.filter((call) => call[0] === 'upload').map((call) => call[1].name),
+    ['auto-caption-v1.3.0.exe', 'auto-caption-v1.3.0.tar.gz']
   )
   assert.equal(calls[0][1].target_commitish, 'trigger-sha')
   assert.equal(calls[0][1].draft, true)
@@ -88,7 +93,7 @@ test('Upload failure leaves draft unpublished', async () => {
 test('Draft retry replaces partial asset and publishes', async () => {
   const { calls, error } = await simulate({
     release: { id: 42, draft: true, target_commitish: 'trigger-sha' },
-    assets: [{ id: 9, name: 'app.dmg' }]
+    assets: [{ id: 9, name: 'auto-caption-v1.3.0.exe' }]
   })
   assert.equal(error, undefined)
   assert.ok(calls.some((call) => call[0] === 'delete' && call[1].asset_id === 9))
@@ -122,11 +127,16 @@ test('API permission failure is not treated as a missing release', async () => {
   assert.equal(error.status, 403)
   assert.equal(calls.length, 0)
 })
-test('Missing platform installer fails before creating release', async () => {
-  const { calls, error } = await simulate({ files: ['app-setup.exe', 'app.dmg'] })
-  assert.match(error.message, /Missing installer/)
-  assert.equal(calls.length, 0)
-})
+for (const [missing, files] of [
+  ['.exe', ['auto-caption-v1.3.0.tar.gz']],
+  ['.tar.gz', ['auto-caption-v1.3.0.exe']]
+]) {
+  test(`Missing ${missing} installer fails before creating release`, async () => {
+    const { calls, error } = await simulate({ files })
+    assert.equal(error.message, `Missing installer: ${missing}`)
+    assert.equal(calls.length, 0)
+  })
+}
 test('Pre-release is published without marking latest', async () => {
   const { calls, error } = await simulate({ prerelease: true })
   assert.equal(error, undefined)

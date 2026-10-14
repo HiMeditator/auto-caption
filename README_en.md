@@ -224,3 +224,5 @@ npm run build:linux
 ```
 
 These installer commands build the engine before the desktop app. Run each command on its target operating system; PyInstaller does not cross-compile the engine for another OS.
+
+GitHub Actions currently checks and publishes Windows/Linux x64 only; automated macOS builds are temporarily disabled. PRs targeting `main` run code checks, desktop builds and tests. When a push or merge to `main` changes the `package.json` version, successful checks are followed by packaging the Windows NSIS installer (`.exe`) and Linux archive (`.tar.gz`). The GitHub Release is published after both uploads complete.

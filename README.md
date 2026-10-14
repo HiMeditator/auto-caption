@@ -224,3 +224,5 @@ npm run build:linux
 ```
 
 以上安装包命令会先构建字幕引擎，再构建桌面端。必须在目标操作系统上构建相应的安装包；PyInstaller 不支持跨操作系统编译引擎。
+
+GitHub Actions 当前仅检查和发布 Windows/Linux x64，暂时移除 macOS 自动构建。面向 `main` 的 PR 运行代码检查、桌面端构建和测试；推送或合并到 `main` 且 `package.json` 版本号变化时，检查通过后构建 Windows NSIS 安装包（`.exe`）和 Linux 压缩包（`.tar.gz`），两者上传完成后发布 GitHub Release。

@@ -224,3 +224,5 @@ npm run build:linux
 ```
 
 これらの配布用コマンドは字幕エンジンを先に構築してからデスクトップアプリを構築します。対象の OS 上で実行してください。PyInstaller は別の OS 向けのクロスコンパイルに対応していません。
+
+現在の GitHub Actions は Windows/Linux x64 のみを検証・配布し、macOS の自動ビルドは一時的に無効にしています。`main` 向けの PR ではコード検証、デスクトップアプリのビルド、テストを実行します。`main` へのプッシュまたはマージで `package.json` のバージョンが変わると、検証成功後に Windows の NSIS インストーラー（`.exe`）と Linux のアーカイブ（`.tar.gz`）を作成し、両方のアップロード完了後に GitHub Release を公開します。
