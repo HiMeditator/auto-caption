@@ -45,7 +45,7 @@ export const useEngineControlStore = defineStore('engineControl', () => {
   const changeSignal = ref<boolean>(false)
   const errorSignal = ref<boolean>(false)
 
-  function sendControlsChange() {
+  function sendControlsChange(): void {
     const controls: Controls = {
       engineEnabled: engineEnabled.value,
       sourceLang: sourceLang.value,
@@ -76,7 +76,7 @@ export const useEngineControlStore = defineStore('engineControl', () => {
     window.electron.ipcRenderer.send('control.controls.change', controls)
   }
 
-  function setControls(controls: Controls, set = false) {
+  function setControls(controls: Controls, set = false): void {
     if(set && !engineEnabled.value && !controls.engineEnabled) {
       errorSignal.value = true
       notification.open({
@@ -120,7 +120,7 @@ export const useEngineControlStore = defineStore('engineControl', () => {
     changeSignal.value = true
   }
 
-  function emptyModelPathErr() {
+  function emptyModelPathErr(): void {
     notification.open({
       message: t('noti.empty'),
       description: t('noti.emptyInfo'),

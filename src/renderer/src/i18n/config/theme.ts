@@ -1,13 +1,14 @@
 import { theme } from 'ant-design-vue';
+import type { ThemeConfig } from 'ant-design-vue/es/config-provider/context'
 
 let isLight = true
 let themeColor = '#1677ff'
 
-export function setThemeColor(color: string) {
+export function setThemeColor(color: string): void {
   themeColor = color
 }
 
-export function getTheme(curIsLight?: boolean) {
+export function getTheme(curIsLight?: boolean): ThemeConfig {
   const lightTheme = {
     token: {
       colorPrimary: themeColor,

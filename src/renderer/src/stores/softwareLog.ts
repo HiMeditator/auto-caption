@@ -5,7 +5,7 @@ import { type SoftwareLogItem } from '../types'
 export const useSoftwareLogStore = defineStore('softwareLog', () => {
   const softwareLogs = ref<SoftwareLogItem[]>([])
 
-  function clear() {
+  function clear(): void {
     softwareLogs.value = []
   }
 

@@ -1,4 +1,4 @@
-import { exec, spawn } from 'child_process'
+import { exec, spawn, type ChildProcessWithoutNullStreams } from 'child_process'
 import { app } from 'electron'
 import { is } from '@electron-toolkit/utils'
 import * as path from 'path'
@@ -8,18 +8,24 @@ import { allConfig } from './AllConfig'
 import { i18n } from '../i18n'
 import { Log } from './Log'
 import { passwordMaskingForList } from './UtilsFunc'
+import type { CaptionItem } from '../types'
+
+type EngineMessage =
+  | (CaptionItem & { command: 'caption'; update_by_time?: boolean })
+  | { command: 'translation'; time_s: string; translation: string }
+  | { command: 'connect' | 'kill' | 'print' | 'info' | 'warn' | 'error' | 'usage'; content: string }
 
 export class CaptionEngine {
   appPath: string = ''
   command: string[] = []
-  process: any | undefined
+  process: ChildProcessWithoutNullStreams | undefined
   client: net.Socket | undefined
   port: number = 8080
   status: 'running' | 'starting' | 'stopping' | 'stopped' | 'starting-timeout' = 'stopped'
   timerID: NodeJS.Timeout | undefined
   startTimeoutID: NodeJS.Timeout | undefined
 
-  private addTranslationArguments() {
+  private addTranslationArguments(): void {
     const controls = allConfig.controls
     this.command.push('--translation_provider', controls.translationProvider)
     if(controls.translationProvider === 'ollama') {
@@ -139,7 +145,11 @@ export class CaptionEngine {
     return true
   }
 
-  public connect() {
+  public connect(): void {
+    if(!this.process?.pid) {
+      Log.warn('Caption engine process is not available, ignoring connection request')
+      return
+    }
     if(this.client) { Log.warn('Client already exists, ignoring...') }
     if (this.startTimeoutID) {
       clearTimeout(this.startTimeoutID)
@@ -159,7 +169,7 @@ export class CaptionEngine {
     }
   }
 
-  public sendCommand(command: string, content: string = "") {
+  public sendCommand(command: string, content: string = ""): void {
     if(this.client === undefined) {
       Log.error('Client not initialized yet')
       return
@@ -169,7 +179,7 @@ export class CaptionEngine {
     Log.info(`Send data to python server: ${data}`);
   }
 
-  public start() {
+  public start(): void {
     if (this.status !== 'stopped') {
       Log.warn('Caption engine is not stopped, current status:', this.status)
       return
@@ -190,7 +200,7 @@ export class CaptionEngine {
       }
     }, timeoutMs)
     
-    this.process.stdout.on('data', (data: any) => {
+    this.process.stdout.on('data', (data: Buffer) => {
       const lines = data.toString().split('\n')
       lines.forEach((line: string) => {
         if (line.trim()) {
@@ -205,7 +215,7 @@ export class CaptionEngine {
       });
     });
 
-    this.process.stderr.on('data', (data: any) => {
+    this.process.stderr.on('data', (data: Buffer) => {
       const lines = data.toString().split('\n')
       lines.forEach((line: string) => {
         if(line.trim()){
@@ -214,7 +224,7 @@ export class CaptionEngine {
       })
     });
 
-    this.process.on('close', (code: any) => {
+    this.process.on('close', (code: number | null) => {
       this.process = undefined;
       this.client = undefined
       allConfig.controls.engineEnabled = false
@@ -232,7 +242,7 @@ export class CaptionEngine {
     });
   }
 
-  public stop() {
+  public stop(): void {
     if(this.status !== 'running'){
       Log.warn('Trying to stop engine which is not running, current status:', this.status)
     }
@@ -249,7 +259,7 @@ export class CaptionEngine {
     }, 4000);
   }
 
-  public kill(){
+  public kill(): void {
     if(!this.process || !this.process.pid) return
     if(this.status !== 'running'){
       Log.warn('Trying to kill engine which is not running, current status:', this.status)
@@ -280,7 +290,7 @@ export class CaptionEngine {
   }
 }
 
-function handleEngineData(data: any) {
+function handleEngineData(data: EngineMessage): void {
   if(data.command === 'connect'){
     captionEngine.connect()
   }

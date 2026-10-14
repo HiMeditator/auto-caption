@@ -16,9 +16,9 @@ export const useGeneralSettingStore = defineStore('generalSetting', () => {
   const uiColor = ref<string>('#1677ff')
   const leftBarWidth = ref<number>(8)
 
-  const antdTheme = ref<Object>(getTheme())
+  const antdTheme = ref<ReturnType<typeof getTheme>>(getTheme())
 
-  function handleThemeChange(newTheme: RealTheme) {
+  function handleThemeChange(newTheme: RealTheme): void {
     realTheme.value = newTheme
     if(newTheme === 'dark' && uiColor.value === '#000000') {
       uiColor.value = '#b9d7ea'
@@ -85,7 +85,7 @@ export const useGeneralSettingStore = defineStore('generalSetting', () => {
     handleThemeChange(args)
   })
 
-  function setLightTheme(){
+  function setLightTheme(): void {
     antdTheme.value = getTheme(true)
     const root = document.documentElement
     root.style.setProperty('--control-background', '#fff')
@@ -93,7 +93,7 @@ export const useGeneralSettingStore = defineStore('generalSetting', () => {
     root.style.setProperty('--icon-color', 'rgba(0, 0, 0, 0.88)')
   }
 
-  function setDarkTheme(){
+  function setDarkTheme(): void {
     antdTheme.value = getTheme(false)
     const root = document.documentElement
     root.style.setProperty('--control-background', '#000')

@@ -14,7 +14,7 @@ interface CaptionTranslation {
   translation: string
 }
 
-function getDesktopPath() {
+function getDesktopPath(): string {
   const homeDir = os.homedir()
   return path.join(homeDir, 'Desktop')
 }
@@ -83,9 +83,7 @@ class AllConfig {
   lastLogIndex: number = -1;
   captionLog: CaptionItem[] = [];
 
-  constructor() {}
-
-  public readConfig() {
+  public readConfig(): void {
     const configPath = path.join(app.getPath('userData'), 'config.json')
     if(fs.existsSync(configPath)){
       Log.info('Read Config from:', configPath)
@@ -100,7 +98,7 @@ class AllConfig {
     }
   }
 
-  public writeConfig() {
+  public writeConfig(): void {
     const config = {
       captionWindowWidth: this.captionWindowWidth,
       uiLanguage: this.uiLanguage,
@@ -129,8 +127,8 @@ class AllConfig {
     }
   }
 
-  public setStyles(args: Object) {
-    for(let key in this.styles) {
+  public setStyles(args: object): void {
+    for(const key in this.styles) {
       if(key in args) {
         this.styles[key] = args[key]
       }
@@ -138,16 +136,16 @@ class AllConfig {
     Log.info('Set Styles:', this.styles)
   }
 
-  public resetStyles() {
+  public resetStyles(): void {
     this.setStyles(defaultStyles)
   }
 
-  public sendStyles(window: BrowserWindow) {
+  public sendStyles(window: BrowserWindow): void {
     window.webContents.send('both.styles.set', this.styles)
     Log.info(`Send Styles to #${window.id}:`, this.styles)
   }
 
-  public setControls(args: Object) {
+  public setControls(args: object): void {
     const legacy = args as Record<string, unknown>
     const migratedArgs: Record<string, unknown> = { ...legacy }
     if(!('translationProvider' in legacy) && typeof legacy.transModel === 'string') {
@@ -178,7 +176,7 @@ class AllConfig {
       if(legacy.sourceLang === 'es' || legacy.sourceLang === 'it') migratedArgs.sourceLang = 'auto'
     }
     const engineEnabled = this.controls.engineEnabled
-    for(let key in this.controls){
+    for(const key in this.controls){
       if(key in migratedArgs) {
         this.controls[key] = migratedArgs[key]
       }
@@ -187,12 +185,12 @@ class AllConfig {
     Log.info('Set Controls:', passwordMaskingForObject(this.controls))
   }
 
-  public sendControls(window: BrowserWindow, info = true) {
+  public sendControls(window: BrowserWindow, info = true): void {
     window.webContents.send('control.controls.set', this.controls)
     if(info) Log.info(`Send Controls to #${window.id}:`, passwordMaskingForObject(this.controls))
   }
 
-  public updateCaptionLog(log: CaptionItem, matchByTime = false) {
+  public updateCaptionLog(log: CaptionItem, matchByTime = false): void {
     // Source transcription can finish after the next speech segment has started.
     const existingIndex = matchByTime
       ? this.captionLog.findLastIndex(item => item.time_s === log.time_s)
@@ -223,7 +221,7 @@ class AllConfig {
     }
   }
 
-  public updateCaptionTranslation(trans: CaptionTranslation){
+  public updateCaptionTranslation(trans: CaptionTranslation): void {
     for(let i = this.captionLog.length - 1; i >= 0; i--){
       if(this.captionLog[i].time_s === trans.time_s){
         this.captionLog[i].translation = trans.translation
@@ -238,7 +236,7 @@ class AllConfig {
     window: BrowserWindow,
     command: 'add' | 'upd' | 'set',
     index: number | undefined = undefined
-  ) {
+  ): void {
     if(command === 'add'){
       window.webContents.send(`both.captionLog.add`, this.captionLog.at(-1))
     }

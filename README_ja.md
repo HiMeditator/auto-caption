@@ -244,6 +244,17 @@ vosk_path = str(Path('./.venv/lib/python3.x/site-packages/vosk').resolve())
 npm run dev
 ```
 
+### コードチェック
+
+リポジトリのルートで実行します：
+
+```bash
+npm run lint
+npm run typecheck
+```
+
+ESLint はデスクトップ側の JavaScript、TypeScript、Vue のソースとビルド設定をチェックし、ビルド成果物、依存環境、モデル、実験用ディレクトリを除外します。Python エンジンは ESLint の対象外です。
+
 ### プロジェクト構築
 
 ```bash

@@ -216,7 +216,7 @@ const columns = [
   },
 ]
 
-function changeBaseTime() {
+function changeBaseTime(): void {
   if(baseHH.value < 0) baseHH.value = 0
   if(baseMM.value < 0) baseMM.value = 0
   if(baseMM.value > 59) baseMM.value = 59
@@ -240,7 +240,7 @@ function changeBaseTime() {
   }
 }
 
-function exportCaptions() {
+function exportCaptions(): void {
   const exportData = getExportData()
   const blob = new Blob([exportData], {
     type: exportFormat.value === 'json' ? 'application/json' : 'text/plain'
@@ -256,7 +256,7 @@ function exportCaptions() {
   URL.revokeObjectURL(url)
 }
 
-function getExportData() {
+function getExportData(): string {
   if(exportFormat.value === 'json') return JSON.stringify(captionData.value, null, 2)
   let content = ''
   for(let i = 0; i < captionData.value.length; i++){
@@ -270,7 +270,7 @@ function getExportData() {
   return content
 }
 
-function copyCaptions() {
+function copyCaptions(): void {
   let content = ''
   let start = 0
   if(copyNum.value > 0) {
@@ -289,7 +289,7 @@ function copyCaptions() {
   message.success(t('log.copySuccess'))
 }
 
-function clearCaptions() {
+function clearCaptions(): void {
   captionLog.clear()
 }
 </script>

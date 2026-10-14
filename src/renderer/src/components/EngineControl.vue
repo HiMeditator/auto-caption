@@ -447,7 +447,7 @@ const translationProviders = computed(() => {
   return []
 })
 
-function applyChange(){
+function applyChange(): void {
   if(
     currentTranslation.value && translationProviders.value.length &&
     ((currentTranslationProvider.value === 'ollama' && !currentOllamaModel.value.trim()) ||
@@ -497,7 +497,7 @@ function applyChange(){
   });
 }
 
-function cancelChange(){
+function cancelChange(): void {
   currentSourceLang.value = engineControl.sourceLang
   currentTargetLang.value = engineControl.targetLang
   currentTranslationProvider.value = engineControl.translationProvider
@@ -524,7 +524,7 @@ function cancelChange(){
   currentStartTimeoutSeconds.value = engineControl.startTimeoutSeconds
 }
 
-function selectFolderPath(type: 'vosk' | 'sosv' | 'rec') {
+function selectFolderPath(type: 'vosk' | 'sosv' | 'rec'): void {
   window.electron.ipcRenderer.invoke('control.folder.select').then((folderPath) => {
     if(!folderPath) return
     if(type == 'vosk')

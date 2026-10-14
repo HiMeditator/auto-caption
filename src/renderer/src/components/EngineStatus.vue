@@ -131,11 +131,11 @@ const cpu = ref(0)
 const mem = ref(0)
 const elapsed = ref(0)
 
-function openCaptionWindow() {
+function openCaptionWindow(): void {
   window.electron.ipcRenderer.send('control.captionWindow.activate')
 }
 
-function startEngine() {
+function startEngine(): void {
   pending.value = true
   isStarting.value = true
   if(engineControl.engine === 'vosk' && engineControl.voskModelPath.trim() === '') {
@@ -153,18 +153,18 @@ function startEngine() {
   window.electron.ipcRenderer.send('control.engine.start')
 }
 
-function stopEngine() {
+function stopEngine(): void {
   pending.value = true
   window.electron.ipcRenderer.send('control.engine.stop')
 }
 
-function forceKillEngine() {
+function forceKillEngine(): void {
   pending.value = true
   isStarting.value = false
   window.electron.ipcRenderer.send('control.engine.forceKill')
 }
 
-function getEngineInfo() {
+function getEngineInfo(): void {
   window.electron.ipcRenderer.invoke('control.engine.info').then((data: EngineInfo) => {
     pid.value = data.pid
     ppid.value = data.ppid

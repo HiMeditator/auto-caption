@@ -116,26 +116,26 @@ onMounted(() => {
   }
 });
 
-function pinCaptionWindow() {
+function pinCaptionWindow(): void {
   pinned.value = !pinned.value;
   window.electron.ipcRenderer.send('caption.mouseEvents.ignore', pinned.value)
 }
 
-function openControlWindow() {
+function openControlWindow(): void {
   window.electron.ipcRenderer.send('caption.controlWindow.activate')
 }
 
-function closeCaptionWindow() {
+function closeCaptionWindow(): void {
   window.electron.ipcRenderer.send('caption.window.close')
 }
 
-function onTitleBarEnter() {
+function onTitleBarEnter(): void {
   if(pinned.value) {
     window.electron.ipcRenderer.send('caption.mouseEvents.ignore', false)
   }
 }
 
-function onTitleBarLeave() {
+function onTitleBarLeave(): void {
   if(pinned.value) {
     window.electron.ipcRenderer.send('caption.mouseEvents.ignore', true)
   }

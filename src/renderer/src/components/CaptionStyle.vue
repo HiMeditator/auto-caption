@@ -298,7 +298,7 @@ const currentOffsetY = ref<number>(2)
 const currentBlur = ref<number>(0)
 const currentTextShadowColor = ref<string>('#ffffff')
 
-function closePreview() {
+function closePreview(): void {
   currentPreview.value = false
   notification.open({
     placement: 'topLeft',
@@ -307,20 +307,20 @@ function closePreview() {
   })
 }
 
-function addOpicityToColor(color: string, opicity: number) {
+function addOpicityToColor(color: string, opicity: number): string {
   const opicityValue = Math.round(opicity * 255 / 100);
   const opicityHex = opicityValue.toString(16).padStart(2, '0');
   return `${color}${opicityHex}`;
 }
 
-function useSameStyle(){
+function useSameStyle(): void {
   currentTransFontFamily.value = currentFontFamily.value;
   currentTransFontSize.value = currentFontSize.value;
   currentTransFontColor.value = currentFontColor.value;
   currentTransFontWeight.value = currentFontWeight.value;
 }
 
-function applyStyle(){
+function applyStyle(): void {
   captionStyle.lineNumber = currentLineNumber.value;
   captionStyle.lineBreak = currentLineBreak.value;
   captionStyle.fontFamily = currentFontFamily.value;
@@ -350,7 +350,7 @@ function applyStyle(){
   });
 }
 
-function backStyle(){
+function backStyle(): void {
   currentLineNumber.value = captionStyle.lineNumber;
   currentLineBreak.value = captionStyle.lineBreak;
   currentFontFamily.value = captionStyle.fontFamily;
@@ -372,7 +372,7 @@ function backStyle(){
   currentTextShadowColor.value = captionStyle.textShadowColor;
 }
 
-function resetStyle() {
+function resetStyle(): void {
   captionStyle.sendStylesReset();
 }
 

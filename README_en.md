@@ -243,6 +243,17 @@ After the build completes, you can find the executable file in the `engine/dist`
 npm run dev
 ```
 
+### Code Checks
+
+Run these commands from the repository root:
+
+```bash
+npm run lint
+npm run typecheck
+```
+
+ESLint checks the desktop JavaScript, TypeScript and Vue source files and build configuration, excluding build outputs, dependency environments, models and experimental directories. The Python engine is outside ESLint's scope.
+
 ### Build Project
 
 ```bash

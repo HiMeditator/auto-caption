@@ -14,6 +14,3 @@ engine/pyinstaller_cache
 engine/models
 engine/notebook
 # engine/main.spec
-
-.repomap
-.virtualme

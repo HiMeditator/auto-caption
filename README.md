@@ -243,6 +243,17 @@ vosk_path = str(Path('./.venv/lib/python3.x/site-packages/vosk').resolve())
 npm run dev
 ```
 
+### 代码检查
+
+在仓库根目录执行：
+
+```bash
+npm run lint
+npm run typecheck
+```
+
+ESLint 检查桌面端 JavaScript、TypeScript 和 Vue 源码及构建配置，跳过构建产物、依赖环境、模型和实验目录；Python 引擎不在 ESLint 检查范围内。
+
 ### 构建项目
 
 ```bash
