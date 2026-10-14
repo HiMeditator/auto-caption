@@ -52,7 +52,7 @@ export default {
     "sourceLang": "ソース言語",
     "transLang": "翻訳言語",
     "workspaceId": "業務スペース ID",
-    "workspaceIdInfo": "Qwen LiveTranslate で使用するアリババクラウド百煉の業務スペース ID です。業務スペースと API Key は選択したリージョンに一致する必要があります。空欄の場合は環境変数 DASHSCOPE_WORKSPACE_ID を使用します。",
+    "workspaceIdInfo": "Qwen LiveTranslate で使用するアリババクラウド百煉の業務スペース ID です。ご自身の業務スペース ID はアリババクラウド百煉プラットフォームで取得してください。下のリンクからアクセスできます。業務スペースと API Key は選択したリージョンに一致する必要があります。空欄の場合は環境変数 DASHSCOPE_WORKSPACE_ID を使用します。",
     "dashscopeRegion": "リージョン",
     "dashscopeRegionInfo": "Qwen LiveTranslate サービスのリージョンを北京またはシンガポールから選択します。サービスに正常に接続するには、業務スペース ID と API Key が選択したリージョンに一致する必要があります。",
     "regionBeijing": "北京",

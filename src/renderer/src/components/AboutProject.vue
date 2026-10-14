@@ -39,7 +39,7 @@
 
       <footer class="about-footer">
         <span>{{ $t('status.about.author') }}</span>
-        <span class="about-author">HiMeditator</span>
+        <a class="about-author" href="https://github.com/HiMeditator" target="_blank" rel="noopener noreferrer">HiMeditator</a>
       </footer>
     </div>
   </a-modal>
@@ -252,7 +252,17 @@ const links = computed(() => [
 }
 
 .about-author {
-  color: var(--about-text);
+  color: var(--about-primary);
+}
+
+.about-author:hover {
+  color: var(--about-primary);
+  text-decoration: underline;
+}
+
+.about-author:focus-visible {
+  outline: 2px solid var(--about-primary);
+  outline-offset: 3px;
 }
 
 @media (max-width: 420px) {

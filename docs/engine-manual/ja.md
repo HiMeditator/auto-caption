@@ -1,10 +1,6 @@
 # 字幕エンジン説明ドキュメント
 
-## 注意：このドキュメントはメンテナンスが行われていないため、記載されている情報は古くなっています。最新の情報については、[中国語版](./zh.md)または[英語版](./en.md)のドキュメントをご参照ください。
-
-対応バージョン：v0.6.0
-
-この文書は大規模モデルを使用して翻訳されていますので、内容に正確でない部分があるかもしれません。
+対応バージョン：v1.2.0
 
 ![](../../assets/media/structure_ja.png)
 
@@ -32,8 +28,8 @@
 ### エンジンの停止
 
 - メインプロセス：ユーザーがフロントエンドで字幕エンジンを停止する操作を実行すると、メインプロセスはSocket通信を介して字幕エンジンプロセスに`command`フィールドが`stop`のオブジェクト文字列を送信
-- 字幕エンジンプロセス：メインエンジンプロセスから送信された字幕データオブジェクト文字列を受信し、文字列をオブジェクトとして解析。オブジェクトの`command`フィールドが`stop`の場合、グローバル変数`thread_data.status`の値を`stop`に設定
-- 字幕エンジンプロセス：メインスレッドでシステムオーディオ出力をループ監視し、`thread_data.status`の値が`running`でない場合、ループを終了し、リソースを解放して実行を終了
+- 字幕エンジンプロセス：メインエンジンプロセスから送信された字幕データオブジェクト文字列を受信し、文字列をオブジェクトとして解析。オブジェクトの`command`フィールドが`stop`の場合、グローバル変数`shared_data.status`の値を`stop`に設定
+- 字幕エンジンプロセス：メインスレッドでシステムオーディオ出力をループ監視し、`shared_data.status`の値が`running`でない場合、ループを終了し、リソースを解放して実行を終了
 - メインプロセス：字幕エンジンプロセスの終了を検出した場合、対応する処理を実行し、フロントエンドにフィードバック
 
 ## プロジェクトで実装済みの機能
@@ -49,25 +45,26 @@
 ```python
 from utils import stdout, stdout_cmd, stdout_obj, stderr
 stdout("Hello") # {"command": "print", "content": "Hello"}\n
-stdout_cmd("connect", "8080") # {"command": "connect", "content": "8080"}\n
+stdout_cmd("connect") # {"command": "connect", "content": ""}\n
 stdout_obj({"command": "print", "content": "Hello"})
 stderr("Error Info")
 ```
 
 ### Socketサービスの作成
 
-このSocketサービスは指定されたポートを監視し、Electronメインプログラムから送信された内容を解析し、`thread_data.status`の値を変更する可能性があります。
+このSocketサービスは指定されたポートを監視し、Electronメインプログラムから送信された内容を解析し、`shared_data.status`の値を変更する可能性があります。
 
 サンプル：
 
 ```python
-from utils import start_server
-from utils import thread_data
+import threading
+import time
+from utils import start_server, shared_data
+
 port = 8080
-start_server(port)
-while thread_data == 'running':
-    # 何か処理
-    pass
+threading.Thread(target=start_server, args=(port,), daemon=True).start()
+while shared_data.status == 'running':
+    time.sleep(0.1)
 ```
 
 ### オーディオ取得
@@ -77,34 +74,37 @@ while thread_data == 'running':
 - `audio_type`：取得するオーディオのタイプ。0はシステム出力オーディオ（スピーカー）、1はシステム入力オーディオ（マイク）
 - `chunk_rate`：オーディオデータの取得頻度。1秒あたりに取得するオーディオブロックの数
 
-このクラスには3つのメソッドがあります：
+このクラスには次のメソッドがあります：
 
 - `open_stream()`：オーディオ取得を開始
 - `read_chunk() -> bytes`：1つのオーディオブロックを読み取り
 - `close_stream()`：オーディオ取得を閉じる
+- `close_stream_signal()`：スレッドから安全にオーディオ取得を終了
 
 サンプル：
 
 ```python
 from sysaudio import AudioStream
-audio_type = 0
-chunk_rate = 20
-stream =  AudioStream(audio_type, chunk_rate)
+from utils import shared_data
+
+stream = AudioStream(0, 20)
 stream.open_stream()
-while True:
-    data = stream.read_chunk()
-    # データで何か処理
-    pass
-stream.close_stream()
+try:
+    while shared_data.status == 'running':
+        data = stream.read_chunk()
+        if data is None:
+            continue
+        # Process the audio chunk here.
+finally:
+    stream.close_stream()
 ```
 
 ### オーディオ処理
 
-取得したオーディオストリームは、文字に変換する前に前処理が必要な場合があります。一般的に、マルチチャンネルオーディオをシングルチャンネルオーディオに変換し、リサンプリングが必要な場合もあります。このプロジェクトでは、3つのオーディオ処理関数を提供しています：
+取得したオーディオストリームは、文字に変換する前に前処理が必要な場合があります。一般的に、マルチチャンネルオーディオをシングルチャンネルオーディオに変換し、リサンプリングが必要な場合もあります。このプロジェクトでは、次の2つのオーディオ処理関数を提供しています：
 
 - `merge_chunk_channels(chunk: bytes, channels: int) -> bytes`：マルチチャンネルオーディオブロックをシングルチャンネルオーディオブロックに変換
-- `resample_chunk_mono(chunk: bytes, channels: int, orig_sr: int, target_sr: int, mode="sinc_best") -> bytes`：現在のマルチチャンネルオーディオデータブロックをシングルチャンネルオーディオデータブロックに変換し、リサンプリングを実行
-- `resample_mono_chunk(chunk: bytes, orig_sr: int, target_sr: int, mode="sinc_best") -> bytes`：現在のシングルチャンネルオーディオブロックをリサンプリング
+- `resample_chunk_mono(chunk: bytes, channels: int, orig_sr: int, target_sr: int) -> bytes`：現在のマルチチャンネルオーディオデータブロックをシングルチャンネルオーディオデータブロックに変換し、リサンプリングを実行
 
 ## 字幕エンジンで実装が必要な機能
 
@@ -112,21 +112,32 @@ stream.close_stream()
 
 適切なオーディオストリームを取得した後、オーディオストリームを文字に変換する必要があります。一般的に、さまざまなモデル（クラウドまたはローカル）を使用してオーディオストリームを文字に変換します。要件に応じて適切なモデルを選択する必要があります。
 
-この部分はクラスとしてカプセル化することをお勧めします。以下の3つのメソッドを実装する必要があります：
+この部分はクラスとしてカプセル化することをお勧めします。以下の4つのメソッドを実装する必要があります：
 
 - `start(self)`：モデルを起動
 - `send_audio_frame(self, data: bytes)`：現在のオーディオブロックデータを処理し、**生成された字幕データを標準出力を介してElectronメインプロセスに送信**
+- `translate(self)`：`shared_data.chunk_queue` から音声チャンクを取得し、`send_audio_frame` に渡す
 - `stop(self)`：モデルを停止
 
 完全な字幕エンジンの実例：
 
 - [paraformer.py](../../engine/audio2text/paraformer.py)
 - [livetranslate.py](../../engine/audio2text/livetranslate.py)
+- [glm.py](../../engine/audio2text/glm.py)
 - [vosk.py](../../engine/audio2text/vosk.py)
+- [sosv.py](../../engine/audio2text/sosv.py)
 
 ### 字幕翻訳
 
-一部の音声文字変換モデルは翻訳を提供していません。必要がある場合、翻訳モジュールを追加する必要があります。
+一部の音声認識モデルは内蔵翻訳を提供していません。既存の翻訳関数を再利用できます。翻訳結果の time_s は元の字幕と一致させてください。
+
+```python
+from utils import google_translate, ollama_translate, openai_translate
+text = "これは翻訳テストです。"
+google_translate("", "en", text, "12:34:56.100")
+ollama_translate("qwen3:0.6b", "en", text, "12:34:56.100")
+openai_translate("gpt-4.1-mini", "en", text, "12:34:56.100", "https://api.openai.com/v1", "<api-key>")
+```
 
 ### 字幕データの送信
 
@@ -155,19 +166,39 @@ export interface CaptionItem {
 
 ```python
 import argparse
+
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='システムオーディオストリームをテキストに変換')
-    # 共通
-    parser.add_argument('-e', '--caption_engine', default='paraformer', help='字幕エンジン: paraformerまたはvosk')
-    parser.add_argument('-a', '--audio_type', default=0, help='オーディオストリームソース: 0は出力、1は入力')
-    parser.add_argument('-c', '--chunk_rate', default=10, help='1秒あたりに収集するオーディオストリームブロックの数')
-    parser.add_argument('-p', '--port', default=8080, help='サーバーを実行するポート、0はサーバーなし')
-    # paraformer専用
-    parser.add_argument('-s', '--source_language', default='en', help='ソース言語コード')
-    parser.add_argument('-t', '--target_language', default='zh', help='ターゲット言語コード')
-    parser.add_argument('--dashscope_api_key', default='', help='ParaformerモデルのAPI KEY')
-    # vosk専用
-    parser.add_argument('-m', '--model_path', default='', help='voskモデルのパス')
+    parser = argparse.ArgumentParser(description='Convert system audio stream to text')
+    # all
+    parser.add_argument('-e', '--caption_engine', default='paraformer', choices=['paraformer', 'livetranslate', 'glm', 'vosk', 'sosv'], help='Caption engine: paraformer, livetranslate, glm, vosk or sosv')
+    parser.add_argument('-a', '--audio_type', type=int, default=0, help='Audio stream source: 0 for output, 1 for input')
+    parser.add_argument('-c', '--chunk_rate', type=int, default=10, help='Number of audio stream chunks collected per second')
+    parser.add_argument('-p', '--port', type=int, default=0, help='The port to run the server on, 0 for no server')
+    parser.add_argument('-d', '--display_caption', type=int, default=0, help='Display caption on terminal, 0 for no display, 1 for display')
+    parser.add_argument('-t', '--target_language', default='none', help='Target language code, "none" for no translation')
+    parser.add_argument('-r', '--record', type=int, default=0, help='Whether to record the audio, 0 for no recording, 1 for recording')
+    parser.add_argument('-rp', '--record_path', default='', help='Path to save the recorded audio')
+    # paraformer and sosv and glm
+    parser.add_argument('-s', '--source_language', default='auto', help='Source language code')
+    # Alibaba Cloud engines
+    parser.add_argument('--dashscope_api_key', default='', help='API key for Alibaba Cloud caption engines')
+    parser.add_argument('--dashscope_workspace_id', default='', help='LiveTranslate workspace ID (or DASHSCOPE_WORKSPACE_ID)')
+    parser.add_argument('--dashscope_region', choices=['cn-beijing', 'ap-southeast-1'], default='cn-beijing', help='LiveTranslate API region')
+    # External translation: Paraformer, GLM, Vosk and SOSV
+    parser.add_argument('--translation_provider', choices=['ollama', 'openai', 'google'], default='ollama', help='Translation service provider')
+    parser.add_argument('--translation_model', default='', help='Translation model name (for Ollama or OpenAI-compatible services)')
+    parser.add_argument('--translation_base_url', default='', help='OpenAI-compatible API base URL')
+    parser.add_argument('--translation_api_key', default='', help='OpenAI-compatible API key')
+    # vosk only
+    parser.add_argument('-vosk', '--vosk_model', default='', help='The path to the vosk model.')
+    # sosv only
+    parser.add_argument('-sosv', '--sosv_model', default=None, help='The SenseVoice model path')
+    # glm only
+    parser.add_argument('-gurl', '--glm_url', default='https://open.bigmodel.cn/api/paas/v4/audio/transcriptions', help='GLM API URL')
+    parser.add_argument('-gmodel', '--glm_model', default='glm-asr-2512', help='GLM Model Name')
+    parser.add_argument('-gkey', '--glm_api_key', default='', help='GLM API Key')
+
+    args = parser.parse_args()
 ```
 
 たとえば、このプロジェクトの字幕エンジンでParaformerモデルを使用し、原文を日本語、翻訳を中国語に指定し、システムオーディオ出力の字幕を取得し、毎回0.1秒のオーディオデータをキャプチャする場合、コマンドラインパラメータは以下のようになります：

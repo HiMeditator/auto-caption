@@ -2,8 +2,6 @@
 
 Corresponding Version: v1.2.0
 
-**Note: Due to limited personal resources, the English and Japanese documentation files for this project (except for the README document) will no longer be maintained. The content of this document may not be consistent with the latest version of the project. If you are willing to help with translation, please submit relevant Pull Requests.**
-
 ## Software Introduction
 
 Auto Caption is a cross-platform caption display software that can real-time capture system audio input (recording) or output (playback) streaming data and use an audio-to-text model to generate captions for the corresponding audio. The default Paraformer engine recognizes eight source languages including Cantonese, with translation provided by external services.
@@ -24,7 +22,7 @@ The following operating system versions have been tested and confirmed to work p
 
 ### About Project
 
-Click the GitHub icon under “About Project” on the main screen to open the About window. It displays the app icon at the top, the software version, update date and author, with a two-by-two grid of cards linking to the project repository, user manual, caption engine manual and changelog. Each link shows its full address. Manual links follow the interface language, the changelog links to the shared update history, and the window follows the light or dark theme.
+Click the GitHub icon under “About Project” on the main screen to open the About window. It displays the app icon at the top, the software version, update date and author, with a two-by-two grid of cards linking to the project repository, user manual, caption engine manual and changelog. Each link shows its full address. Manual links follow the interface language, the changelog links to the shared update history, and the window follows the light or dark theme. Click the author name [HiMeditator](https://github.com/HiMeditator) to open the GitHub profile in your default browser.
 
 ### Software Limitations
 
@@ -142,7 +140,7 @@ When the last color option (black) is selected in the light theme, model and tra
 
 Model, audio, custom engine and More Settings options come first. Translation and Enable Recording share a row in the following group, followed by target language, translation service and its model name, Base URL and API Key. A translation service description between the two groups uses the same style as the model description and updates immediately when you select Ollama, an OpenAI-compatible service or Google Translate. Qwen LiveTranslate shows a built-in translation description and omits external translation service settings.
 
-Hover over the Audio Type, Enable Recording, Custom Eng, Translation or More Settings label to see its function and configuration requirements. When Qwen LiveTranslate is selected, Workspace ID and Alibaba Cloud region also provide hover help explaining that the workspace, API Key and region must match, and that an empty workspace ID falls back to the environment variable. Labels with hover help use the theme color. The translation help for Qwen LiveTranslate explains that disabling translation only hides translated text while the service still translates.
+Hover over the Audio Type, Enable Recording, Custom Eng, Translation or More Settings label to see its function and configuration requirements. When Qwen LiveTranslate is selected, Workspace ID and Alibaba Cloud region also provide hover help explaining that the workspace, API Key and region must match, and that an empty workspace ID falls back to the environment variable. The Workspace ID help also links to [Alibaba Cloud Model Studio workspace settings](https://bailian.console.aliyun.com/cn-beijing/settings/workspace), where you can obtain your own workspace ID. Labels with hover help use the theme color. The translation help for Qwen LiveTranslate explains that disabling translation only hides translated text while the service still translates.
 
 The so-called caption engine is essentially a subprogram that captures real-time streaming data from system audio input (recording) or output (playback), and invokes speech-to-text models to generate corresponding captions. The generated captions are converted into JSON-formatted strings and passed to the main program through standard output. The main program reads the caption data, processes it, and displays it in the window.
 
@@ -232,11 +230,19 @@ The SOSV model supports specifying the following languages: English, Chinese, Ja
 
 #### `--dashscope_api_key`
 
-Specify the Alibaba Cloud API KEY required for the `Paraformer` model.
+Specify the Alibaba Cloud API Key used by Paraformer and Qwen LiveTranslate. If empty, the engine reads `DASHSCOPE_API_KEY`. The key must match the service region.
 
 Default value is empty.
 
-This only applies to the Paraformer model.
+This applies to Paraformer and Qwen LiveTranslate.
+
+#### `--dashscope_workspace_id`
+
+The Qwen LiveTranslate workspace ID. The default is empty, falling back to `DASHSCOPE_WORKSPACE_ID`. Obtain your ID from [Alibaba Cloud Model Studio workspace settings](https://bailian.console.aliyun.com/cn-beijing/settings/workspace). The workspace, API Key and region must match.
+
+#### `--dashscope_region`
+
+The Qwen LiveTranslate service region: `cn-beijing` (Beijing, default) or `ap-southeast-1` (Singapore). Paraformer uses the default Beijing endpoint and does not use this option.
 
 #### `-gkey, --glm_api_key`  
 

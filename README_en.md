@@ -53,8 +53,6 @@ https://github.com/user-attachments/assets/9c188d78-9520-4397-bacf-4c8fdcc54874
 
 ## 📖 Basic Usage
 
-> ⚠️ Note: Currently, only the latest version of the software on Windows platform is maintained, while the last versions for other platforms remain at v1.0.0.
-
 The software has been adapted for Windows, macOS, and Linux platforms. The tested platform information is as follows:
 
 | OS Version         | Architecture | System Audio Input | System Audio Output |

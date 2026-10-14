@@ -30,6 +30,11 @@
       <a-popover placement="right">
         <template #content>
           <p class="label-hover-info">{{ $t('engine.workspaceIdInfo') }}</p>
+          <p class="label-hover-info workspace-link">
+            <a href="https://bailian.console.aliyun.com/cn-beijing/settings/workspace" target="_blank" rel="noopener noreferrer">
+              https://bailian.console.aliyun.com/cn-beijing/settings/workspace
+            </a>
+          </p>
         </template>
         <span class="input-label info-label"
           :style="{color: uiColor}"
@@ -573,6 +578,10 @@ watch(currentEngine, (val) => {
 .label-hover-info {
   margin-top: 10px;
   max-width: min(36vw, 380px);
+}
+
+.workspace-link {
+  overflow-wrap: anywhere;
 }
 
 .info-label {

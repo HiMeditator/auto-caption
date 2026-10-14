@@ -52,7 +52,7 @@ export default {
     "sourceLang": "源语言",
     "transLang": "翻译语言",
     "workspaceId": "业务空间 ID",
-    "workspaceIdInfo": "Qwen LiveTranslate 使用的阿里云百炼业务空间 ID。业务空间与 API Key 必须匹配所选地域；留空时读取 DASHSCOPE_WORKSPACE_ID 环境变量。",
+    "workspaceIdInfo": "Qwen LiveTranslate 使用的阿里云百炼业务空间 ID。请在阿里云百炼平台获取自己的业务空间 ID，可点击下方链接前往。业务空间与 API Key 必须匹配所选地域；留空时读取 DASHSCOPE_WORKSPACE_ID 环境变量。",
     "dashscopeRegion": "阿里云地域",
     "dashscopeRegionInfo": "选择 Qwen LiveTranslate 服务所在地域，目前支持北京和新加坡。业务空间 ID 和 API Key 必须与所选地域匹配，否则无法正常连接服务。",
     "regionBeijing": "北京",

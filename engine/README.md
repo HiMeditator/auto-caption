@@ -1,5 +1,7 @@
 # Auto Caption 字幕引擎
 
+对应版本：v1.2.0
+
 [项目首页](../README.md)
 
 Auto Caption 的 Python 字幕引擎负责系统音频或麦克风采集、语音识别和翻译。可以独立通过命令行运行，也可以作为 Electron 应用的子进程使用；独立使用无需 Node.js 或 npm。

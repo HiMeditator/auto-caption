@@ -1,6 +1,6 @@
 # 字幕引擎说明文档
 
-对应版本：v1.0.0
+对应版本：v1.2.0
 
 ![](../../assets/media/structure_zh.png)
 
@@ -29,7 +29,7 @@
 
 - Electron 主进程：当用户在前端操作关闭字幕引擎时，主进程通过 Socket 通信给字幕引擎进程发送 `command` 字段为 `stop` 的对象字符串
 - 字幕引擎进程：接收主引擎进程发送的字幕数据对象字符串，将字符串解析为对象，如果对象的 `command` 字段为 `stop`，则将全局变量 `shared_data.status` 的值设置为 `stop`
-- 字幕引擎进程：主线程循环监听系统音频输出，当 `thread_data.status` 的值不为 `running` 时，则结束循环，释放资源，结束运行
+- 字幕引擎进程：主线程循环监听系统音频输出，当 `shared_data.status` 的值不为 `running` 时，则结束循环，释放资源，结束运行
 - Electron 主进程：如果检测到字幕引擎进程结束，进行相应处理，并向前端反馈
 
 ## 项目已经实现的功能
@@ -46,8 +46,8 @@
 from utils import stdout, stdout_cmd, stdout_obj, stderr
 # {"command": "print", "content": "Hello"}\n
 stdout("Hello")
-# {"command": "connect", "content": "8080"}\n
-stdout_cmd("connect", "8080")
+# {"command": "connect", "content": ""}\n
+stdout_cmd("connect")
 # {"command": "print", "content": "print"}\n
 stdout_obj({"command": "print", "content": "print"})
 # sys.stderr.write("Error Info" + "\n")
@@ -61,13 +61,14 @@ stderr("Error Info")
 样例：
 
 ```python
-from utils import start_server
-from utils import shared_data
+import threading
+import time
+from utils import start_server, shared_data
+
 port = 8080
-start_server(port)
-while thread_data == 'running':
-    # do something
-    pass
+threading.Thread(target=start_server, args=(port,), daemon=True).start()
+while shared_data.status == 'running':
+    time.sleep(0.1)
 ```
 
 ### 音频获取
@@ -88,15 +89,18 @@ while thread_data == 'running':
 
 ```python
 from sysaudio import AudioStream
-audio_type = 0
-chunk_rate = 20
-stream =  AudioStream(audio_type, chunk_rate)
+from utils import shared_data
+
+stream = AudioStream(0, 20)
 stream.open_stream()
-while True:
-    data = stream.read_chunk()
-    # do something with data
-    pass
-stream.close_stream()
+try:
+    while shared_data.status == 'running':
+        data = stream.read_chunk()
+        if data is None:
+            continue
+        # Process the audio chunk here.
+finally:
+    stream.close_stream()
 ```
 
 ### 音频处理
@@ -110,12 +114,19 @@ stream.close_stream()
 
 ```python
 from sysaudio import AudioStream
-from utils import merge_chunk_channels
-stream =  AudioStream(1)
-while True:
-    raw_chunk = stream.read_chunk()
-    chunk = resample_chunk_mono(raw_chunk, stream.CHANNELS, stream.RATE, 16000)
-    # do something with chunk
+from utils import resample_chunk_mono, shared_data
+
+stream = AudioStream(1)
+stream.open_stream()
+try:
+    while shared_data.status == 'running':
+        raw_chunk = stream.read_chunk()
+        if raw_chunk is None:
+            continue
+        chunk = resample_chunk_mono(raw_chunk, stream.CHANNELS, stream.RATE, 16000)
+        # Send the mono PCM chunk to the recognizer here.
+finally:
+    stream.close_stream()
 ```
 
 ## 字幕引擎需要实现的功能
@@ -135,6 +146,7 @@ while True:
 
 - [paraformer.py](../../engine/audio2text/paraformer.py)
 - [livetranslate.py](../../engine/audio2text/livetranslate.py)
+- [glm.py](../../engine/audio2text/glm.py)
 - [vosk.py](../../engine/audio2text/vosk.py)
 - [sosv.py](../../engine/audio2text/sosv.py)
 
@@ -176,29 +188,40 @@ export interface CaptionItem {
 自定义字幕引擎的设置提供命令行参数指定，因此需要设置好字幕引擎的参数，本项目目前用到的参数如下：
 
 ```python
+import argparse
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Convert system audio stream to text')
     # all
-    parser.add_argument('-e', '--caption_engine', default='paraformer', help='Caption engine: paraformer, livetranslate, glm, vosk or sosv')
-    parser.add_argument('-a', '--audio_type', default=0, help='Audio stream source: 0 for output, 1 for input')
-    parser.add_argument('-c', '--chunk_rate', default=10, help='Number of audio stream chunks collected per second')
-    parser.add_argument('-p', '--port', default=0, help='The port to run the server on, 0 for no server')
-    parser.add_argument('-t', '--target_language', default='zh', help='Target language code, "none" for no translation')
-    parser.add_argument('-r', '--record', default=0, help='Whether to record the audio, 0 for no recording, 1 for recording')
+    parser.add_argument('-e', '--caption_engine', default='paraformer', choices=['paraformer', 'livetranslate', 'glm', 'vosk', 'sosv'], help='Caption engine: paraformer, livetranslate, glm, vosk or sosv')
+    parser.add_argument('-a', '--audio_type', type=int, default=0, help='Audio stream source: 0 for output, 1 for input')
+    parser.add_argument('-c', '--chunk_rate', type=int, default=10, help='Number of audio stream chunks collected per second')
+    parser.add_argument('-p', '--port', type=int, default=0, help='The port to run the server on, 0 for no server')
+    parser.add_argument('-d', '--display_caption', type=int, default=0, help='Display caption on terminal, 0 for no display, 1 for display')
+    parser.add_argument('-t', '--target_language', default='none', help='Target language code, "none" for no translation')
+    parser.add_argument('-r', '--record', type=int, default=0, help='Whether to record the audio, 0 for no recording, 1 for recording')
     parser.add_argument('-rp', '--record_path', default='', help='Path to save the recorded audio')
-    # paraformer and sosv
+    # paraformer and sosv and glm
     parser.add_argument('-s', '--source_language', default='auto', help='Source language code')
-    # paraformer only
-    parser.add_argument('--dashscope_api_key', default='', help='API key for the Paraformer caption engine')
-    # all engines: external translation
+    # Alibaba Cloud engines
+    parser.add_argument('--dashscope_api_key', default='', help='API key for Alibaba Cloud caption engines')
+    parser.add_argument('--dashscope_workspace_id', default='', help='LiveTranslate workspace ID (or DASHSCOPE_WORKSPACE_ID)')
+    parser.add_argument('--dashscope_region', choices=['cn-beijing', 'ap-southeast-1'], default='cn-beijing', help='LiveTranslate API region')
+    # External translation: Paraformer, GLM, Vosk and SOSV
     parser.add_argument('--translation_provider', choices=['ollama', 'openai', 'google'], default='ollama', help='Translation service provider')
-    parser.add_argument('--translation_model', default='', help='Translation model name')
+    parser.add_argument('--translation_model', default='', help='Translation model name (for Ollama or OpenAI-compatible services)')
     parser.add_argument('--translation_base_url', default='', help='OpenAI-compatible API base URL')
     parser.add_argument('--translation_api_key', default='', help='OpenAI-compatible API key')
     # vosk only
     parser.add_argument('-vosk', '--vosk_model', default='', help='The path to the vosk model.')
     # sosv only
     parser.add_argument('-sosv', '--sosv_model', default=None, help='The SenseVoice model path')
+    # glm only
+    parser.add_argument('-gurl', '--glm_url', default='https://open.bigmodel.cn/api/paas/v4/audio/transcriptions', help='GLM API URL')
+    parser.add_argument('-gmodel', '--glm_model', default='glm-asr-2512', help='GLM Model Name')
+    parser.add_argument('-gkey', '--glm_api_key', default='', help='GLM API Key')
+
+    args = parser.parse_args()
 ```
 
 比如对于本项目的字幕引擎，我想使用 Paraformer 模型，指定原文为日语，翻译为中文，获取系统音频输出的字幕，每次截取 0.1s 的音频数据，那么命令行参数如下：

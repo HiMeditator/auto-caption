@@ -22,7 +22,7 @@ Auto Caption 是一个跨平台的字幕显示软件，能够实时获取系统�
 
 ### 项目关于
 
-点击主界面“项目关于”下的 GitHub 图标，打开关于窗口。窗口顶部展示软件图标，显示软件版本、更新日期和作者信息，并以两行两列的卡片布局提供项目仓库、用户手册、字幕引擎手册和更新日志入口，各链接显示完整地址。手册链接随界面语言切换，更新日志链接指向统一的更新记录，窗口配色跟随深浅主题。
+点击主界面“项目关于”下的 GitHub 图标，打开关于窗口。窗口顶部展示软件图标，显示软件版本、更新日期和作者信息，并以两行两列的卡片布局提供项目仓库、用户手册、字幕引擎手册和更新日志入口，各链接显示完整地址。手册链接随界面语言切换，更新日志链接指向统一的更新记录，窗口配色跟随深浅主题。点击作者姓名 [HiMeditator](https://github.com/HiMeditator) 可在默认浏览器中打开作者的 GitHub 主页。
 
 ### 软件缺点
 
@@ -140,7 +140,7 @@ sudo yum install pulseaudio pavucontrol
 
 模型、音频、自定义引擎和更多设置位于前半部分；启用翻译与启用录制在后半部分的同一行显示，其后为翻译语言、翻译服务及其模型名称、Base URL 和 API Key。两部分之间显示与模型描述相同样式的翻译服务说明，随 Ollama、OpenAI 兼容服务或 Google 翻译的选择立即更新。选择 Qwen LiveTranslate 时显示内置翻译说明，不显示外部翻译服务的配置项。
 
-将鼠标悬停在“音频类型”“启用录制”“自定义引擎”“启用翻译”或“更多设置”的标签上，可查看对应功能和配置要求。选择 Qwen LiveTranslate 时，“业务空间 ID”和“阿里云地域”也提供悬浮说明，提示业务空间、API Key 与地域的匹配要求，以及业务空间 ID 留空时使用环境变量。带有悬浮说明的标签使用主题色显示；Qwen LiveTranslate 的翻译提示会说明关闭翻译仅隐藏译文、服务端仍执行翻译。
+将鼠标悬停在“音频类型”“启用录制”“自定义引擎”“启用翻译”或“更多设置”的标签上，可查看对应功能和配置要求。选择 Qwen LiveTranslate 时，“业务空间 ID”和“阿里云地域”也提供悬浮说明，提示业务空间、API Key 与地域的匹配要求，以及业务空间 ID 留空时使用环境变量。业务空间 ID 的说明还提供[阿里云百炼业务空间设置](https://bailian.console.aliyun.com/cn-beijing/settings/workspace)链接，方便获取自己的业务空间 ID。带有悬浮说明的标签使用主题色显示；Qwen LiveTranslate 的翻译提示会说明关闭翻译仅隐藏译文、服务端仍执行翻译。
 
 所谓的字幕引擎实际上是一个子程序，它会实时获取系统音频输入（录音）或输出（播放声音）的流式数据，并调用音频转文字的模型生成对应音频的字幕。生成的字幕通过转换为字符串的 JSON 数据，并通过标准输出传递给主程序。主程序读取字幕数据，处理后显示在窗口上。
 
@@ -230,11 +230,19 @@ SOSV 模型支持指定的语言有：英语、中文、日语、韩语、粤语
 
 #### `--dashscope_api_key`
 
-指定 `Paraformer` 模型需要使用的阿里云 API KEY。
+指定 Paraformer 和 Qwen LiveTranslate 使用的阿里云 API Key；留空时读取 `DASHSCOPE_API_KEY` 环境变量，密钥须与服务地域匹配。
 
 该项默认值为空。
 
-该项仅适用于 Paraformer 模型。
+该项适用于 Paraformer 和 Qwen LiveTranslate 模型。
+
+#### `--dashscope_workspace_id`
+
+Qwen LiveTranslate 的业务空间 ID，默认值为空，留空时读取 `DASHSCOPE_WORKSPACE_ID` 环境变量。请在[阿里云百炼业务空间设置](https://bailian.console.aliyun.com/cn-beijing/settings/workspace)中获取自己的业务空间 ID，业务空间、API Key 和地域必须匹配。
+
+#### `--dashscope_region`
+
+Qwen LiveTranslate 的服务地域，默认 `cn-beijing`（北京），也支持 `ap-southeast-1`（新加坡）。Paraformer 当前使用北京默认端点，不使用此参数。
 
 #### `-gkey, --glm_api_key`
 

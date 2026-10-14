@@ -53,8 +53,6 @@ https://github.com/user-attachments/assets/9c188d78-9520-4397-bacf-4c8fdcc54874
 
 ## 📖 基本使用
 
-> ⚠️ 注意：目前只维护了 Windows 平台的软件的最新版本，其他平台的最后版本停留在 v1.0.0。
-
 软件已经适配了 Windows、macOS 和 Linux 平台。测试过的主流平台信息如下：
 
 | 操作系统版本        | 处理器架构 | 获取系统音频输入 | 获取系统音频输出 |

@@ -52,7 +52,7 @@ export default {
     "sourceLang": "Source",
     "transLang": "Translation",
     "workspaceId": "Workspace ID",
-    "workspaceIdInfo": "The Alibaba Cloud Model Studio workspace ID used by Qwen LiveTranslate. The workspace and API Key must match the selected region. If left empty, the DASHSCOPE_WORKSPACE_ID environment variable is used.",
+    "workspaceIdInfo": "The Alibaba Cloud Model Studio workspace ID used by Qwen LiveTranslate. Obtain your workspace ID from Alibaba Cloud Model Studio using the link below. The workspace and API Key must match the selected region. If left empty, the DASHSCOPE_WORKSPACE_ID environment variable is used.",
     "dashscopeRegion": "Alibaba Cloud region",
     "dashscopeRegionInfo": "Select the region for the Qwen LiveTranslate service: Beijing or Singapore. The workspace ID and API Key must match this region for the service connection to work.",
     "regionBeijing": "Beijing",
