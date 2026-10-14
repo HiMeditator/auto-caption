@@ -14,7 +14,7 @@ interface CaptionTranslation {
   translation: string
 }
 
-function getDesktopPath() {
+function getDesktopPath(): string {
   const homeDir = os.homedir()
   return path.join(homeDir, 'Desktop')
 }
@@ -44,14 +44,17 @@ const defaultStyles: Styles = {
 const defaultControls: Controls = {
   sourceLang: 'en',
   targetLang: 'zh',
-  transModel: 'ollama',
-  ollamaName: 'qwen2.5:0.5b',
-  ollamaUrl: 'http://localhost:11434',
-  ollamaApiKey: '',
-  engine: 'gummy',
+  translationProvider: 'ollama',
+  ollamaModel: 'qwen2.5:0.5b',
+  openaiModel: '',
+  openaiBaseUrl: 'https://api.openai.com/v1',
+  openaiApiKey: '',
+  engine: 'paraformer',
   audio: 0,
   engineEnabled: false,
-  API_KEY: '',
+  dashscopeApiKey: '',
+  dashscopeWorkspaceId: '',
+  dashscopeRegion: 'cn-beijing',
   voskModelPath: '',
   sosvModelPath: '',
   glmUrl: 'https://open.bigmodel.cn/api/paas/v4/audio/transcriptions',
@@ -80,9 +83,7 @@ class AllConfig {
   lastLogIndex: number = -1;
   captionLog: CaptionItem[] = [];
 
-  constructor() {}
-
-  public readConfig() {
+  public readConfig(): void {
     const configPath = path.join(app.getPath('userData'), 'config.json')
     if(fs.existsSync(configPath)){
       Log.info('Read Config from:', configPath)
@@ -97,7 +98,7 @@ class AllConfig {
     }
   }
 
-  public writeConfig() {
+  public writeConfig(): void {
     const config = {
       captionWindowWidth: this.captionWindowWidth,
       uiLanguage: this.uiLanguage,
@@ -126,8 +127,8 @@ class AllConfig {
     }
   }
 
-  public setStyles(args: Object) {
-    for(let key in this.styles) {
+  public setStyles(args: object): void {
+    for(const key in this.styles) {
       if(key in args) {
         this.styles[key] = args[key]
       }
@@ -135,32 +136,73 @@ class AllConfig {
     Log.info('Set Styles:', this.styles)
   }
 
-  public resetStyles() {
+  public resetStyles(): void {
     this.setStyles(defaultStyles)
   }
 
-  public sendStyles(window: BrowserWindow) {
+  public sendStyles(window: BrowserWindow): void {
     window.webContents.send('both.styles.set', this.styles)
     Log.info(`Send Styles to #${window.id}:`, this.styles)
   }
 
-  public setControls(args: Object) {
+  public setControls(args: object): void {
+    const legacy = args as Record<string, unknown>
+    const migratedArgs: Record<string, unknown> = { ...legacy }
+    if(!('translationProvider' in legacy) && typeof legacy.transModel === 'string') {
+      const legacyUrl = typeof legacy.ollamaUrl === 'string' ? legacy.ollamaUrl : ''
+      const usesOpenAI = Boolean(legacyUrl && !/^https?:\/\/(localhost|127\.0\.0\.1):11434\/?$/i.test(legacyUrl))
+      migratedArgs.translationProvider = legacy.transModel === 'ollama' && usesOpenAI
+        ? 'openai'
+        : legacy.transModel
+    }
+    if(!('ollamaModel' in legacy) && typeof legacy.ollamaName === 'string') {
+      migratedArgs.ollamaModel = legacy.ollamaName
+    }
+    if(!('openaiModel' in legacy) && migratedArgs.translationProvider === 'openai' && typeof legacy.ollamaName === 'string') {
+      migratedArgs.openaiModel = legacy.ollamaName
+    }
+    if(!('openaiBaseUrl' in legacy) && migratedArgs.translationProvider === 'openai' && typeof legacy.ollamaUrl === 'string' && legacy.ollamaUrl) {
+      migratedArgs.openaiBaseUrl = legacy.ollamaUrl
+    }
+    if(!('openaiApiKey' in legacy) && typeof legacy.ollamaApiKey === 'string') {
+      migratedArgs.openaiApiKey = legacy.ollamaApiKey
+    }
+    if(!('dashscopeApiKey' in legacy)) {
+      if(typeof legacy.gummyApiKey === 'string') migratedArgs.dashscopeApiKey = legacy.gummyApiKey
+      else if(typeof legacy.API_KEY === 'string') migratedArgs.dashscopeApiKey = legacy.API_KEY
+    }
+    if(legacy.engine === 'gummy') {
+      migratedArgs.engine = 'paraformer'
+      if(legacy.sourceLang === 'es' || legacy.sourceLang === 'it') migratedArgs.sourceLang = 'auto'
+    }
     const engineEnabled = this.controls.engineEnabled
-    for(let key in this.controls){
-      if(key in args) {
-        this.controls[key] = args[key]
+    for(const key in this.controls){
+      if(key in migratedArgs) {
+        this.controls[key] = migratedArgs[key]
       }
     }
     this.controls.engineEnabled = engineEnabled
     Log.info('Set Controls:', passwordMaskingForObject(this.controls))
   }
 
-  public sendControls(window: BrowserWindow, info = true) {
+  public sendControls(window: BrowserWindow, info = true): void {
     window.webContents.send('control.controls.set', this.controls)
-    if(info) Log.info(`Send Controls to #${window.id}:`, this.controls)
+    if(info) Log.info(`Send Controls to #${window.id}:`, passwordMaskingForObject(this.controls))
   }
 
-  public updateCaptionLog(log: CaptionItem) {
+  public updateCaptionLog(log: CaptionItem, matchByTime = false): void {
+    // Source transcription can finish after the next speech segment has started.
+    const existingIndex = matchByTime
+      ? this.captionLog.findLastIndex(item => item.time_s === log.time_s)
+      : -1
+    if(existingIndex >= 0) {
+      log.index = this.captionLog[existingIndex].index
+      this.captionLog.splice(existingIndex, 1, log)
+      for(const window of BrowserWindow.getAllWindows()) {
+        this.sendCaptionLog(window, 'upd', existingIndex)
+      }
+      return
+    }
     let command: 'add' | 'upd' = 'add'
     if(
       this.captionLog.length &&
@@ -179,7 +221,7 @@ class AllConfig {
     }
   }
 
-  public updateCaptionTranslation(trans: CaptionTranslation){
+  public updateCaptionTranslation(trans: CaptionTranslation): void {
     for(let i = this.captionLog.length - 1; i >= 0; i--){
       if(this.captionLog[i].time_s === trans.time_s){
         this.captionLog[i].translation = trans.translation
@@ -194,7 +236,7 @@ class AllConfig {
     window: BrowserWindow,
     command: 'add' | 'upd' | 'set',
     index: number | undefined = undefined
-  ) {
+  ): void {
     if(command === 'add'){
       window.webContents.send(`both.captionLog.add`, this.captionLog.at(-1))
     }

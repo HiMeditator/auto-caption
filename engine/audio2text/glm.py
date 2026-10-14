@@ -8,7 +8,7 @@ import requests
 from datetime import datetime
 
 from utils import shared_data
-from utils import stdout_cmd, stdout_obj, google_translate, ollama_translate
+from utils import stdout_cmd, stdout_obj, get_translation_function
 
 class GlmRecognizer:
     """
@@ -20,22 +20,19 @@ class GlmRecognizer:
         api_key: GLM-ASR API Key
         source: 源语言
         target: 目标语言
-        trans_model: 翻译模型名称
-        ollama_name: Ollama 模型名称
+        translation_provider: 翻译服务
+        translation_model: 翻译模型名称
     """
-    def __init__(self, url: str, model: str, api_key: str, source: str, target: str | None, trans_model: str, ollama_name: str, ollama_url: str = '', ollama_api_key: str = ''):
+    def __init__(self, url: str, model: str, api_key: str, source: str, target: str | None, translation_provider: str, translation_model: str, translation_base_url: str = '', translation_api_key: str = ''):
         self.url = url
         self.model = model
         self.api_key = api_key
         self.source = source
         self.target = target
-        if trans_model == 'google':
-            self.trans_func = google_translate
-        else:
-            self.trans_func = ollama_translate
-        self.ollama_name = ollama_name
-        self.ollama_url = ollama_url
-        self.ollama_api_key = ollama_api_key
+        self.translation_function = get_translation_function(translation_provider)
+        self.translation_model = translation_model
+        self.translation_base_url = translation_base_url
+        self.translation_api_key = translation_api_key
         
         self.audio_buffer = []
         self.is_speech = False
@@ -140,18 +137,11 @@ class GlmRecognizer:
         }
         
         if self.target:
-             if self.trans_func == ollama_translate:
-                 th = threading.Thread(
-                    target=self.trans_func,
-                    args=(self.ollama_name, self.target, caption['text'], time_s, self.ollama_url, self.ollama_api_key),
-                    daemon=True
-                )
-             else:
-                 th = threading.Thread(
-                    target=self.trans_func,
-                    args=(self.ollama_name, self.target, caption['text'], time_s),
-                    daemon=True
-                )
+             th = threading.Thread(
+                target=self.translation_function,
+                args=(self.translation_model, self.target, caption['text'], time_s, self.translation_base_url, self.translation_api_key),
+                daemon=True
+            )
              th.start()
         
         stdout_obj(caption)

@@ -1,0 +1,33 @@
+[project]
+name = "auto-caption-engine"
+version = "1.2.0"
+description = "Audio capture, speech recognition and translation engine for Auto Caption."
+requires-python = ">=3.10"
+dependencies = [
+    "dashscope",
+    "websocket-client",
+    "numpy",
+    "resampy",
+    "vosk",
+    "pyaudio; sys_platform == 'darwin'",
+    "pyaudiowpatch; sys_platform == 'win32'",
+    "googletrans",
+    "ollama",
+    # The sdist omits the core dependency; keep both packages at the same version.
+    # https://github.com/k2-fsa/sherpa-onnx/issues/3689
+    "sherpa-onnx",
+    "sherpa-onnx-core",
+    "requests",
+    "openai",
+]
+
+[dependency-groups]
+dev = ["pyinstaller"]
+
+[tool.uv]
+package = false
+
+# [[tool.uv.index]]
+# name = "pypi"
+# url = "https://pypi.org/simple"
+# default = true

@@ -4,7 +4,7 @@ import { type SoftwareLogItem } from "../types"
 let logIndex = 0
 const logQueue: SoftwareLogItem[] = []
 
-function getTimeString() {
+function getTimeString(): string {
   const now = new Date()
   const HH = String(now.getHours()).padStart(2, '0')
   const MM = String(now.getMinutes()).padStart(2, '0')
@@ -14,13 +14,13 @@ function getTimeString() {
 }
 
 export class Log {
-  static getAndClearLogQueue() {
+  static getAndClearLogQueue(): SoftwareLogItem[] {
     const copiedQueue = structuredClone(logQueue)
     logQueue.length = 0
     return copiedQueue
   }
 
-  static handleLog(logType: "INFO" | "WARN" | "ERROR", ...msg: any[]) {
+  static handleLog(logType: "INFO" | "WARN" | "ERROR", ...msg: unknown[]): void {
     const timeStr = getTimeString()
     const logPre = `[${logType} ${timeStr}]`
     let logStr = ""
@@ -44,15 +44,15 @@ export class Log {
     }
   }
 
-  static info(...msg: any[]){
+  static info(...msg: unknown[]): void {
     this.handleLog("INFO", ...msg)
   }
 
-  static warn(...msg: any[]){
+  static warn(...msg: unknown[]): void {
     this.handleLog("WARN", ...msg)
   }
 
-  static error(...msg: any[]){
+  static error(...msg: unknown[]): void {
     this.handleLog("ERROR", ...msg)
   }
 }

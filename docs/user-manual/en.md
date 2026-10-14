@@ -1,12 +1,10 @@
 # Auto Caption User Manual
 
-Corresponding Version: v1.1.1
-
-**Note: Due to limited personal resources, the English and Japanese documentation files for this project (except for the README document) will no longer be maintained. The content of this document may not be consistent with the latest version of the project. If you are willing to help with translation, please submit relevant Pull Requests.**
+Corresponding Version: v1.2.0
 
 ## Software Introduction
 
-Auto Caption is a cross-platform caption display software that can real-time capture system audio input (recording) or output (playback) streaming data and use an audio-to-text model to generate captions for the corresponding audio. The default caption engine provided by the software (using Alibaba Cloud Gummy model) supports recognition and translation in nine languages (Chinese, English, Japanese, Korean, German, French, Russian, Spanish, Italian).
+Auto Caption is a cross-platform caption display software that can real-time capture system audio input (recording) or output (playback) streaming data and use an audio-to-text model to generate captions for the corresponding audio. The default Paraformer engine recognizes eight source languages including Cantonese, with translation provided by external services.
 
 The default caption engine currently has full functionality on Windows, macOS, and Linux platforms. Additional configuration is required to capture system audio output on macOS.
 
@@ -22,25 +20,31 @@ The following operating system versions have been tested and confirmed to work p
 
 ![](../../assets/media/main_en.png)
 
+### About Project
+
+Click the GitHub icon under “About Project” on the main screen to open the About window. It displays the app icon at the top, the software version, update date and author, with a two-by-two grid of cards linking to the project repository, user manual, caption engine manual and changelog. Each link shows its full address. Manual links follow the interface language, the changelog links to the shared update history, and the window follows the light or dark theme. Click the author name [HiMeditator](https://github.com/HiMeditator) to open the GitHub profile in your default browser.
+
 ### Software Limitations
 
-To use the Gummy caption engine, you need to obtain an API KEY from Alibaba Cloud.
+To use the Paraformer caption engine, you need to obtain an API KEY from Alibaba Cloud.
 
 Additional configuration is required to capture audio output on macOS platform.
 
 The software is built using Electron, so the software size is inevitably large.
 
-## Preparation for Using Gummy Engine
+## Paraformer Realtime v2
 
-To use the default caption engine provided by the software (Alibaba Cloud Gummy), you need to obtain an API KEY from the Alibaba Cloud Bailian platform. Then add the API KEY to the software settings or configure it in environment variables (only Windows platform supports reading API KEY from environment variables).
+The default engine is Alibaba Cloud `paraformer-realtime-v2`, using the DashScope Recognition SDK for duplex streaming ASR. Audio is uploaded as 16kHz, 16-bit mono PCM. Supported source languages are Chinese, English, Japanese, Korean, German, French, Russian and Cantonese; `auto` sends no language hint. There is no built-in translation: configure Ollama, an OpenAI-compatible service or Google Translate to translate finalized sentences asynchronously. Set the Alibaba Cloud API Key in settings or the `DASHSCOPE_API_KEY` environment variable on any platform; the CLI option is `--dashscope_api_key`. The current endpoint is the default Beijing endpoint and requires a matching regional API Key. Old Gummy selections and API Keys migrate automatically; old Spanish/Italian source selections switch to auto detection. Update old custom commands manually. See the [official SDK documentation](https://help.aliyun.com/zh/model-studio/paraformer-real-time-speech-recognition-python-sdk).
 
-**The international version of Alibaba Cloud services does not provide the Gummy model, so non-Chinese users currently cannot use the default caption engine.**
+## Qwen LiveTranslate
 
-Alibaba Cloud provides detailed tutorials for this part, which can be referenced:
+Qwen LiveTranslate uses `qwen3.8-livetranslate-flash-realtime` to stream source transcripts and translated text in one WebSocket session, with no external translation service. Paraformer remains the default. Select this engine, enter the workspace ID and region (Beijing or Singapore), and enter an Alibaba Cloud API Key for that workspace and region in More Settings. Alternatively, use `DASHSCOPE_WORKSPACE_ID` and `DASHSCOPE_API_KEY`. The source language is detected automatically. The UI offers Chinese, English, Japanese, Korean, German, French, Russian, Spanish and Italian as target languages. Audio is uploaded as 16kHz, 16-bit mono PCM. Only text is returned; translated speech is not played. Disabling translation only hides the translation, while the service still translates. Use Paraformer for recognition only.
 
-- [Obtaining API KEY (Chinese)](https://help.aliyun.com/zh/model-studio/get-api-key)
-- [Configuring API Key through Environment Variables (Chinese)](https://help.aliyun.com/zh/model-studio/configure-api-key-through-environment-variables)
+[API / WebSocket](https://help.aliyun.com/zh/model-studio/qwen3-5-livetranslate-flash-realtime)
 
+```bash
+uv run python main.py -e livetranslate -t zh --dashscope_api_key <api-key> --dashscope_workspace_id <workspace-id> --dashscope_region cn-beijing
+```
 
 ## Preparation for GLM Engine
 
@@ -110,6 +114,8 @@ sudo yum install pulseaudio pavucontrol
 
 Caption settings can be divided into three categories: general settings, caption engine settings, and caption style settings. Note that changes to general settings take effect immediately. For the other two categories, after making changes, you need to click the "Apply" option in the upper right corner of the corresponding settings module for the changes to take effect. If you click "Cancel Changes," the current modifications will not be saved and will revert to the previous state.
 
+The caption style preview has a close icon in its top-right corner, matching the caption window's button style and using the source caption text color. Clicking it immediately hides the preview and turns off the Preview switch in Caption Style Settings. A notification confirms that the preview is closed and explains how to enable it again in Caption Style Settings. Turn the switch back on to show the preview again. Apply saves this setting; Cancel restores the last saved state.
+
 ### Starting and Stopping Captions
 
 After completing all configurations, click the "Start Caption Engine" button on the interface to start the captions. If you need a separate caption display window, click the "Open Caption Window" button to activate the independent caption display window. To pause caption recognition, click the "Stop Caption Engine" button.
@@ -126,9 +132,19 @@ In the caption control window, you can see the records of all collected captions
 
 ## Caption Engine
 
+Caption engine options appear in the order Qwen LiveTranslate 3.8, Paraformer, GLM-ASR, Vosk, SOSV, with cloud models first. Local models show their execution device: `Local / CPU / Vosk` and `Local / CPU / SOSV`.
+
+In Caption Engine Settings, each model's description appears at the top of the model settings, explaining its recognition method, configuration requirements and translation support. The description updates immediately when you select another model. Its bordered box uses the current theme's primary color palette for its background and border, adapting to light and dark themes.
+
+When the last color option (black) is selected in the light theme, model and translation descriptions use a light gray background and gray border to keep the text readable.
+
+Model, audio, custom engine and More Settings options come first. Translation and Enable Recording share a row in the following group, followed by target language, translation service and its model name, Base URL and API Key. A translation service description between the two groups uses the same style as the model description and updates immediately when you select Ollama, an OpenAI-compatible service or Google Translate. Qwen LiveTranslate shows a built-in translation description and omits external translation service settings.
+
+Hover over the Audio Type, Enable Recording, Custom Eng, Translation or More Settings label to see its function and configuration requirements. When Qwen LiveTranslate is selected, Workspace ID and Alibaba Cloud region also provide hover help explaining that the workspace, API Key and region must match, and that an empty workspace ID falls back to the environment variable. The Workspace ID help also links to [Alibaba Cloud Model Studio workspace settings](https://bailian.console.aliyun.com/cn-beijing/settings/workspace), where you can obtain your own workspace ID. Labels with hover help use the theme color. The translation help for Qwen LiveTranslate explains that disabling translation only hides translated text while the service still translates.
+
 The so-called caption engine is essentially a subprogram that captures real-time streaming data from system audio input (recording) or output (playback), and invokes speech-to-text models to generate corresponding captions. The generated captions are converted into JSON-formatted strings and passed to the main program through standard output. The main program reads the caption data, processes it, and displays it in the window.
 
-The software provides two default caption engines. If you need other caption engines, you can invoke them by enabling the custom engine option (other engines need to be specifically developed for this software). The engine path refers to the location of the custom caption engine on your computer, while the engine command represents the runtime parameters of the custom caption engine, which should be configured according to the rules of that particular caption engine.
+The software provides five built-in caption engines. If you need other caption engines, you can invoke them by enabling the custom engine option (other engines need to be specifically developed for this software). The engine path refers to the location of the custom caption engine on your computer, while the engine command represents the runtime parameters of the custom caption engine, which should be configured according to the rules of that particular caption engine.
 
 ![](../img/02_en.png)
 
@@ -152,9 +168,9 @@ The following parameter descriptions only include necessary parameters.
 
 #### `-e , --caption_engine`
 
-The caption engine model to select, currently three options are available: `gummy, glm, vosk, sosv`.
+The caption engine model to select, currently five options are available: `paraformer, livetranslate, glm, vosk, sosv`.
 
-The default value is `gummy`.
+The default value is `paraformer`.
 
 This applies to all models.
 
@@ -204,21 +220,29 @@ Source language for recognition. Default value is `auto`, meaning no specific so
 
 Specifying the source language can improve recognition accuracy to some extent. You can specify the source language using the language codes above.
 
-This applies to Gummy, GLM and SOSV models.
+This applies to Paraformer, GLM and SOSV models.
 
-The Gummy model can use all the languages mentioned above, plus Cantonese (`yue`).
+Paraformer supports `zh, en, ja, ko, de, fr, ru, yue` and `auto`; Spanish and Italian recognition are unsupported.
 
 The GLM model supports specifying the following languages: English, Chinese, Japanese, Korean.
 
 The SOSV model supports specifying the following languages: English, Chinese, Japanese, Korean, and Cantonese.
 
-#### `-k, --api_key`
+#### `--dashscope_api_key`
 
-Specify the Alibaba Cloud API KEY required for the `Gummy` model.
+Specify the Alibaba Cloud API Key used by Paraformer and Qwen LiveTranslate. If empty, the engine reads `DASHSCOPE_API_KEY`. The key must match the service region.
 
 Default value is empty.
 
-This only applies to the Gummy model.
+This applies to Paraformer and Qwen LiveTranslate.
+
+#### `--dashscope_workspace_id`
+
+The Qwen LiveTranslate workspace ID. The default is empty, falling back to `DASHSCOPE_WORKSPACE_ID`. Obtain your ID from [Alibaba Cloud Model Studio workspace settings](https://bailian.console.aliyun.com/cn-beijing/settings/workspace). The workspace, API Key and region must match.
+
+#### `--dashscope_region`
+
+The Qwen LiveTranslate service region: `cn-beijing` (Beijing, default) or `ap-southeast-1` (Singapore). Paraformer uses the default Beijing endpoint and does not use this option.
 
 #### `-gkey, --glm_api_key`  
 
@@ -232,36 +256,37 @@ Specifies the model name to be used for the `glm` model. The default value is `g
 
 Specifies the API URL required for the `glm` model. The default value is: `https://open.bigmodel.cn/api/paas/v4/audio/transcriptions`.  
 
-#### `-tm, --translation_model`
+#### `--translation_provider`
 
-Specify the translation method for Vosk and SOSV models. Default is `ollama`.
+Specifies the translation service used by the Paraformer, Vosk, SOSV, and GLM caption engines. The default is `ollama`.
 
 Supported values are:
 
 - `ollama` Use local Ollama model for translation. Users need to install Ollama software and corresponding models
+- `openai` Use an OpenAI API-compatible translation service
 - `google` Use Google Translate API for translation. No additional configuration needed, but requires network access to Google
 
-This only applies to Vosk and SOSV models.
+This only applies to caption engines without built-in translation.
 
-#### `-omn, --ollama_name`
+#### `--translation_model`
 
-Specifies the name of the translation model to be used, which can be either a local Ollama model or a cloud model compatible with the OpenAI API. If the Base URL field is not filled in, the local Ollama service will be called by default; otherwise, the API service at the specified address will be invoked via the Python OpenAI library.  
+Specifies the model name used by Ollama or an OpenAI-compatible service. Google Translate does not use this option.
 
 If using an Ollama model, it is recommended to use a model with fewer than 1B parameters, such as `qwen2.5:0.5b` or `qwen3:0.6b`. The corresponding model must be downloaded in Ollama for normal use.  
 
-The default value is empty and applies to models other than Gummy.  
+The default value is empty and applies to Paraformer, GLM, Vosk and SOSV.
 
-#### `-ourl, --ollama_url`
+#### `--translation_base_url`
 
-The base request URL for calling the OpenAI API. If left blank, the local Ollama model on the default port will be called.  
+The base URL of the OpenAI-compatible service, such as `https://api.openai.com/v1`. Used only with `--translation_provider openai`.
 
-The default value is empty and applies to models other than Gummy.  
+The default value is empty and applies to Paraformer, GLM, Vosk and SOSV.
 
-#### `-okey, --ollama_api_key`
+#### `--translation_api_key`
 
-Specifies the API KEY for calling OpenAI-compatible models.  
+Specifies the API key for the OpenAI-compatible service. Used only with `--translation_provider openai`.
 
-The default value is empty and applies to models other than Gummy.  
+The default value is empty and applies to Paraformer, GLM, Vosk and SOSV.
 
 #### `-vosk, --vosk_model`
 
@@ -279,18 +304,26 @@ This only applies to the SOSV model.
 
 > The following content assumes users who use this method have knowledge of Python environment configuration and usage.
 
-First, download the project source code locally. The caption engine source code is located in the  `engine` directory of the project. Then configure the Python environment, where the project dependencies are listed in the `requirements.txt` file in the `engine` directory.
+Download the source code, install [uv](https://docs.astral.sh/uv/getting-started/installation/), and enter the `engine` directory. Dependencies are declared in `pyproject.toml`; `uv.lock` is generated locally and ignored by Git, with Python 3.12 selected by default:
 
-After configuration, enter the `engine` directory and execute commands to run the caption engine.
+```bash
+cd engine
+uv sync
+uv run python main.py --help
+```
 
-For example, to use the Gummy model, specify audio type as system audio output, source language as English, and target language as Chinese, execute the following command:
+No virtual environment activation is required. Run the source commands below from `engine` using `uv run python main.py`. See the README engine build section for platform audio dependencies. The packaged app uses its bundled engine and does not require uv.
+
+For example, to use the Paraformer model, specify audio type as system audio output, source language as English, and target language as Chinese, execute the following command:
 
 > Note: For better visualization, the commands below are written on multiple lines. If execution fails, try removing backslashes and executing as a single line command.
 
 ```bash
-python main.py \
--e gummy \
--k sk-******************************** \
+uv run python main.py \
+-e paraformer \
+--dashscope_api_key sk-******************************** \
+--translation_provider ollama \
+--translation_model qwen2.5:0.5b \
 -a 0 \
 -d 1 \
 -s en \
@@ -300,18 +333,33 @@ python main.py \
 To specify the Vosk model, audio type as system audio output, translate to English, and use Ollama `qwen3:0.6b` model for translation:
 
 ```bash
-python main.py \
+uv run python main.py \
 -e vosk \
 -vosk D:\Projects\auto-caption\engine\models\vosk-model-small-cn-0.22 \
 -a 0 \
 -d 1 \
 -t en \
+--translation_provider ollama \
+--translation_model qwen3:0.6b
+```
+
+To use an OpenAI-compatible service instead, specify the service type, model, and Base URL explicitly:
+
+```bash
+uv run python main.py \
+-e vosk \
+-vosk D:\Projects\auto-caption\engine\models\vosk-model-small-cn-0.22 \
+-t en \
+--translation_provider openai \
+--translation_model gpt-4.1-mini \
+--translation_base_url https://api.openai.com/v1 \
+--translation_api_key sk-********************************
 ```
 
 To specify the SOSV model, audio type as microphone, automatically select source language, and no translation:
 
 ```bash
-python main.py \
+uv run python main.py \
 -e sosv \
 -sosv D:\\Projects\\auto-caption\\engine\\models\\sosv-int8 \
 -a 1 \
@@ -320,7 +368,7 @@ python main.py \
 -t none
 ```
 
-Running result using the Gummy model is shown below:
+Running result using the Paraformer model is shown below:
 
 ![](../img/07.png)
 
@@ -330,4 +378,6 @@ First, download the executable file for your platform from [GitHub Releases](htt
 
 Then open a terminal in the directory containing the caption engine executable file and execute commands to run the caption engine.
 
-Simply replace `python main.py` in the above commands with the executable file name (for example: `engine-win.exe`).
+Simply replace `uv run python main.py` in the above commands with the executable file name (for example: `engine-win.exe`).
+
+LiveTranslate CLI: `--dashscope_workspace_id` specifies the workspace ID (falls back to the environment variable); `--dashscope_region` defaults to `cn-beijing`, also supporting `ap-southeast-1`. `--dashscope_api_key` is shared with Paraformer. `-s` is unused; `-t none` only hides translated text. External translation options do not apply to LiveTranslate.

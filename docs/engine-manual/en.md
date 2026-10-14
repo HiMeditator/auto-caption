@@ -1,6 +1,6 @@
 # Caption Engine Documentation
 
-Corresponding version: v1.0.0
+Corresponding Version: v1.2.0
 
 ![](../../assets/media/structure_en.png)
 
@@ -29,7 +29,7 @@ Process of communication between main process and caption engine:
 
 - Electron main process: When the user operates to close the caption engine in the frontend, the main process sends an object string with `command` field set to `stop` to the caption engine process through Socket communication
 - Caption engine process: Receive the caption data object string sent by the main engine process, parse the string into an object. If the object's `command` field is `stop`, set the value of global variable `shared_data.status` to `stop`
-- Caption engine process: Main thread continuously monitors system audio output, when `thread_data.status` value is not `running`, end the loop, release resources, and terminate execution
+- Caption engine process: Main thread continuously monitors system audio output, when `shared_data.status` value is not `running`, end the loop, release resources, and terminate execution
 - Electron main process: If the caption engine process termination is detected, perform corresponding processing and provide feedback to the frontend
 
 ## Implemented Features
@@ -46,8 +46,8 @@ Examples:
 from utils import stdout, stdout_cmd, stdout_obj, stderr
 # {"command": "print", "content": "Hello"}\n
 stdout("Hello")
-# {"command": "connect", "content": "8080"}\n
-stdout_cmd("connect", "8080")
+# {"command": "connect", "content": ""}\n
+stdout_cmd("connect")
 # {"command": "print", "content": "print"}\n
 stdout_obj({"command": "print", "content": "print"})
 # sys.stderr.write("Error Info" + "\n")
@@ -61,13 +61,14 @@ This Socket service listens on a specified port, parses content sent by the Elec
 Example:
 
 ```python
-from utils import start_server
-from utils import shared_data
+import threading
+import time
+from utils import start_server, shared_data
+
 port = 8080
-start_server(port)
-while thread_data == 'running':
-    # do something
-    pass
+threading.Thread(target=start_server, args=(port,), daemon=True).start()
+while shared_data.status == 'running':
+    time.sleep(0.1)
 ```
 
 ### Audio Acquisition
@@ -88,15 +89,18 @@ Example:
 
 ```python
 from sysaudio import AudioStream
-audio_type = 0
-chunk_rate = 20
-stream =  AudioStream(audio_type, chunk_rate)
+from utils import shared_data
+
+stream = AudioStream(0, 20)
 stream.open_stream()
-while True:
-    data = stream.read_chunk()
-    # do something with data
-    pass
-stream.close_stream()
+try:
+    while shared_data.status == 'running':
+        data = stream.read_chunk()
+        if data is None:
+            continue
+        # Process the audio chunk here.
+finally:
+    stream.close_stream()
 ```
 
 ### Audio Processing
@@ -110,12 +114,19 @@ Example:
 
 ```python
 from sysaudio import AudioStream
-from utils import merge_chunk_channels
-stream =  AudioStream(1)
-while True:
-    raw_chunk = stream.read_chunk()
-    chunk = resample_chunk_mono(raw_chunk, stream.CHANNELS, stream.RATE, 16000)
-    # do something with chunk
+from utils import resample_chunk_mono, shared_data
+
+stream = AudioStream(1)
+stream.open_stream()
+try:
+    while shared_data.status == 'running':
+        raw_chunk = stream.read_chunk()
+        if raw_chunk is None:
+            continue
+        chunk = resample_chunk_mono(raw_chunk, stream.CHANNELS, stream.RATE, 16000)
+        # Send the mono PCM chunk to the recognizer here.
+finally:
+    stream.close_stream()
 ```
 
 ## Features to be Implemented by the Caption Engine
@@ -133,7 +144,9 @@ It is recommended to encapsulate this as a class, implementing four methods:
 
 Complete caption engine examples:
 
-- [gummy.py](../../engine/audio2text/gummy.py)
+- [paraformer.py](../../engine/audio2text/paraformer.py)
+- [livetranslate.py](../../engine/audio2text/livetranslate.py)
+- [glm.py](../../engine/audio2text/glm.py)
 - [vosk.py](../../engine/audio2text/vosk.py)
 - [sosv.py](../../engine/audio2text/sosv.py)
 
@@ -144,10 +157,11 @@ Some speech-to-text models do not provide translation. If needed, an additional 
 Example:
 
 ```python
-from utils import google_translate, ollama_translate
+from utils import google_translate, ollama_translate, openai_translate
 text = "This is a translation test."
 google_translate("", "en", text, "time_s")
 ollama_translate("qwen3:0.6b", "en", text, "time_s")
+openai_translate("gpt-4.1-mini", "en", text, "time_s", "https://api.openai.com/v1", "<api-key>")
 ```
 
 ### Caption Data Transmission
@@ -174,33 +188,46 @@ export interface CaptionItem {
 Custom caption engine settings provide command line parameter specification, so the caption engine parameters need to be set properly. Currently used parameters in this project are as follows:
 
 ```python
+import argparse
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Convert system audio stream to text')
     # all
-    parser.add_argument('-e', '--caption_engine', default='gummy', help='Caption engine: gummy or vosk')
-    parser.add_argument('-a', '--audio_type', default=0, help='Audio stream source: 0 for output, 1 for input')
-    parser.add_argument('-c', '--chunk_rate', default=10, help='Number of audio stream chunks collected per second')
-    parser.add_argument('-p', '--port', default=0, help='The port to run the server on, 0 for no server')
-    parser.add_argument('-t', '--target_language', default='zh', help='Target language code, "none" for no translation')
-    parser.add_argument('-r', '--record', default=0, help='Whether to record the audio, 0 for no recording, 1 for recording')
+    parser.add_argument('-e', '--caption_engine', default='paraformer', choices=['paraformer', 'livetranslate', 'glm', 'vosk', 'sosv'], help='Caption engine: paraformer, livetranslate, glm, vosk or sosv')
+    parser.add_argument('-a', '--audio_type', type=int, default=0, help='Audio stream source: 0 for output, 1 for input')
+    parser.add_argument('-c', '--chunk_rate', type=int, default=10, help='Number of audio stream chunks collected per second')
+    parser.add_argument('-p', '--port', type=int, default=0, help='The port to run the server on, 0 for no server')
+    parser.add_argument('-d', '--display_caption', type=int, default=0, help='Display caption on terminal, 0 for no display, 1 for display')
+    parser.add_argument('-t', '--target_language', default='none', help='Target language code, "none" for no translation')
+    parser.add_argument('-r', '--record', type=int, default=0, help='Whether to record the audio, 0 for no recording, 1 for recording')
     parser.add_argument('-rp', '--record_path', default='', help='Path to save the recorded audio')
-    # gummy and sosv
+    # paraformer and sosv and glm
     parser.add_argument('-s', '--source_language', default='auto', help='Source language code')
-    # gummy only
-    parser.add_argument('-k', '--api_key', default='', help='API KEY for Gummy model')
-    # vosk and sosv
-    parser.add_argument('-tm', '--translation_model', default='ollama', help='Model for translation: ollama or google')
-    parser.add_argument('-omn', '--ollama_name', default='', help='Ollama model name for translation')
+    # Alibaba Cloud engines
+    parser.add_argument('--dashscope_api_key', default='', help='API key for Alibaba Cloud caption engines')
+    parser.add_argument('--dashscope_workspace_id', default='', help='LiveTranslate workspace ID (or DASHSCOPE_WORKSPACE_ID)')
+    parser.add_argument('--dashscope_region', choices=['cn-beijing', 'ap-southeast-1'], default='cn-beijing', help='LiveTranslate API region')
+    # External translation: Paraformer, GLM, Vosk and SOSV
+    parser.add_argument('--translation_provider', choices=['ollama', 'openai', 'google'], default='ollama', help='Translation service provider')
+    parser.add_argument('--translation_model', default='', help='Translation model name (for Ollama or OpenAI-compatible services)')
+    parser.add_argument('--translation_base_url', default='', help='OpenAI-compatible API base URL')
+    parser.add_argument('--translation_api_key', default='', help='OpenAI-compatible API key')
     # vosk only
     parser.add_argument('-vosk', '--vosk_model', default='', help='The path to the vosk model.')
     # sosv only
     parser.add_argument('-sosv', '--sosv_model', default=None, help='The SenseVoice model path')
+    # glm only
+    parser.add_argument('-gurl', '--glm_url', default='https://open.bigmodel.cn/api/paas/v4/audio/transcriptions', help='GLM API URL')
+    parser.add_argument('-gmodel', '--glm_model', default='glm-asr-2512', help='GLM Model Name')
+    parser.add_argument('-gkey', '--glm_api_key', default='', help='GLM API Key')
+
+    args = parser.parse_args()
 ```
 
-For example, for this project's caption engine, if I want to use the Gummy model, specify the original text as Japanese, translate to Chinese, and capture captions from system audio output, with 0.1s audio data segments each time, the command line parameters would be:
+For example, for this project's caption engine, if I want to use the Paraformer model, specify the original text as Japanese, translate to Chinese, and capture captions from system audio output, with 0.1s audio data segments each time, the command line parameters would be:
 
 ```bash
-python main.py -e gummy -s ja -t zh -a 0 -c 10 -k <dashscope-api-key>
+uv run python main.py -e paraformer -s ja -t zh -a 0 -c 10 --dashscope_api_key <dashscope-api-key> --translation_provider ollama --translation_model qwen2.5:0.5b
 ```
 
 ## Additional Notes  
@@ -218,14 +245,34 @@ python main.py -e gummy -s ja -t zh -a 0 -c 10 -k <dashscope-api-key>
 Except for audio-to-text conversion and translation, other components (audio acquisition, audio resampling, and communication with the main process) are recommended to directly reuse the project's code. If this approach is taken, the content that needs to be added includes:
 
 - `engine/audio2text/`: Add a new audio-to-text class (file-level).  
-- `engine/main.py`: Add new parameter settings and workflow functions (refer to `main_gummy` and `main_vosk` functions).  
+- `engine/main.py`: Add new parameter settings and workflow functions (refer to `main_paraformer` and `main_vosk` functions).
 
 ### Packaging  
 
-After development and testing, the caption engine must be packaged into an executable. Typically, `pyinstaller` is used. If the packaged executable reports errors, check for missing dependencies.  
+The engine uses uv: `engine/pyproject.toml` declares runtime dependencies and the PyInstaller development dependency, `engine/uv.lock` is generated locally and ignored by Git, and Python 3.12 is selected by default. Run from the repository root:
+
+```bash
+npm run engine:sync
+npm run engine:test
+npm run build:engine
+```
+
+Alternatively, run `uv run pyinstaller --noconfirm --clean main.spec` from `engine`. The Vosk package path is discovered from the active environment. PyInstaller produces a single file, `engine/dist/main.exe` on Windows or `engine/dist/main` on macOS/Linux. Installers copy it to `engine/main.exe` or `engine/main` inside the resources directory, matching the main process launch path. Installer commands build the engine first and must run on the target OS. See the README for platform audio dependencies. Packaged apps do not require uv or Python.
 
 ### Execution  
 
 With a functional caption engine, it can be launched in the caption software window by specifying the engine's path and runtime arguments.  
 
-![](../img/02_en.png)  
+![](../img/02_en.png)
+
+The default engine is Alibaba Cloud `paraformer-realtime-v2`, using the DashScope Recognition SDK for duplex streaming ASR. Audio is uploaded as 16kHz, 16-bit mono PCM. Supported source languages are Chinese, English, Japanese, Korean, German, French, Russian and Cantonese; `auto` sends no language hint. There is no built-in translation: configure Ollama, an OpenAI-compatible service or Google Translate to translate finalized sentences asynchronously. Set the Alibaba Cloud API Key in settings or the `DASHSCOPE_API_KEY` environment variable on any platform; the CLI option is `--dashscope_api_key`. The current endpoint is the default Beijing endpoint and requires a matching regional API Key. Old Gummy selections and API Keys migrate automatically; old Spanish/Italian source selections switch to auto detection. Update old custom commands manually. See the [official SDK documentation](https://help.aliyun.com/zh/model-studio/paraformer-real-time-speech-recognition-python-sdk).
+
+## Qwen LiveTranslate
+
+Qwen LiveTranslate uses `qwen3.8-livetranslate-flash-realtime` to stream source transcripts and translated text in one WebSocket session, with no external translation service. Paraformer remains the default. Select this engine, enter the workspace ID and region (Beijing or Singapore), and enter an Alibaba Cloud API Key for that workspace and region in More Settings. Alternatively, use `DASHSCOPE_WORKSPACE_ID` and `DASHSCOPE_API_KEY`. The source language is detected automatically. The UI offers Chinese, English, Japanese, Korean, German, French, Russian, Spanish and Italian as target languages. Audio is uploaded as 16kHz, 16-bit mono PCM. Only text is returned; translated speech is not played. Disabling translation only hides the translation, while the service still translates. Use Paraformer for recognition only.
+
+[API / WebSocket](https://help.aliyun.com/zh/model-studio/qwen3-5-livetranslate-flash-realtime)
+
+```bash
+uv run python main.py -e livetranslate -t zh --dashscope_api_key <api-key> --dashscope_workspace_id <workspace-id> --dashscope_region cn-beijing
+```

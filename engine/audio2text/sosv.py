@@ -14,7 +14,7 @@ import numpy as np
 
 from utils import shared_data
 from utils import stdout_cmd, stdout_obj
-from utils import google_translate, ollama_translate
+from utils import get_translation_function
 
 
 class SosvRecognizer:
@@ -26,10 +26,10 @@ class SosvRecognizer:
         vad_model: Silero VAD 模型路径
         source: 识别源语言(auto, zh, en, ja, ko, yue)
         target: 翻译目标语言
-        trans_model: 翻译模型名称
-        ollama_name: Ollama 模型名称
+        translation_provider: 翻译服务
+        translation_model: 翻译模型名称
     """
-    def __init__(self, model_path: str, source: str, target: str | None, trans_model: str, ollama_name: str, ollama_url: str = '', ollama_api_key: str = ''):
+    def __init__(self, model_path: str, source: str, target: str | None, translation_provider: str, translation_model: str, translation_base_url: str = '', translation_api_key: str = ''):
         if model_path.startswith('"'):
             model_path = model_path[1:]
         if model_path.endswith('"'):
@@ -40,13 +40,10 @@ class SosvRecognizer:
             self.ext = ".int8"
         self.source = source
         self.target = target
-        if trans_model == 'google':
-            self.trans_func = google_translate
-        else:
-            self.trans_func = ollama_translate
-        self.ollama_name = ollama_name
-        self.ollama_url = ollama_url
-        self.ollama_api_key = ollama_api_key
+        self.translation_function = get_translation_function(translation_provider)
+        self.translation_model = translation_model
+        self.translation_base_url = translation_base_url
+        self.translation_api_key = translation_api_key
         self.time_str = ''
         self.cur_id = 0
         self.prev_content = ''
@@ -153,8 +150,8 @@ class SosvRecognizer:
                 stdout_obj(caption)
                 if self.target:
                     th = threading.Thread(
-                        target=self.trans_func,
-                        args=(self.ollama_name, self.target, caption['text'], self.time_str, self.ollama_url, self.ollama_api_key),
+                        target=self.translation_function,
+                        args=(self.translation_model, self.target, caption['text'], self.time_str, self.translation_base_url, self.translation_api_key),
                         daemon=True
                     )
                     th.start()    

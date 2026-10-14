@@ -53,7 +53,7 @@ class ControlWindow {
     }
   }
 
-  public handleMessage() {
+  public handleMessage(): void {
     nativeTheme.on('updated', () => {
       if(allConfig.uiTheme === 'system'){
         if(nativeTheme.shouldUseDarkColors && this.window){
@@ -92,7 +92,9 @@ class ControlWindow {
         pid: 0, ppid: 0, port: 0, cpu: 0, mem: 0, elapsed: 0
       }
       if(captionEngine.status !== 'running') return info
-      const stats = await pidusage(captionEngine.process.pid)
+      const pid = captionEngine.process?.pid
+      if(pid === undefined) return info
+      const stats = await pidusage(pid)
       info.pid = stats.pid
       info.ppid = stats.ppid
       info.port = captionEngine.port
@@ -168,7 +170,7 @@ class ControlWindow {
     })
   }
 
-  public sendErrorMessage(message: string) {
+  public sendErrorMessage(message: string): void {
     this.window?.webContents.send('control.error.occurred', message)
   }
 }

@@ -1,5 +1,6 @@
 appId: com.himeditator.autocaption
 productName: Auto Caption
+artifactName: ${name}-v${version}.${ext}
 directories:
   buildResources: build
 files:
@@ -15,18 +16,14 @@ files:
   - '!assets/*'
   - '!.repomap/*'
   - '!.virtualme/*'
-extraResources:
-  # For Windows
-  - from: ./engine/dist/main.exe
-    to: ./engine/main.exe
-  # For macOS and Linux
-  - from: ./engine/dist/main
-    to: ./engine/main
+  - '!.uv-cache/**'
 win:
+  extraResources:
+    - from: ./engine/dist/main.exe
+      to: ./engine/main.exe
   executableName: auto-caption
   icon: build/icon.png
 nsis:
-  artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
@@ -34,6 +31,9 @@ nsis:
   perMachine: true
   allowToChangeInstallationDirectory: true
 mac:
+  extraResources:
+    - from: ./engine/dist/main
+      to: ./engine/main
   entitlementsInherit: build/entitlements.mac.plist
   extendInfo:
     - NSCameraUsageDescription: Application requests access to the device's camera.
@@ -41,9 +41,10 @@ mac:
     - NSDocumentsFolderUsageDescription: Application requests access to the user's Documents folder.
     - NSDownloadsFolderUsageDescription: Application requests access to the user's Downloads folder.
   notarize: false
-dmg:
-  artifactName: ${name}-${version}.${ext}
 linux:
+  extraResources:
+    - from: ./engine/dist/main
+      to: ./engine/main
   target:
     # - AppImage
     # - snap
@@ -51,8 +52,6 @@ linux:
     - tar.gz
   maintainer: electronjs.org
   category: Utility
-appImage:
-  artifactName: ${name}-${version}.${ext}
 npmRebuild: false
 publish:
   provider: generic

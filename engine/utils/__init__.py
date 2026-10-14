@@ -3,4 +3,4 @@ from .sysout import stdout, stdout_err, stdout_cmd, stdout_obj, stderr
 from .sysout import change_caption_display
 from .shared import shared_data
 from .server import start_server
-from .translation import ollama_translate, google_translate
+from .translation import get_translation_function, google_translate, ollama_translate, openai_translate

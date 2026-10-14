@@ -27,7 +27,7 @@ export const useCaptionStyleStore = defineStore('captionStyle', () => {
   const iBreakOptions = ref(breakOptions['zh'])
   const changeSignal = ref<boolean>(false)
 
-  function addOpicityToColor(color: string, opicity: number) {
+  function addOpicityToColor(color: string, opicity: number): string {
     const opicityValue = Math.round(opicity * 255 / 100);
     const opicityHex = opicityValue.toString(16).padStart(2, '0');
     return `${color}${opicityHex}`;
@@ -37,7 +37,7 @@ export const useCaptionStyleStore = defineStore('captionStyle', () => {
     return addOpicityToColor(background.value, opacity.value)
   })
 
-  function sendStylesChange() {
+  function sendStylesChange(): void {
     const styles: Styles = {
       lineNumber: lineNumber.value,
       lineBreak: lineBreak.value,
@@ -62,11 +62,11 @@ export const useCaptionStyleStore = defineStore('captionStyle', () => {
     window.electron.ipcRenderer.send('control.styles.change', styles)
   }
 
-  function sendStylesReset() {
+  function sendStylesReset(): void {
     window.electron.ipcRenderer.send('control.styles.reset')
   }
 
-  function setStyles(args: Styles){
+  function setStyles(args: Styles): void {
     lineNumber.value = args.lineNumber
     lineBreak.value = args.lineBreak
     fontFamily.value = args.fontFamily
@@ -79,7 +79,7 @@ export const useCaptionStyleStore = defineStore('captionStyle', () => {
     transDisplay.value = args.transDisplay
     transFontFamily.value = args.transFontFamily
     transFontSize.value = args.transFontSize
-    transFontColor.value = args.transFontColor,
+    transFontColor.value = args.transFontColor
     transFontWeight.value = args.transFontWeight
     textShadow.value = args.textShadow
     offsetX.value = args.offsetX

@@ -3,7 +3,7 @@
     <h1 align="center">auto-caption</h1>
     <p>Auto Caption 是一个跨平台的实时字幕显示软件。</p>
     <p>
-      <a href="https://github.com/HiMeditator/auto-caption/releases"><img src="https://img.shields.io/badge/release-1.1.1-blue"></a>
+      <a href="https://github.com/HiMeditator/auto-caption/releases"><img src="https://img.shields.io/badge/version-1.2.0-blue"></a>
       <a href="https://github.com/HiMeditator/auto-caption/issues"><img src="https://img.shields.io/github/issues/HiMeditator/auto-caption?color=orange"></a>
       <img src="https://img.shields.io/github/languages/top/HiMeditator/auto-caption?color=royalblue">
       <img src="https://img.shields.io/github/repo-size/HiMeditator/auto-caption?color=green">
@@ -14,7 +14,7 @@
         | <a href="./README_en.md">English</a>
         | <a href="./README_ja.md">日本語</a> |
     </p>
-    <p><i>v1.1.1 版本已经发布，新增 GLM-ASR 云端字幕模型和 OpenAI 兼容模型翻译...</i></p>
+    <p><i>当前软件版本：v1.2.0。更新内容详见<a href="./docs/CHANGELOG.md">更新日志</a>。</i></p>
 </div>
 
 ![](./assets/media/main_zh.png)
@@ -28,6 +28,8 @@ Vosk 模型下载：[Vosk Models](https://alphacephei.com/vosk/models)
 SOSV 模型下载：[ Shepra-ONNX SenseVoice Model](https://github.com/HiMeditator/auto-caption/releases/tag/sosv-model)
 
 ## 📚 相关文档
+
+[字幕引擎独立使用与构建](./engine/README.md)
 
 [Auto Caption 用户手册](./docs/user-manual/zh.md)
 
@@ -45,13 +47,11 @@ https://github.com/user-attachments/assets/9c188d78-9520-4397-bacf-4c8fdcc54874
 - 支持调用本地 Ollama 模型、云端 OpenAI 兼容模型、或云端 Google 翻译 API 进行翻译
 - 跨平台（Windows、macOS、Linux）、多界面语言（中文、英语、日语）支持
 - 丰富的字幕样式设置（字体、字体大小、字体粗细、字体颜色、背景颜色等）
-- 灵活的字幕引擎选择（阿里云 Gummy 云端模型、GLM-ASR 云端模型、本地 Vosk 模型、本地 SOSV 模型、还可以自己开发模型）
+- 灵活的字幕引擎选择（阿里云 Paraformer 云端模型、GLM-ASR 云端模型、本地 Vosk 模型、本地 SOSV 模型等、还可以自己开发模型）
 - 多语言识别与翻译（见下文“⚙️ 自带字幕引擎说明”）
 - 字幕记录展示与导出（支持导出 `.srt` 和 `.json` 格式）
 
 ## 📖 基本使用
-
-> ⚠️ 注意：目前只维护了 Windows 平台的软件的最新版本，其他平台的最后版本停留在 v1.0.0。
 
 软件已经适配了 Windows、macOS 和 Linux 平台。测试过的主流平台信息如下：
 
@@ -67,13 +67,14 @@ macOS 平台和 Linux 平台获取系统音频输出需要进行额外设置，�
 
 |                                                              | 准确率 | 实时性 | 部署类型          | 支持语言   | 翻译       | 备注                                                       |
 | ------------------------------------------------------------ | -------- | ------------- | ---------- | ---------- | ---------------------------------------------------------- | ---------------------------------------------------------- |
-| [Gummy](https://help.aliyun.com/zh/model-studio/gummy-speech-recognition-translation) | 很好😊    | 很好😊 | 云端 / 阿里云 | 10 种      | 自带翻译   | 收费，识别0.54CNY / 小时，识别+翻译1.08CNY/小时           |
+| [Qwen LiveTranslate 3.8](https://help.aliyun.com/zh/model-studio/qwen3-8-livetranslate-flash-realtime) | 很好😊 | 很好😊 | 云端 / 阿里云 | 自动检测 | 自带翻译 | 收费，计费规则见模型链接 |
+| [Paraformer Realtime v2](https://help.aliyun.com/zh/model-studio/paraformer-real-time-speech-recognition-python-sdk) | 很好😊 | 很好😊 | 云端 / 阿里云 | 8 种语言（含粤语） | 需额外配置 | 收费，约 0.864 CNY / 小时 |
 | [glm-asr-2512](https://docs.bigmodel.cn/cn/guide/models/sound-and-video/glm-asr-2512) | 很好😊 | 较差😞 | 云端 / 智谱 AI | 4 种 | 需额外配置 | 收费，约 0.72CNY / 小时 |
 | [Vosk](https://alphacephei.com/vosk)                         | 较差😞    | 很好😊 | 本地 / CPU    | 超过 30 种 | 需额外配置 | 支持的语言非常多                                           |
 | [SOSV](https://k2-fsa.github.io/sherpa/onnx/sense-voice/index.html) | 一般😐    | 一般😐 | 本地 / CPU    | 5 种       | 需额外配置 | 仅有一个模型                                               |
 | 自己开发                                                     | 🤔        | 🤔      | 自定义        | 自定义     | 自定义     | 根据[文档](./docs/engine-manual/zh.md)使用 Python 自己开发 |
 
-如果你选择的不是 Gummy 模型，你还需要配置自己的翻译模型。
+Qwen LiveTranslate 自带翻译；其他字幕引擎开启翻译时需要配置翻译服务。
 
 ### 配置翻译模型
 
@@ -85,11 +86,11 @@ macOS 平台和 Linux 平台获取系统音频输出需要进行额外设置，�
 
 > 注意：使用参数量过大的模型会导致资源消耗和翻译延迟较大。建议使用参数量小于 1B 的模型，比如： `qwen2.5:0.5b`, `qwen3:0.6b`。
 
-使用该模型之前你需要确定本机安装了 [Ollama](https://ollama.com/) 软件，并已经下载了需要的大语言模型。只需要将需要调用的大模型名称添加到设置中的 `模型名称` 字段中，并保证 `Base URL` 字段为空。
+使用该模型之前你需要确定本机安装了 [Ollama](https://ollama.com/) 软件，并已经下载了需要的大语言模型。在“翻译服务”中选择 `Ollama 本地模型`，再填写模型名称即可；Ollama 会使用本机默认服务地址。
 
 #### OpenAI 兼容模型
 
-如果觉得本地 Ollama 模型的翻译效果不佳，或者不想在本地安装 Ollama 模型，那么可以使用云端的 OpenAI 兼容模型。
+如果觉得本地 Ollama 模型的翻译效果不佳，或者不想在本地安装 Ollama 模型，那么可以在“翻译服务”中选择 `OpenAI 兼容模型`，并分别填写模型名称、Base URL 和 API Key。
 
 以下是一些模型提供商的 `Base URL`：
 - OpenAI: https://api.openai.com/v1
@@ -104,30 +105,37 @@ API Key 需要在对应的模型提供商处获取。
 
 无需任何配置，联网即可使用。
 
-### 使用 Gummy 模型
+## ⚙️ 自带的语音识别模型
 
-> 国际版的阿里云服务似乎并没有提供 Gummy 模型，因此目前非中国用户可能无法使用 Gummy 字幕引擎。
+目前软件自带 5 个语音识别模型。它们的使用方法和介绍如下。
 
-如果要使用默认的 Gummy 字幕引擎（使用云端模型进行语音识别和翻译），首先需要获取阿里云百炼平台的 API KEY，然后将 API KEY 添加到软件设置中（在字幕引擎设置的更多设置中）或者配置到环境变量中（仅 Windows 平台支持读取环境变量中的 API KEY），这样才能正常使用该模型。相关教程：
+#### 使用 Qwen LiveTranslate
 
-- [获取 API KEY](https://help.aliyun.com/zh/model-studio/get-api-key)
-- [将 API Key 配置到环境变量](https://help.aliyun.com/zh/model-studio/configure-api-key-through-environment-variables)
+Qwen LiveTranslate 使用 `qwen3.8-livetranslate-flash-realtime`，在同一个 WebSocket 会话中流式返回原文和译文，无需配置外部翻译服务。默认仍为 Paraformer。选择此引擎后填写业务空间 ID、地域（北京或新加坡），并在更多设置中填写该业务空间和地域的阿里云 API Key；也可使用 `DASHSCOPE_WORKSPACE_ID` 和 `DASHSCOPE_API_KEY` 环境变量。源语言自动检测，界面提供中、英、日、韩、德、法、俄、西、意作为翻译目标语言。音频上传为 16kHz、16bit、单声道 PCM，仅输出文字，不播放翻译语音。关闭翻译仅隐藏译文，服务端仍执行翻译；只需要识别时建议选择 Paraformer。
 
-### 使用 GLM-ASR 模型
+[API / WebSocket](https://help.aliyun.com/zh/model-studio/qwen3-8-livetranslate-flash-realtime)
+
+#### 使用 Paraformer Realtime v2
+
+默认引擎为阿里云 `paraformer-realtime-v2`，通过 DashScope Recognition SDK 双向流式识别。上传音频为 16kHz、16bit、单声道 PCM；支持中文、英文、日语、韩语、德语、法语、俄语及粤语，`auto` 不指定语言提示。模型不提供内置翻译；开启翻译后需配置 Ollama、OpenAI 兼容服务或 Google 翻译，完整句子返回后异步翻译。设置中的阿里云 API Key 或 `DASHSCOPE_API_KEY` 环境变量用于鉴权（所有平台）；CLI 参数为 `--dashscope_api_key`。当前使用北京地域默认端点，API Key 必须匹配该地域。旧 Gummy 引擎选项和 API Key 自动迁移，旧西班牙语/意大利语源语言改为自动检测；旧自定义命令需手动更新。详见[阿里云官方 SDK 文档](https://help.aliyun.com/zh/model-studio/paraformer-real-time-speech-recognition-python-sdk)。
+
+#### 使用 GLM-ASR 模型
 
 使用前需要获取智谱 AI 平台的 API KEY，并添加到软件设置中。
 
 API KEY 获取相关链接：[快速开始](https://docs.bigmodel.cn/cn/guide/start/quick-start)。
 
-### 使用 Vosk 模型
+#### 使用 Vosk 模型
 
-> Vosk 模型的识别效果较差，请谨慎使用。
+基于 [vosk-api](https://github.com/alphacep/vosk-api) 开发。该字幕引擎的优点是可选的语言模型非常多（超过 30 种），缺点是识别效果比较差，且生成内容没有标点符号。
 
 如果要使用 Vosk 本地字幕引擎，首先需要在 [Vosk Models](https://alphacephei.com/vosk/models) 页面下载你需要的模型，并将模型解压到本地，并将模型文件夹的路径添加到软件的设置中。
 
 ![](./assets/media/config_zh.png)
 
-### 使用 SOSV 模型
+#### 使用 SOSV 模型
+
+SOSV 是一个模型整合包，该整合包主要基于 [Shepra-ONNX SenseVoice](https://k2-fsa.github.io/sherpa/onnx/sense-voice/index.html)，并添加了端点检测模型和标点恢复模型。该模型支持识别的语言有：英语、中文、日语、韩语、粤语。
 
 使用 SOSV 模型的方式和 Vosk 一样，下载地址如下：https://github.com/HiMeditator/auto-caption/releases/tag/sosv-model
 
@@ -140,12 +148,16 @@ API KEY 获取相关链接：[快速开始](https://docs.bigmodel.cn/cn/guide/st
 1. 使用项目字幕引擎部分的源代码，使用安装了对应库的 Python 环境进行运行
 2. 使用打包好的字幕引擎的可执行文件，通过终端运行
 
+源码方式请先安装 uv，进入 `engine` 目录并执行 `uv sync`；下方示例也在此目录运行。打包后的可执行文件无需 uv。
+
 运行参数和详细使用介绍请参考[用户手册](./docs/user-manual/zh.md#单独使用字幕引擎)。
 
 ```bash
-python main.py \
--e gummy \
--k sk-******************************** \
+uv run python main.py \
+-e paraformer \
+--dashscope_api_key sk-******************************** \
+--translation_provider ollama \
+--translation_model qwen2.5:0.5b \
 -a 0 \
 -d 1 \
 -s en \
@@ -153,48 +165,6 @@ python main.py \
 ```
 
 ![](./docs/img/07.png)
-
-## ⚙️ 自带字幕引擎说明
-
-目前软件自带 4 个字幕引擎。它们的详细信息如下。
-
-### Gummy 字幕引擎（云端）
-
-基于通义实验室[Gummy语音翻译大模型](https://help.aliyun.com/zh/model-studio/gummy-speech-recognition-translation/)进行开发，基于[阿里云百炼](https://bailian.console.aliyun.com)的 API 进行调用该云端模型。
-
-**模型详细参数：**
-
-- 音频采样率支持：16kHz及以上
-- 音频采样位数：16bit
-- 音频通道数支持：单通道
-- 可识别语言：中文、英文、日语、韩语、德语、法语、俄语、意大利语、西班牙语
-- 支持的翻译：
-  - 中文 → 英文、日语、韩语
-  - 英文 → 中文、日语、韩语
-  - 日语、韩语、德语、法语、俄语、意大利语、西班牙语 → 中文或英文
-
-**网络流量消耗：**
-
-字幕引擎使用原生采样率（假设为 48kHz）进行采样，样本位深为 16bit，上传音频为为单通道，因此上传速率约为：
-
-$$
-48000\ \text{samples/second} \times 2\ \text{bytes/sample} \times 1\ \text{channel}  = 93.75\ \text{KB/s}
-$$
-
-而且引擎只会获取到音频流的时候才会上传数据，因此实际上传速率可能更小。模型结果回传流量消耗较小，没有纳入考虑。
-
-### GLM-ASR 字幕引擎（云端）
-
-https://docs.bigmodel.cn/cn/guide/models/sound-and-video/glm-asr-2512
-
-### Vosk 字幕引擎（本地）
-
-基于 [vosk-api](https://github.com/alphacep/vosk-api) 开发。该字幕引擎的优点是可选的语言模型非常多（超过 30 种），缺点是识别效果比较差，且生成内容没有标点符号。
-
-
-### SOSV 字幕引擎（本地）
-
-[SOSV](https://github.com/HiMeditator/auto-caption/releases/tag/sosv-model) 是一个整合包，该整合包主要基于 [Shepra-ONNX SenseVoice](https://k2-fsa.github.io/sherpa/onnx/sense-voice/index.html)，并添加了端点检测模型和标点恢复模型。该模型支持识别的语言有：英语、中文、日语、韩语、粤语。
 
 ## 🚀 项目运行
 
@@ -206,55 +176,41 @@ https://docs.bigmodel.cn/cn/guide/models/sound-and-video/glm-asr-2512
 npm install
 ```
 
-### 构建字幕引擎
+### 管理与构建字幕引擎
 
-首先进入 `engine` 文件夹，执行如下指令创建虚拟环境（需要使用大于等于 Python 3.10 的 Python 运行环境，建议使用 Python 3.12）：
-
-```bash
-cd ./engine
-# in ./engine folder
-python -m venv .venv
-# or
-python3 -m venv .venv
-```
-
-然后激活虚拟环境：
+先安装 [uv](https://docs.astral.sh/uv/getting-started/installation/)。引擎依赖声明在 `engine/pyproject.toml`；`engine/.python-version` 默认选择 Python 3.12。新克隆环境会重新解析依赖，不同开发者或构建可能使用不同版本。以下命令均在仓库根目录执行：
 
 ```bash
-# Windows
-.venv/Scripts/activate
-# Linux or macOS
-source .venv/bin/activate
+# 更新项目依赖
+npm run engine:sync
+# 运行测试
+npm run engine:test
+# 构建可执行文件
+npm run build:engine
 ```
 
-然后安装依赖（这一步在 macOS 和 Linux 可能会报错，一般是因为构建失败，需要根据报错信息进行处理）：
+开发版 Electron 直接运行该环境中的 Python；发布版运行打包后的引擎，不需要用户安装 uv 或 Python。
 
-```bash
-pip install -r requirements.txt
-```
+macOS 的 PyAudio 需要 PortAudio（例如使用 `brew install portaudio` 安装）；Linux 的音频采集需要 `pactl` 和 `parec`（Ubuntu 可安装 `pulseaudio-utils`），并需要可用的 PulseAudio 或 PipeWire PulseAudio 兼容服务。其他平台配置见[用户手册](./docs/user-manual/zh.md)。
 
-然后使用 `pyinstaller` 构建项目：
-
-```bash
-pyinstaller ./main.spec
-```
-
-注意 `main.spec` 文件中 `vosk` 库的路径可能不正确，需要根据实际状况配置（与 Python 环境的版本相关）。
-
-```
-# Windows
-vosk_path = str(Path('./.venv/Lib/site-packages/vosk').resolve())
-# Linux or macOS
-vosk_path = str(Path('./.venv/lib/python3.x/site-packages/vosk').resolve())
-```
-
-此时项目构建完成，进入 `engine/dist` 文件夹可见对应的可执行文件。即可进行后续操作。
+`build:engine` 使用 uv 管理的环境运行 PyInstaller，生成单文件引擎：Windows 为 `engine/dist/main.exe`，macOS/Linux 为 `engine/dist/main`。安装包将引擎放在 `resources/engine/main.exe`（Windows）或 `resources/engine/main`（macOS/Linux）。
 
 ### 运行项目
 
 ```bash
 npm run dev
 ```
+
+### 代码检查
+
+在仓库根目录执行：
+
+```bash
+npm run lint
+npm run typecheck
+```
+
+ESLint 检查桌面端 JavaScript、TypeScript 和 Vue 源码及构建配置，跳过构建产物、依赖环境、模型和实验目录；Python 引擎不在 ESLint 检查范围内。
 
 ### 构建项目
 
@@ -266,3 +222,7 @@ npm run build:mac
 # For Linux
 npm run build:linux
 ```
+
+以上安装包命令会先构建字幕引擎，再构建桌面端。必须在目标操作系统上构建相应的安装包；PyInstaller 不支持跨操作系统编译引擎。
+
+GitHub Actions 当前仅检查和发布 Windows/Linux x64，暂时移除 macOS 自动构建。面向 `main` 的 PR 运行代码检查、桌面端构建和测试；推送或合并到 `main` 且 `package.json` 版本号变化时，检查通过后构建 Windows NSIS 安装包（`.exe`）和 Linux 压缩包（`.tar.gz`），两者上传完成后发布 GitHub Release。

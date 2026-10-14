@@ -6,14 +6,13 @@ out
 *.log*
 __pycache__
 .venv
+.uv-cache
 test.py
 
 engine/build
+engine/uv.lock
 engine/portaudio
 engine/pyinstaller_cache
 engine/models
 engine/notebook
 # engine/main.spec
-
-.repomap
-.virtualme

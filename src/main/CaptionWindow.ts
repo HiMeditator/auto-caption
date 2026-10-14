@@ -55,7 +55,7 @@ class CaptionWindow {
     }
   }
 
-  public handleMessage() {
+  public handleMessage(): void {
     ipcMain.on('caption.controlWindow.activate', () => {
       if(!controlWindow.window){
         controlWindow.createWindow()

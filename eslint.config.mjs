@@ -4,9 +4,24 @@ import eslintPluginVue from 'eslint-plugin-vue'
 import vueParser from 'vue-eslint-parser'
 
 export default tseslint.config(
-  { ignores: ['**/node_modules', '**/dist', '**/out'] },
+  {
+    ignores: [
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/out/**',
+      '**/.venv/**',
+      '**/.uv-cache/**',
+      'engine/build/**',
+      'engine/models/**',
+      'engine/notebook/**',
+      'engine/portaudio/**',
+      'engine/pyinstaller_cache/**',
+      '.repomap/**',
+      '.virtualme/**'
+    ]
+  },
   tseslint.configs.recommended,
-  eslintPluginVue.configs['essential'],
+  ...eslintPluginVue.configs['flat/essential'],
   {
     files: ['**/*.vue'],
     languageOptions: {

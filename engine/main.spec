@@ -1,20 +1,13 @@
 # -*- mode: python ; coding: utf-8 -*-
 
 from pathlib import Path
-import sys
+from PyInstaller.utils.hooks import get_package_paths
 
-if sys.platform == 'win32':
-    vosk_path = str(Path('./.venv/Lib/site-packages/vosk').resolve())
-else:
-    venv_lib = Path('./.venv/lib')
-    python_dirs = list(venv_lib.glob('python*'))
-    if python_dirs:
-        vosk_path = str((python_dirs[0] / 'site-packages' / 'vosk').resolve())
-    else:
-        vosk_path = str(Path('./.venv/lib/python3.12/site-packages/vosk').resolve())
+engine_path = Path(SPECPATH)
+_, vosk_path = get_package_paths('vosk')
 
 a = Analysis(
-    ['main.py'],
+    [str(engine_path / 'main.py')],
     pathex=[],
     binaries=[],
     datas=[(vosk_path, 'vosk')],

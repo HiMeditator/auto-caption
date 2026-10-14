@@ -1,4 +1,4 @@
-import { exec, spawn } from 'child_process'
+import { exec, spawn, type ChildProcessWithoutNullStreams } from 'child_process'
 import { app } from 'electron'
 import { is } from '@electron-toolkit/utils'
 import * as path from 'path'
@@ -8,16 +8,37 @@ import { allConfig } from './AllConfig'
 import { i18n } from '../i18n'
 import { Log } from './Log'
 import { passwordMaskingForList } from './UtilsFunc'
+import type { CaptionItem } from '../types'
+
+type EngineMessage =
+  | (CaptionItem & { command: 'caption'; update_by_time?: boolean })
+  | { command: 'translation'; time_s: string; translation: string }
+  | { command: 'connect' | 'kill' | 'print' | 'info' | 'warn' | 'error' | 'usage'; content: string }
 
 export class CaptionEngine {
   appPath: string = ''
   command: string[] = []
-  process: any | undefined
+  process: ChildProcessWithoutNullStreams | undefined
   client: net.Socket | undefined
   port: number = 8080
   status: 'running' | 'starting' | 'stopping' | 'stopped' | 'starting-timeout' = 'stopped'
   timerID: NodeJS.Timeout | undefined
   startTimeoutID: NodeJS.Timeout | undefined
+
+  private addTranslationArguments(): void {
+    const controls = allConfig.controls
+    this.command.push('--translation_provider', controls.translationProvider)
+    if(controls.translationProvider === 'ollama') {
+      this.command.push('--translation_model', controls.ollamaModel)
+    }
+    else if(controls.translationProvider === 'openai') {
+      this.command.push('--translation_model', controls.openaiModel)
+      this.command.push('--translation_base_url', controls.openaiBaseUrl)
+      if(controls.openaiApiKey) {
+        this.command.push('--translation_api_key', controls.openaiApiKey)
+      }
+    }
+  }
 
   private getApp(): boolean {
     if (allConfig.controls.customized) {
@@ -28,10 +49,16 @@ export class CaptionEngine {
       this.command.push('-p', this.port.toString())
     }
     else {
-      if(allConfig.controls.engine === 'gummy' && 
-        !allConfig.controls.API_KEY && !process.env.DASHSCOPE_API_KEY
+      if(['paraformer', 'livetranslate'].includes(allConfig.controls.engine) &&
+        !allConfig.controls.dashscopeApiKey && !process.env.DASHSCOPE_API_KEY
       ) {
-        controlWindow.sendErrorMessage(i18n('gummy.key.missing'))
+        controlWindow.sendErrorMessage(i18n('dashscope.key.missing'))
+        return false
+      }
+      if(allConfig.controls.engine === 'livetranslate' &&
+        !allConfig.controls.dashscopeWorkspaceId && !process.env.DASHSCOPE_WORKSPACE_ID
+      ) {
+        controlWindow.sendErrorMessage(i18n('livetranslate.workspace.missing'))
         return false
       }
       this.command = []
@@ -44,12 +71,11 @@ export class CaptionEngine {
           this.command.push(path.join(
             app.getAppPath(), 'engine', 'main.py'
           ))
-          // this.appPath = path.join(app.getAppPath(), 'engine', 'dist', 'main.exe')
         }
         else {
           this.appPath = path.join(
             app.getAppPath(), 'engine',
-            '.venv', 'bin', 'python3'
+            '.venv', 'bin', 'python'
           )
           this.command.push(path.join(
             app.getAppPath(), 'engine', 'main.py'
@@ -61,7 +87,7 @@ export class CaptionEngine {
           this.appPath = path.join(process.resourcesPath, 'engine', 'main.exe')
         }
         else {
-          this.appPath = path.join(process.resourcesPath, 'engine', 'main', 'main')
+          this.appPath = path.join(process.resourcesPath, 'engine', 'main')
         }
       }
       this.command.push('-a', allConfig.controls.audio ? '1' : '0')
@@ -76,29 +102,31 @@ export class CaptionEngine {
         allConfig.controls.targetLang : 'none'
       )
 
-      if(allConfig.controls.engine === 'gummy') {
-        this.command.push('-e', 'gummy')
+      if(['paraformer', 'livetranslate'].includes(allConfig.controls.engine)) {
+        this.command.push('-e', allConfig.controls.engine)
         this.command.push('-s', allConfig.controls.sourceLang)
-        if(allConfig.controls.API_KEY) {
-          this.command.push('-k', allConfig.controls.API_KEY)
+        if(allConfig.controls.dashscopeApiKey) {
+          this.command.push('--dashscope_api_key', allConfig.controls.dashscopeApiKey)
+        }
+        if(allConfig.controls.engine === 'livetranslate') {
+          this.command.push('--dashscope_region', allConfig.controls.dashscopeRegion)
+          if(allConfig.controls.dashscopeWorkspaceId) {
+            this.command.push('--dashscope_workspace_id', allConfig.controls.dashscopeWorkspaceId)
+          }
+        } else {
+          this.addTranslationArguments()
         }
       }
       else if(allConfig.controls.engine === 'vosk'){
         this.command.push('-e', 'vosk')
         this.command.push('-vosk', `"${allConfig.controls.voskModelPath}"`)
-        this.command.push('-tm', allConfig.controls.transModel)
-        this.command.push('-omn', allConfig.controls.ollamaName)
-        if(allConfig.controls.ollamaUrl) this.command.push('-ourl', allConfig.controls.ollamaUrl)
-        if(allConfig.controls.ollamaApiKey) this.command.push('-okey', allConfig.controls.ollamaApiKey)
+        this.addTranslationArguments()
       }
       else if(allConfig.controls.engine === 'sosv'){
         this.command.push('-e', 'sosv')
         this.command.push('-s', allConfig.controls.sourceLang)
         this.command.push('-sosv', `"${allConfig.controls.sosvModelPath}"`)
-        this.command.push('-tm', allConfig.controls.transModel)
-        this.command.push('-omn', allConfig.controls.ollamaName)
-        if(allConfig.controls.ollamaUrl) this.command.push('-ourl', allConfig.controls.ollamaUrl)
-        if(allConfig.controls.ollamaApiKey) this.command.push('-okey', allConfig.controls.ollamaApiKey)
+        this.addTranslationArguments()
       }
       else if(allConfig.controls.engine === 'glm'){
         this.command.push('-e', 'glm')
@@ -108,10 +136,7 @@ export class CaptionEngine {
         if(allConfig.controls.glmApiKey) {
           this.command.push('-gkey', allConfig.controls.glmApiKey)
         }
-        this.command.push('-tm', allConfig.controls.transModel)
-        this.command.push('-omn', allConfig.controls.ollamaName)
-        if(allConfig.controls.ollamaUrl) this.command.push('-ourl', allConfig.controls.ollamaUrl)
-        if(allConfig.controls.ollamaApiKey) this.command.push('-okey', allConfig.controls.ollamaApiKey)
+        this.addTranslationArguments()
       }
     }
     Log.info('Engine Path:', this.appPath)
@@ -119,7 +144,11 @@ export class CaptionEngine {
     return true
   }
 
-  public connect() {
+  public connect(): void {
+    if(!this.process?.pid) {
+      Log.warn('Caption engine process is not available, ignoring connection request')
+      return
+    }
     if(this.client) { Log.warn('Client already exists, ignoring...') }
     if (this.startTimeoutID) {
       clearTimeout(this.startTimeoutID)
@@ -139,7 +168,7 @@ export class CaptionEngine {
     }
   }
 
-  public sendCommand(command: string, content: string = "") {
+  public sendCommand(command: string, content: string = ""): void {
     if(this.client === undefined) {
       Log.error('Client not initialized yet')
       return
@@ -149,7 +178,7 @@ export class CaptionEngine {
     Log.info(`Send data to python server: ${data}`);
   }
 
-  public start() {
+  public start(): void {
     if (this.status !== 'stopped') {
       Log.warn('Caption engine is not stopped, current status:', this.status)
       return
@@ -170,7 +199,7 @@ export class CaptionEngine {
       }
     }, timeoutMs)
     
-    this.process.stdout.on('data', (data: any) => {
+    this.process.stdout.on('data', (data: Buffer) => {
       const lines = data.toString().split('\n')
       lines.forEach((line: string) => {
         if (line.trim()) {
@@ -185,7 +214,7 @@ export class CaptionEngine {
       });
     });
 
-    this.process.stderr.on('data', (data: any) => {
+    this.process.stderr.on('data', (data: Buffer) => {
       const lines = data.toString().split('\n')
       lines.forEach((line: string) => {
         if(line.trim()){
@@ -194,7 +223,7 @@ export class CaptionEngine {
       })
     });
 
-    this.process.on('close', (code: any) => {
+    this.process.on('close', (code: number | null) => {
       this.process = undefined;
       this.client = undefined
       allConfig.controls.engineEnabled = false
@@ -212,7 +241,7 @@ export class CaptionEngine {
     });
   }
 
-  public stop() {
+  public stop(): void {
     if(this.status !== 'running'){
       Log.warn('Trying to stop engine which is not running, current status:', this.status)
     }
@@ -229,7 +258,7 @@ export class CaptionEngine {
     }, 4000);
   }
 
-  public kill(){
+  public kill(): void {
     if(!this.process || !this.process.pid) return
     if(this.status !== 'running'){
       Log.warn('Trying to kill engine which is not running, current status:', this.status)
@@ -260,7 +289,7 @@ export class CaptionEngine {
   }
 }
 
-function handleEngineData(data: any) {
+function handleEngineData(data: EngineMessage): void {
   if(data.command === 'connect'){
     captionEngine.connect()
   }
@@ -271,7 +300,7 @@ function handleEngineData(data: any) {
     }
   }
   else if(data.command === 'caption') {
-    allConfig.updateCaptionLog(data);
+    allConfig.updateCaptionLog(data, data.update_by_time === true);
   }
   else if(data.command === 'translation') {
     allConfig.updateCaptionTranslation(data);
