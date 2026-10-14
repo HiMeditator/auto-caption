@@ -29,6 +29,8 @@ SOSV 模型下载：[ Shepra-ONNX SenseVoice Model](https://github.com/HiMeditat
 
 ## 📚 相关文档
 
+[字幕引擎独立使用与构建](./engine/README.md)
+
 [Auto Caption 用户手册](./docs/user-manual/zh.md)
 
 [字幕引擎说明文档](./docs/engine-manual/zh.md)
@@ -112,7 +114,7 @@ Qwen LiveTranslate 使用 `qwen3.8-livetranslate-flash-realtime`，在同一个 
 [API / WebSocket](https://help.aliyun.com/zh/model-studio/qwen3-5-livetranslate-flash-realtime)
 
 ```bash
-python main.py -e livetranslate -t zh --dashscope_api_key <api-key> --dashscope_workspace_id <workspace-id> --dashscope_region cn-beijing
+uv run python main.py -e livetranslate -t zh --dashscope_api_key <api-key> --dashscope_workspace_id <workspace-id> --dashscope_region cn-beijing
 ```
 
 ### Paraformer Realtime v2
@@ -146,10 +148,12 @@ API KEY 获取相关链接：[快速开始](https://docs.bigmodel.cn/cn/guide/st
 1. 使用项目字幕引擎部分的源代码，使用安装了对应库的 Python 环境进行运行
 2. 使用打包好的字幕引擎的可执行文件，通过终端运行
 
+源码方式请先安装 uv，进入 `engine` 目录并执行 `uv sync`；下方示例也在此目录运行。打包后的可执行文件无需 uv。
+
 运行参数和详细使用介绍请参考[用户手册](./docs/user-manual/zh.md#单独使用字幕引擎)。
 
 ```bash
-python main.py \
+uv run python main.py \
 -e paraformer \
 --dashscope_api_key sk-******************************** \
 --translation_provider ollama \
@@ -193,49 +197,23 @@ https://docs.bigmodel.cn/cn/guide/models/sound-and-video/glm-asr-2512
 npm install
 ```
 
-### 构建字幕引擎
+### 管理与构建字幕引擎
 
-首先进入 `engine` 文件夹，执行如下指令创建虚拟环境（需要使用大于等于 Python 3.10 的 Python 运行环境，建议使用 Python 3.12）：
-
-```bash
-cd ./engine
-# in ./engine folder
-python -m venv .venv
-# or
-python3 -m venv .venv
-```
-
-然后激活虚拟环境：
+先安装 [uv](https://docs.astral.sh/uv/getting-started/installation/)。引擎依赖声明在 `engine/pyproject.toml`，`engine/uv.lock` 在本地自动生成并由 Git 忽略，不提交；`engine/.python-version` 默认选择 Python 3.12。新克隆环境会重新解析依赖，不同开发者或构建可能使用不同版本。以下命令均在仓库根目录执行：
 
 ```bash
-# Windows
-.venv/Scripts/activate
-# Linux or macOS
-source .venv/bin/activate
+npm run engine:sync
+npm run engine:test
+npm run build:engine
 ```
 
-然后安装依赖（这一步在 macOS 和 Linux 可能会报错，一般是因为构建失败，需要根据报错信息进行处理）：
+`engine:sync` 优先复用锁文件中的版本，依赖配置变化时自动更新锁文件，并创建或同步 `engine/.venv`。环境包含 PyInstaller 开发依赖，无需手动创建或激活。开发版 Electron 直接运行该环境中的 Python；发布版运行打包后的引擎，不需要用户安装 uv 或 Python。
 
-```bash
-pip install -r requirements.txt
-```
+macOS 的 PyAudio 需要 PortAudio（例如使用 `brew install portaudio` 安装）；Linux 的音频采集需要 `pactl` 和 `parec`（Ubuntu 可安装 `pulseaudio-utils`），并需要可用的 PulseAudio 或 PipeWire PulseAudio 兼容服务。其他平台配置见[用户手册](./docs/user-manual/zh.md)。
 
-然后使用 `pyinstaller` 构建项目：
+`build:engine` 使用 uv 管理的环境运行 PyInstaller，生成单文件引擎：Windows 为 `engine/dist/main.exe`，macOS/Linux 为 `engine/dist/main`。Vosk 的依赖路径自动从当前 Python 环境获取，无需修改 `main.spec`。安装包将引擎放在 `resources/engine/main.exe`（Windows）或 `resources/engine/main`（macOS/Linux；macOS 的资源目录是应用内的 `Contents/Resources`）。
 
-```bash
-pyinstaller ./main.spec
-```
-
-注意 `main.spec` 文件中 `vosk` 库的路径可能不正确，需要根据实际状况配置（与 Python 环境的版本相关）。
-
-```
-# Windows
-vosk_path = str(Path('./.venv/Lib/site-packages/vosk').resolve())
-# Linux or macOS
-vosk_path = str(Path('./.venv/lib/python3.x/site-packages/vosk').resolve())
-```
-
-此时项目构建完成，进入 `engine/dist` 文件夹可见对应的可执行文件。即可进行后续操作。
+添加依赖使用 `uv add --project engine <package>`，添加开发依赖使用 `uv add --project engine --dev <package>`；有意更新版本时执行 `uv lock --project engine --upgrade`，再运行 `npm run engine:sync`，依赖声明变化时提交 `pyproject.toml`，不提交本地 `uv.lock`。Sherpa-ONNX 与 `sherpa-onnx-core` 显式固定为匹配版本，以避免源码包元数据遗漏原生运行库；更新时需要同时修改这两个依赖的版本。
 
 ### 运行项目
 
@@ -264,3 +242,5 @@ npm run build:mac
 # For Linux
 npm run build:linux
 ```
+
+以上安装包命令会先构建字幕引擎，再构建桌面端。必须在目标操作系统上构建相应的安装包；PyInstaller 不支持跨操作系统编译引擎。

@@ -43,7 +43,7 @@ Qwen LiveTranslate 使用 `qwen3.8-livetranslate-flash-realtime`，在同一个 
 [API / WebSocket](https://help.aliyun.com/zh/model-studio/qwen3-5-livetranslate-flash-realtime)
 
 ```bash
-python main.py -e livetranslate -t zh --dashscope_api_key <api-key> --dashscope_workspace_id <workspace-id> --dashscope_region cn-beijing
+uv run python main.py -e livetranslate -t zh --dashscope_api_key <api-key> --dashscope_workspace_id <workspace-id> --dashscope_region cn-beijing
 ```
 
 ## GLM 引擎使用前准备
@@ -296,16 +296,22 @@ OpenAI API 兼容服务的基础请求地址，例如 `https://api.openai.com/v1
 
 > 以下内容默认使用该方式的用户对 Python 环境配置和使用有所了解。
 
-首先下载项目源代码到本地，其中字幕引擎源代码在项目的 `engine` 目录下。然后配置 Python 环境，其中项目依赖的 Python 包在 `engine` 目录下 `requirements.txt` 文件中。
+下载项目源代码并安装 [uv](https://docs.astral.sh/uv/getting-started/installation/)，然后进入 `engine` 目录。依赖由 `pyproject.toml` 声明，`uv.lock` 在本地自动生成并由 Git 忽略，默认使用 Python 3.12：
 
-配置好后进入 `engine` 目录，执行命令进行运行字幕引擎。
+```bash
+cd engine
+uv sync
+uv run python main.py --help
+```
+
+无需激活虚拟环境；下列源码命令均在 `engine` 目录使用 `uv run python main.py` 执行。录音所需的平台系统依赖见 README 的引擎构建说明。发布版应用使用内置引擎，不需要安装 uv。
 
 比如要使用 Paraformer 模型，指定音频类型为系统音频输出，源语言为英语，翻译语言为中文，执行的命令如下：
 
 > 注意：为了更直观，下面的命令写在了多行，如果执行失败，尝试去掉反斜杠，并改换单行命令执行。
 
 ```bash
-python main.py \
+uv run python main.py \
 -e paraformer \
 --dashscope_api_key sk-******************************** \
 --translation_provider ollama \
@@ -319,7 +325,7 @@ python main.py \
 指定 Vosk 模型，指定音频类型为系统音频输出，翻译语言为英语，使用 Ollama `qwen3:0.6b` 模型进行翻译：
 
 ```bash
-python main.py \
+uv run python main.py \
 -e vosk \
 -vosk D:\Projects\auto-caption\engine\models\vosk-model-small-cn-0.22 \
 -a 0 \
@@ -332,7 +338,7 @@ python main.py \
 如果改用 OpenAI API 兼容服务，需要明确指定服务类型、模型和 Base URL：
 
 ```bash
-python main.py \
+uv run python main.py \
 -e vosk \
 -vosk D:\Projects\auto-caption\engine\models\vosk-model-small-cn-0.22 \
 -t en \
@@ -345,7 +351,7 @@ python main.py \
 指定 SOSV 模型，指定音频类型为麦克风，自动选择源语言，不翻译，执行的命令如下：
 
 ```bash
-python main.py \
+uv run python main.py \
 -e sosv \
 -sosv D:\\Projects\\auto-caption\\engine\\models\\sosv-int8 \
 -a 1 \
@@ -364,6 +370,6 @@ python main.py \
 
 然后再字幕引擎可执行文件所在目录打开终端，执行命令进行运行字幕引擎。
 
-只需要将上述指令中的 `python main.py` 替换为可执行文件名称即可（比如：`engine-win.exe`）。
+只需要将上述指令中的 `uv run python main.py` 替换为可执行文件名称即可（比如：`engine-win.exe`）。
 
 LiveTranslate CLI：`--dashscope_workspace_id` 指定业务空间 ID（空值时读取环境变量），`--dashscope_region` 指定地域，默认为 `cn-beijing`，也支持 `ap-southeast-1`。`--dashscope_api_key` 与 Paraformer 共用。`-s` 不用于该模型；`-t none` 仅隐藏译文。外部翻译参数不用于 LiveTranslate。

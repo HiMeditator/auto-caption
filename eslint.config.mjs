@@ -10,6 +10,7 @@ export default tseslint.config(
       '**/dist/**',
       '**/out/**',
       '**/.venv/**',
+      '**/.uv-cache/**',
       'engine/build/**',
       'engine/models/**',
       'engine/notebook/**',

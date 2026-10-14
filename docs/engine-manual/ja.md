@@ -173,7 +173,7 @@ if __name__ == "__main__":
 たとえば、このプロジェクトの字幕エンジンでParaformerモデルを使用し、原文を日本語、翻訳を中国語に指定し、システムオーディオ出力の字幕を取得し、毎回0.1秒のオーディオデータをキャプチャする場合、コマンドラインパラメータは以下のようになります：
 
 ```bash
-python main.py -e paraformer -s ja -t zh -a 0 -c 10 --dashscope_api_key <dashscope-api-key> --translation_provider ollama --translation_model qwen2.5:0.5b
+uv run python main.py -e paraformer -s ja -t zh -a 0 -c 10 --dashscope_api_key <dashscope-api-key> --translation_provider ollama --translation_model qwen2.5:0.5b
 ```
 
 ## その他
@@ -195,7 +195,15 @@ python main.py -e paraformer -s ja -t zh -a 0 -c 10 --dashscope_api_key <dashsco
 
 ### パッケージ化
 
-字幕エンジンの開発とテストが完了した後、字幕エンジンを実行可能ファイルにパッケージ化する必要があります。一般的に`pyinstaller`を使用してパッケージ化します。パッケージ化された字幕エンジンファイルの実行でエラーが発生した場合、依存ライブラリが不足している可能性があります。不足している依存ライブラリを確認してください。
+エンジンの依存関係は uv で管理します。`engine/pyproject.toml` は実行時依存と開発依存の PyInstaller、`engine/uv.lock` はローカルで自動生成し、Git の対象外とします。既定の Python は 3.12 です。リポジトリのルートで実行してください：
+
+```bash
+npm run engine:sync
+npm run engine:test
+npm run build:engine
+```
+
+`engine` ディレクトリでは `uv run pyinstaller --noconfirm --clean main.spec` も使用できます。Vosk のパスは現在の環境から自動取得します。生成される単一実行ファイルは Windows が `engine/dist/main.exe`、macOS/Linux が `engine/dist/main` です。配布アプリのリソース内ではそれぞれ `engine/main.exe`、`engine/main` に配置し、メインプロセスの起動パスと一致させます。配布用コマンドはエンジンを先に構築するため、対象の OS 上で実行してください。音声取得のシステム依存は README を参照してください。配布版には uv や Python のインストールは不要です。
 
 ### 実行
 
@@ -212,5 +220,5 @@ Qwen LiveTranslate は `qwen3.8-livetranslate-flash-realtime` を使用し、1�
 [API / WebSocket](https://help.aliyun.com/zh/model-studio/qwen3-5-livetranslate-flash-realtime)
 
 ```bash
-python main.py -e livetranslate -t zh --dashscope_api_key <api-key> --dashscope_workspace_id <workspace-id> --dashscope_region cn-beijing
+uv run python main.py -e livetranslate -t zh --dashscope_api_key <api-key> --dashscope_workspace_id <workspace-id> --dashscope_region cn-beijing
 ```

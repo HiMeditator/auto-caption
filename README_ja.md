@@ -29,6 +29,8 @@ SOSV モデルダウンロード: [Shepra-ONNX SenseVoice Model](https://github.
 
 ## 📚 関連ドキュメント
 
+[字幕エンジンの単独実行と構築（中国語）](./engine/README.md)
+
 [Auto Caption ユーザーマニュアル](./docs/user-manual/ja.md)
 
 [字幕エンジン説明ドキュメント](./docs/engine-manual/ja.md)
@@ -114,7 +116,7 @@ Qwen LiveTranslate は `qwen3.8-livetranslate-flash-realtime` を使用し、1�
 [API / WebSocket](https://help.aliyun.com/zh/model-studio/qwen3-5-livetranslate-flash-realtime)
 
 ```bash
-python main.py -e livetranslate -t zh --dashscope_api_key <api-key> --dashscope_workspace_id <workspace-id> --dashscope_region cn-beijing
+uv run python main.py -e livetranslate -t zh --dashscope_api_key <api-key> --dashscope_workspace_id <workspace-id> --dashscope_region cn-beijing
 ```
 
 ### Paraformer Realtime v2
@@ -148,10 +150,12 @@ SOSVモデルの使用方法はVoskと同じで、ダウンロードアドレス
 1. プロジェクトの字幕エンジン部分のソースコードを使用し、必要なライブラリがインストールされたPython環境で実行する
 2. パッケージ化された字幕エンジンの実行可能ファイルをターミナルから実行する
 
-実行引数および詳細な使用方法については、[User Manual](./docs/user-manual/en.md#using-caption-engine-standalone)をご参照ください。
+ソースから実行する場合は uv をインストールし、`engine` ディレクトリで `uv sync` を実行してください。以下の例もこのディレクトリで実行します。配布用実行ファイルには uv は不要です。
+
+実行引数および詳細な使用方法については、[ユーザーマニュアル](./docs/user-manual/ja.md#ソースコードでエンジンを実行する)をご参照ください。
 
 ```bash
-python main.py \
+uv run python main.py \
 -e paraformer \
 --dashscope_api_key sk-******************************** \
 --translation_provider ollama \
@@ -194,49 +198,23 @@ https://docs.bigmodel.cn/ja/guide/models/sound-and-video/glm-asr-2512
 npm install
 ```
 
-### 字幕エンジンの構築
+### 字幕エンジンの管理と構築
 
-まず `engine` フォルダに入り、以下のコマンドを実行して仮想環境を作成します（Python 3.10 以上が必要で、Python 3.12 が推奨されます）：
-
-```bash
-cd ./engine
-# ./engine フォルダ内
-python -m venv .venv
-# または
-python3 -m venv .venv
-```
-
-次に仮想環境をアクティブにします：
+まず [uv](https://docs.astral.sh/uv/getting-started/installation/) をインストールしてください。依存関係は `engine/pyproject.toml` で宣言します。`engine/uv.lock` はローカルで自動生成され、Git の対象外でありコミットしません。`engine/.python-version` により既定の Python は 3.12 になります。新しくクローンした環境では依存関係を再解決するため、開発者やビルド間でバージョンが異なる場合があります。以下はリポジトリのルートで実行します：
 
 ```bash
-# Windows
-.venv/Scripts/activate
-# Linux または macOS
-source .venv/bin/activate
+npm run engine:sync
+npm run engine:test
+npm run build:engine
 ```
 
-次に依存関係をインストールします（このステップでは macOS と Linux でエラーが発生する可能性があります。通常はビルド失敗によるもので、エラーメッセージに基づいて対処する必要があります）：
+`engine:sync` は既存の固定バージョンを優先し、依存設定の変更時にロックファイルを更新して `engine/.venv` を作成・同期します。開発依存の PyInstaller も含み、仮想環境の手動作成や有効化は不要です。Electron の開発版はこの環境の Python を使用し、配布版は同梱されたエンジンを使用するため、ユーザー側の uv や Python は不要です。
 
-```bash
-pip install -r requirements.txt
-```
+macOS の PyAudio には PortAudio が必要です（例：`brew install portaudio`）。Linux の音声取得には `pactl` と `parec`（Ubuntu では `pulseaudio-utils`）、および動作する PulseAudio または PipeWire の PulseAudio 互換サービスが必要です。その他の設定は[ユーザーマニュアル](./docs/user-manual/ja.md)を参照してください。
 
-その後、`pyinstaller` を使用してプロジェクトをビルドします：
+`build:engine` は uv が管理する環境で PyInstaller を実行し、単一実行ファイルを生成します。Windows は `engine/dist/main.exe`、macOS/Linux は `engine/dist/main` です。Vosk のパスは現在の Python 環境から自動取得するため、`main.spec` の手動修正は不要です。配布アプリ内の配置先は Windows が `resources/engine/main.exe`、macOS/Linux が `resources/engine/main` です（macOS のリソースディレクトリはアプリ内の `Contents/Resources`）。
 
-```bash
-pyinstaller ./main.spec
-```
-
-`main-vosk.spec` ファイル内の `vosk` ライブラリのパスが正しくない可能性があるため、実際の状況（Python 環境のバージョンに関連）に応じて設定する必要があります。
-
-```
-# Windows
-vosk_path = str(Path('./.venv/Lib/site-packages/vosk').resolve())
-# Linux または macOS
-vosk_path = str(Path('./.venv/lib/python3.x/site-packages/vosk').resolve())
-```
-
-これでプロジェクトのビルドが完了し、`engine/dist` フォルダ内に対応する実行可能ファイルが確認できます。その後、次の操作に進むことができます。
+実行時依存の追加は `uv add --project engine <package>`、開発依存の追加は `uv add --project engine --dev <package>` を使用します。意図的に更新する場合は `uv lock --project engine --upgrade`、続いて `npm run engine:sync` を実行し、依存宣言の変更は `pyproject.toml` にコミットし、ローカルの `uv.lock` はコミットしないでください。ソース配布のメタデータでネイティブ依存が省略される問題を避けるため、Sherpa-ONNX と `sherpa-onnx-core` は同じバージョンに固定しています。更新時は両方のバージョンを変更してください。
 
 ### プロジェクト実行
 
@@ -265,3 +243,5 @@ npm run build:mac
 # Linux 用
 npm run build:linux
 ```
+
+これらの配布用コマンドは字幕エンジンを先に構築してからデスクトップアプリを構築します。対象の OS 上で実行してください。PyInstaller は別の OS 向けのクロスコンパイルに対応していません。

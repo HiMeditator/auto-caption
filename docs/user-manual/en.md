@@ -45,7 +45,7 @@ Qwen LiveTranslate uses `qwen3.8-livetranslate-flash-realtime` to stream source 
 [API / WebSocket](https://help.aliyun.com/zh/model-studio/qwen3-5-livetranslate-flash-realtime)
 
 ```bash
-python main.py -e livetranslate -t zh --dashscope_api_key <api-key> --dashscope_workspace_id <workspace-id> --dashscope_region cn-beijing
+uv run python main.py -e livetranslate -t zh --dashscope_api_key <api-key> --dashscope_workspace_id <workspace-id> --dashscope_region cn-beijing
 ```
 
 ## Preparation for GLM Engine
@@ -298,16 +298,22 @@ This only applies to the SOSV model.
 
 > The following content assumes users who use this method have knowledge of Python environment configuration and usage.
 
-First, download the project source code locally. The caption engine source code is located in the  `engine` directory of the project. Then configure the Python environment, where the project dependencies are listed in the `requirements.txt` file in the `engine` directory.
+Download the source code, install [uv](https://docs.astral.sh/uv/getting-started/installation/), and enter the `engine` directory. Dependencies are declared in `pyproject.toml`; `uv.lock` is generated locally and ignored by Git, with Python 3.12 selected by default:
 
-After configuration, enter the `engine` directory and execute commands to run the caption engine.
+```bash
+cd engine
+uv sync
+uv run python main.py --help
+```
+
+No virtual environment activation is required. Run the source commands below from `engine` using `uv run python main.py`. See the README engine build section for platform audio dependencies. The packaged app uses its bundled engine and does not require uv.
 
 For example, to use the Paraformer model, specify audio type as system audio output, source language as English, and target language as Chinese, execute the following command:
 
 > Note: For better visualization, the commands below are written on multiple lines. If execution fails, try removing backslashes and executing as a single line command.
 
 ```bash
-python main.py \
+uv run python main.py \
 -e paraformer \
 --dashscope_api_key sk-******************************** \
 --translation_provider ollama \
@@ -321,7 +327,7 @@ python main.py \
 To specify the Vosk model, audio type as system audio output, translate to English, and use Ollama `qwen3:0.6b` model for translation:
 
 ```bash
-python main.py \
+uv run python main.py \
 -e vosk \
 -vosk D:\Projects\auto-caption\engine\models\vosk-model-small-cn-0.22 \
 -a 0 \
@@ -334,7 +340,7 @@ python main.py \
 To use an OpenAI-compatible service instead, specify the service type, model, and Base URL explicitly:
 
 ```bash
-python main.py \
+uv run python main.py \
 -e vosk \
 -vosk D:\Projects\auto-caption\engine\models\vosk-model-small-cn-0.22 \
 -t en \
@@ -347,7 +353,7 @@ python main.py \
 To specify the SOSV model, audio type as microphone, automatically select source language, and no translation:
 
 ```bash
-python main.py \
+uv run python main.py \
 -e sosv \
 -sosv D:\\Projects\\auto-caption\\engine\\models\\sosv-int8 \
 -a 1 \
@@ -366,6 +372,6 @@ First, download the executable file for your platform from [GitHub Releases](htt
 
 Then open a terminal in the directory containing the caption engine executable file and execute commands to run the caption engine.
 
-Simply replace `python main.py` in the above commands with the executable file name (for example: `engine-win.exe`).
+Simply replace `uv run python main.py` in the above commands with the executable file name (for example: `engine-win.exe`).
 
 LiveTranslate CLI: `--dashscope_workspace_id` specifies the workspace ID (falls back to the environment variable); `--dashscope_region` defaults to `cn-beijing`, also supporting `ap-southeast-1`. `--dashscope_api_key` is shared with Paraformer. `-s` is unused; `-t none` only hides translated text. External translation options do not apply to LiveTranslate.

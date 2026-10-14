@@ -204,7 +204,7 @@ if __name__ == "__main__":
 For example, for this project's caption engine, if I want to use the Paraformer model, specify the original text as Japanese, translate to Chinese, and capture captions from system audio output, with 0.1s audio data segments each time, the command line parameters would be:
 
 ```bash
-python main.py -e paraformer -s ja -t zh -a 0 -c 10 --dashscope_api_key <dashscope-api-key> --translation_provider ollama --translation_model qwen2.5:0.5b
+uv run python main.py -e paraformer -s ja -t zh -a 0 -c 10 --dashscope_api_key <dashscope-api-key> --translation_provider ollama --translation_model qwen2.5:0.5b
 ```
 
 ## Additional Notes  
@@ -226,7 +226,15 @@ Except for audio-to-text conversion and translation, other components (audio acq
 
 ### Packaging  
 
-After development and testing, the caption engine must be packaged into an executable. Typically, `pyinstaller` is used. If the packaged executable reports errors, check for missing dependencies.  
+The engine uses uv: `engine/pyproject.toml` declares runtime dependencies and the PyInstaller development dependency, `engine/uv.lock` is generated locally and ignored by Git, and Python 3.12 is selected by default. Run from the repository root:
+
+```bash
+npm run engine:sync
+npm run engine:test
+npm run build:engine
+```
+
+Alternatively, run `uv run pyinstaller --noconfirm --clean main.spec` from `engine`. The Vosk package path is discovered from the active environment. PyInstaller produces a single file, `engine/dist/main.exe` on Windows or `engine/dist/main` on macOS/Linux. Installers copy it to `engine/main.exe` or `engine/main` inside the resources directory, matching the main process launch path. Installer commands build the engine first and must run on the target OS. See the README for platform audio dependencies. Packaged apps do not require uv or Python.
 
 ### Execution  
 
@@ -243,5 +251,5 @@ Qwen LiveTranslate uses `qwen3.8-livetranslate-flash-realtime` to stream source 
 [API / WebSocket](https://help.aliyun.com/zh/model-studio/qwen3-5-livetranslate-flash-realtime)
 
 ```bash
-python main.py -e livetranslate -t zh --dashscope_api_key <api-key> --dashscope_workspace_id <workspace-id> --dashscope_region cn-beijing
+uv run python main.py -e livetranslate -t zh --dashscope_api_key <api-key> --dashscope_workspace_id <workspace-id> --dashscope_region cn-beijing
 ```

@@ -71,12 +71,11 @@ export class CaptionEngine {
           this.command.push(path.join(
             app.getAppPath(), 'engine', 'main.py'
           ))
-          // this.appPath = path.join(app.getAppPath(), 'engine', 'dist', 'main.exe')
         }
         else {
           this.appPath = path.join(
             app.getAppPath(), 'engine',
-            '.venv', 'bin', 'python3'
+            '.venv', 'bin', 'python'
           )
           this.command.push(path.join(
             app.getAppPath(), 'engine', 'main.py'
@@ -88,7 +87,7 @@ export class CaptionEngine {
           this.appPath = path.join(process.resourcesPath, 'engine', 'main.exe')
         }
         else {
-          this.appPath = path.join(process.resourcesPath, 'engine', 'main', 'main')
+          this.appPath = path.join(process.resourcesPath, 'engine', 'main')
         }
       }
       this.command.push('-a', allConfig.controls.audio ? '1' : '0')

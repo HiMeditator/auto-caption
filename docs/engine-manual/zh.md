@@ -204,7 +204,7 @@ if __name__ == "__main__":
 比如对于本项目的字幕引擎，我想使用 Paraformer 模型，指定原文为日语，翻译为中文，获取系统音频输出的字幕，每次截取 0.1s 的音频数据，那么命令行参数如下：
 
 ```bash
-python main.py -e paraformer -s ja -t zh -a 0 -c 10 --dashscope_api_key <dashscope-api-key> --translation_provider ollama --translation_model qwen2.5:0.5b
+uv run python main.py -e paraformer -s ja -t zh -a 0 -c 10 --dashscope_api_key <dashscope-api-key> --translation_provider ollama --translation_model qwen2.5:0.5b
 ```
 
 ## 其他
@@ -226,7 +226,15 @@ python main.py -e paraformer -s ja -t zh -a 0 -c 10 --dashscope_api_key <dashsco
 
 ### 打包
 
-在完成字幕引擎的开发和测试后，需要将字幕引擎打包成可执行文件。一般使用 `pyinstaller` 进行打包。如果打包好的字幕引擎文件执行报错，可能是打包漏掉了某些依赖库，请检查是否缺少了依赖库。
+引擎使用 uv 管理依赖：`engine/pyproject.toml` 声明运行依赖与 PyInstaller 开发依赖，`engine/uv.lock` 在本地自动生成并由 Git 忽略，默认 Python 为 3.12。在仓库根目录执行：
+
+```bash
+npm run engine:sync
+npm run engine:test
+npm run build:engine
+```
+
+也可在 `engine` 目录执行 `uv run pyinstaller --noconfirm --clean main.spec`。Vosk 路径由当前环境自动发现。PyInstaller 生成单文件 `engine/dist/main.exe`（Windows）或 `engine/dist/main`（macOS/Linux），安装包分别复制至资源目录的 `engine/main.exe` 或 `engine/main`，与主进程启动路径一致。安装包构建命令会自动先构建引擎；必须在目标操作系统上构建。平台音频依赖见三语 README，发布版无需安装 uv 或 Python。
 
 ### 运行
 
@@ -243,5 +251,5 @@ Qwen LiveTranslate 使用 `qwen3.8-livetranslate-flash-realtime`，在同一个 
 [API / WebSocket](https://help.aliyun.com/zh/model-studio/qwen3-5-livetranslate-flash-realtime)
 
 ```bash
-python main.py -e livetranslate -t zh --dashscope_api_key <api-key> --dashscope_workspace_id <workspace-id> --dashscope_region cn-beijing
+uv run python main.py -e livetranslate -t zh --dashscope_api_key <api-key> --dashscope_workspace_id <workspace-id> --dashscope_region cn-beijing
 ```

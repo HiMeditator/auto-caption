@@ -29,6 +29,8 @@ SOSV Model Download: [Shepra-ONNX SenseVoice Model](https://github.com/HiMeditat
 
 ## 📚 Documentation
 
+[Standalone Engine Usage and Build Guide (Chinese)](./engine/README.md)
+
 [Auto Caption User Manual](./docs/user-manual/en.md)
 
 [Caption Engine Documentation](./docs/engine-manual/en.md)
@@ -113,7 +115,7 @@ Qwen LiveTranslate uses `qwen3.8-livetranslate-flash-realtime` to stream source 
 [API / WebSocket](https://help.aliyun.com/zh/model-studio/qwen3-5-livetranslate-flash-realtime)
 
 ```bash
-python main.py -e livetranslate -t zh --dashscope_api_key <api-key> --dashscope_workspace_id <workspace-id> --dashscope_region cn-beijing
+uv run python main.py -e livetranslate -t zh --dashscope_api_key <api-key> --dashscope_workspace_id <workspace-id> --dashscope_region cn-beijing
 ```
 
 ### Paraformer Realtime v2
@@ -147,10 +149,12 @@ Caption engine is developed using Python and packaged as executable files via Py
 1. Use the source code of the project's caption engine part and run it with a Python environment that has the required libraries installed
 2. Run the packaged executable file of the caption engine through the terminal
 
+For source execution, install uv, enter `engine`, and run `uv sync` first. Run the example below in that directory. Packaged executables do not require uv.
+
 For runtime parameters and detailed usage instructions, please refer to the [User Manual](./docs/user-manual/en.md#using-caption-engine-standalone).
 
 ```bash
-python main.py \
+uv run python main.py \
 -e paraformer \
 --dashscope_api_key sk-******************************** \
 --translation_provider ollama \
@@ -193,49 +197,23 @@ Developed based on [vosk-api](https://github.com/alphacep/vosk-api). The advanta
 npm install
 ```
 
-### Build Subtitle Engine
+### Manage and Build the Subtitle Engine
 
-First enter the `engine` folder and execute the following commands to create a virtual environment (requires Python 3.10 or higher, with Python 3.12 recommended):
-
-```bash
-cd ./engine
-# in ./engine folder
-python -m venv .venv
-# or
-python3 -m venv .venv
-```
-
-Then activate the virtual environment:
+Install [uv](https://docs.astral.sh/uv/getting-started/installation/) first. Engine dependencies are declared in `engine/pyproject.toml`. uv generates `engine/uv.lock` locally; Git ignores it. `engine/.python-version` selects Python 3.12 by default. Fresh clones resolve dependencies again, so versions can differ between developers or builds. Run these commands from the repository root:
 
 ```bash
-# Windows
-.venv/Scripts/activate
-# Linux or macOS
-source .venv/bin/activate
+npm run engine:sync
+npm run engine:test
+npm run build:engine
 ```
 
-Then install dependencies (this step might result in errors on macOS and Linux, usually due to build failures, and you need to handle them based on the error messages):
+`engine:sync` prefers existing locked versions, updates the lockfile when dependency configuration changes, and creates or synchronizes `engine/.venv`, including PyInstaller. No manual environment creation or activation is needed. Electron development mode uses Python in this environment; the packaged app uses the bundled engine and does not require uv or Python on the user's machine.
 
-```bash
-pip install -r requirements.txt
-```
+On macOS, PyAudio requires PortAudio (for example, `brew install portaudio`). Linux audio capture requires `pactl` and `parec` (`pulseaudio-utils` on Ubuntu) and a working PulseAudio server or PipeWire PulseAudio compatibility service. See the [user manual](./docs/user-manual/en.md) for other platform settings.
 
-Then use `pyinstaller` to build the project:
+`build:engine` runs PyInstaller in the uv-managed environment and produces a single executable: `engine/dist/main.exe` on Windows or `engine/dist/main` on macOS/Linux. The Vosk package path is discovered from the current Python environment; no manual edits to `main.spec` are needed. Installers copy the executable to `resources/engine/main.exe` on Windows or `resources/engine/main` on macOS/Linux (the macOS resources directory is `Contents/Resources` inside the app).
 
-```bash
-pyinstaller ./main.spec
-```
-
-Note that the path to the `vosk` library in `main-vosk.spec` might be incorrect and needs to be configured according to the actual situation (related to the version of the Python environment).
-
-```
-# Windows
-vosk_path = str(Path('./.venv/Lib/site-packages/vosk').resolve())
-# Linux or macOS
-vosk_path = str(Path('./.venv/lib/python3.x/site-packages/vosk').resolve())
-```
-
-After the build completes, you can find the executable file in the `engine/dist` folder. Then proceed with subsequent operations.
+Use `uv add --project engine <package>` for runtime dependencies and `uv add --project engine --dev <package>` for development dependencies. For intentional upgrades, run `uv lock --project engine --upgrade`, followed by `npm run engine:sync`, and commit dependency declaration changes in `pyproject.toml`; do not commit the local `uv.lock`. Sherpa-ONNX and `sherpa-onnx-core` are explicitly pinned to matching versions because source package metadata can omit the native runtime dependency; update both version pins together.
 
 ### Run Project
 
@@ -264,3 +242,5 @@ npm run build:mac
 # For Linux
 npm run build:linux
 ```
+
+These installer commands build the engine before the desktop app. Run each command on its target operating system; PyInstaller does not cross-compile the engine for another OS.

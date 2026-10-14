@@ -45,7 +45,7 @@ Qwen LiveTranslate は `qwen3.8-livetranslate-flash-realtime` を使用し、1�
 [API / WebSocket](https://help.aliyun.com/zh/model-studio/qwen3-5-livetranslate-flash-realtime)
 
 ```bash
-python main.py -e livetranslate -t zh --dashscope_api_key <api-key> --dashscope_workspace_id <workspace-id> --dashscope_region cn-beijing
+uv run python main.py -e livetranslate -t zh --dashscope_api_key <api-key> --dashscope_workspace_id <workspace-id> --dashscope_region cn-beijing
 ```
 
 ## GLM エンジン使用前の準備
@@ -156,3 +156,15 @@ sudo yum install pulseaudio pavucontrol
 開発者の方で、カスタム字幕エンジンを開発したい場合は、[字幕エンジン説明文書](../engine-manual/ja.md)をご覧ください。
 
 LiveTranslate CLI：`--dashscope_workspace_id` は業務スペース ID（省略時は環境変数）、`--dashscope_region` はリージョン（既定値 `cn-beijing`、`ap-southeast-1` も対応）です。`--dashscope_api_key` は Paraformer と共通です。`-s` は使用せず、`-t none` は訳文の非表示のみです。外部翻訳パラメータは使用しません。
+
+## ソースコードでエンジンを実行する
+
+[uv](https://docs.astral.sh/uv/getting-started/installation/) をインストールし、リポジトリの `engine` ディレクトリで実行します。依存関係は `pyproject.toml` で宣言し、`uv.lock` はローカルで自動生成して Git の対象外とし、既定の Python は 3.12 です。
+
+```bash
+cd engine
+uv sync
+uv run python main.py --help
+```
+
+仮想環境の有効化は不要です。認識エンジン、API Key、音声入力、翻訳などの引数を `main.py` の後に指定してください。音声取得のシステム依存は README を参照してください。配布版アプリは同梱された実行ファイルを起動するため、uv や Python のインストールは不要です。自分で構築した単一実行ファイルは Windows が `main.exe`、macOS/Linux が `main` です。

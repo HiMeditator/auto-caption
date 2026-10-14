@@ -1,5 +1,6 @@
 out
 dist
+.uv-cache
 pnpm-lock.yaml
 LICENSE.md
 tsconfig.json
